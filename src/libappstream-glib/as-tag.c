@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2017 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -35,7 +35,6 @@
 
 #include "as-tag.h"
 
-const struct tag_data *_as_tag_from_gperf (const char *tag, GPERF_LEN_TYPE etag);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
@@ -81,7 +80,7 @@ as_tag_from_string_full (const gchar *tag, AsTagFlags flags)
 		return AS_TAG_UNKNOWN;
 
 	/* use a perfect hash */
-	ky = _as_tag_from_gperf (tag, (GPERF_LEN_TYPE) strlen (tag));
+	ky = _as_tag_from_gperf (tag, strlen (tag));
 	if (ky != NULL)
 		etag = ky->etag;
 
@@ -190,6 +189,9 @@ as_tag_to_string (AsTag tag)
 		"suggests",
 		"requires",
 		"custom",
+		"launchable",
+		"agreement",
+		"agreement_section",
 		NULL };
 	if (tag > AS_TAG_LAST)
 		tag = AS_TAG_LAST;

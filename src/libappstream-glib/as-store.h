@@ -177,7 +177,7 @@ gboolean	 as_store_from_xml		(AsStore	*store,
 						 const gchar	*icon_root,
 						 GError		**error);
 gboolean	 as_store_load			(AsStore	*store,
-						 AsStoreLoadFlags flags,
+						 guint32	 flags,
 						 GCancellable	*cancellable,
 						 GError		**error);
 gboolean	 as_store_load_path		(AsStore	*store,
@@ -186,10 +186,13 @@ gboolean	 as_store_load_path		(AsStore	*store,
 						 GError		**error);
 void		 as_store_load_search_cache	(AsStore	*store);
 void		 as_store_set_search_match	(AsStore	*store,
-						 AsAppSearchMatch search_match);
+						 guint16	 search_match);
+guint16		 as_store_get_search_match	(AsStore	*store);
 void		 as_store_remove_all		(AsStore	*store);
 GPtrArray	*as_store_get_apps		(AsStore	*store);
 GPtrArray	*as_store_get_apps_by_id	(AsStore	*store,
+						 const gchar	*id);
+GPtrArray	*as_store_get_apps_by_id_merge	(AsStore	*store,
 						 const gchar	*id);
 GPtrArray	*as_store_get_apps_by_metadata	(AsStore	*store,
 						 const gchar	*key,
@@ -198,7 +201,7 @@ AsApp		*as_store_get_app_by_id		(AsStore	*store,
 						 const gchar	*id);
 AsApp		*as_store_get_app_by_unique_id	(AsStore	*store,
 						 const gchar	*unique_id,
-						 AsStoreSearchFlags search_flags);
+						 guint32	 search_flags);
 AsApp		*as_store_get_app_by_id_ignore_prefix
 						(AsStore	*store,
 						 const gchar	*id);
@@ -211,6 +214,12 @@ AsApp		*as_store_get_app_by_pkgnames	(AsStore	*store,
 AsApp		*as_store_get_app_by_provide	(AsStore	*store,
 						 AsProvideKind	 kind,
 						 const gchar	*value);
+AsApp		*as_store_get_app_by_launchable	(AsStore	*store,
+						 AsLaunchableKind kind,
+						 const gchar	*value);
+GPtrArray	*as_store_get_apps_by_provide	(AsStore	*store,
+						 AsProvideKind	 kind,
+						 const gchar	*value);
 void		 as_store_add_app		(AsStore	*store,
 						 AsApp		*app);
 void		 as_store_add_apps		(AsStore	*store,
@@ -221,10 +230,10 @@ void		 as_store_remove_app_by_id	(AsStore	*store,
 						 const gchar	*id);
 void		 as_store_remove_apps_with_veto	(AsStore	*store);
 GString		*as_store_to_xml		(AsStore	*store,
-						 AsNodeToXmlFlags flags);
+						 guint32	 flags);
 gboolean	 as_store_to_file		(AsStore	*store,
 						 GFile		*file,
-						 AsNodeToXmlFlags flags,
+						 guint32	 flags,
 						 GCancellable	*cancellable,
 						 GError		**error);
 gboolean	 as_store_convert_icons		(AsStore	*store,
@@ -242,14 +251,14 @@ void		 as_store_set_destdir		(AsStore	*store,
 gdouble		 as_store_get_api_version	(AsStore	*store);
 void		 as_store_set_api_version	(AsStore	*store,
 						 gdouble	 api_version);
-AsStoreAddFlags	 as_store_get_add_flags		(AsStore	*store);
+guint32		 as_store_get_add_flags		(AsStore	*store);
 void		 as_store_set_add_flags		(AsStore	*store,
-						 AsStoreAddFlags add_flags);
-AsStoreWatchFlags as_store_get_watch_flags	(AsStore	*store);
+						 guint32	 add_flags);
+guint32		 as_store_get_watch_flags	(AsStore	*store);
 void		 as_store_set_watch_flags	(AsStore	*store,
-						 AsStoreWatchFlags watch_flags);
+						 guint32	 watch_flags);
 GPtrArray	*as_store_validate		(AsStore	*store,
-						 AsAppValidateFlags flags,
+						 guint32	 flags,
 						 GError		**error);
 void		 as_store_add_metadata_index	(AsStore	*store,
 						 const gchar	*key);

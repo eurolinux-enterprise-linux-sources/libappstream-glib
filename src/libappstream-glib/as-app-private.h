@@ -55,6 +55,9 @@ G_BEGIN_DECLS
  * @AS_APP_PROBLEM_EXPECTED_CHILDREN:		Children tags expected
  * @AS_APP_PROBLEM_INVALID_KEYWORDS:		One or more keywords was invalid
  * @AS_APP_PROBLEM_DUPLICATE_RELEASE:		More than one release with the same version
+ * @AS_APP_PROBLEM_DUPLICATE_SCREENSHOT:	More than one screenshot with the same URL
+ * @AS_APP_PROBLEM_DUPLICATE_CONTENT_RATING:	More than one content rating with the same kind
+ * @AS_APP_PROBLEM_DUPLICATE_AGREEMENT:		More than one agreement with the same kind
  *
  * The application problems detected when loading.
  **/
@@ -78,6 +81,9 @@ typedef enum {
 	AS_APP_PROBLEM_EXPECTED_CHILDREN	= 1 << 15,
 	AS_APP_PROBLEM_INVALID_KEYWORDS		= 1 << 16,
 	AS_APP_PROBLEM_DUPLICATE_RELEASE	= 1 << 17,
+	AS_APP_PROBLEM_DUPLICATE_SCREENSHOT	= 1 << 18,
+	AS_APP_PROBLEM_DUPLICATE_CONTENT_RATING	= 1 << 19,
+	AS_APP_PROBLEM_DUPLICATE_AGREEMENT	= 1 << 20,
 	/*< private >*/
 	AS_APP_PROBLEM_LAST
 } AsAppProblems;
@@ -119,8 +125,6 @@ void		 as_app_set_stemmer		(AsApp		*app,
 						 AsStemmer	*stemmer);
 void		 as_app_set_search_blacklist	(AsApp		*app,
 						 GHashTable	*search_blacklist);
-void		 as_app_set_search_match	(AsApp		*app,
-						 AsAppSearchMatch search_match);
 
 G_END_DECLS
 

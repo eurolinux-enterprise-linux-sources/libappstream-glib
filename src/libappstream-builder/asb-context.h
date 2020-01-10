@@ -51,7 +51,7 @@ struct _AsbContextClass
  * @ASB_CONTEXT_FLAG_NONE:			No special actions to use
  * @ASB_CONTEXT_FLAG_IGNORE_MISSING_INFO:	Ignore missing information
  * @ASB_CONTEXT_FLAG_IGNORE_MISSING_PARENTS:	Ignore missing parents
- * @ASB_CONTEXT_FLAG_ADD_CACHE_ID:		Add cache ID to reuse metadata
+ * @ASB_CONTEXT_FLAG_ADD_CACHE_ID:		Unused
  * @ASB_CONTEXT_FLAG_HIDPI_ICONS:		Include HiDPI icons
  * @ASB_CONTEXT_FLAG_EMBEDDED_ICONS:		Embed the icons in the XML
  * @ASB_CONTEXT_FLAG_NO_NETWORK:		Do not download files
@@ -62,6 +62,7 @@ struct _AsbContextClass
  * @ASB_CONTEXT_FLAG_IGNORE_LEGACY_ICONS:	Include apps that use legacy icon formats
  * @ASB_CONTEXT_FLAG_IGNORE_SETTINGS:		Include apps that are marked as settings
  * @ASB_CONTEXT_FLAG_USE_FALLBACKS:		Fall back to suboptimal data where required
+ * @ASB_CONTEXT_FLAG_ADD_DEFAULT_ICONS:		Add artificial icons and categories where required
  *
  * The flags to use when processing the context.
  **/
@@ -80,6 +81,7 @@ typedef enum {
 	ASB_CONTEXT_FLAG_IGNORE_LEGACY_ICONS	= 1 << 9,	/* Since: 0.4.1 */
 	ASB_CONTEXT_FLAG_IGNORE_SETTINGS	= 1 << 10,	/* Since: 0.4.1 */
 	ASB_CONTEXT_FLAG_USE_FALLBACKS		= 1 << 11,	/* Since: 0.4.1 */
+	ASB_CONTEXT_FLAG_ADD_DEFAULT_ICONS	= 1 << 12,	/* Since: 0.4.1 */
 	/*< private >*/
 	ASB_CONTEXT_FLAG_LAST,
 } AsbContextFlags;

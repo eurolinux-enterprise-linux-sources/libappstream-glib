@@ -394,6 +394,17 @@ as_utils_spdx_license_tokenize_drop (AsUtilsSpdxHelper *helper)
 	g_string_truncate (helper->collect, 0);
 }
 
+/* SPDX decided to rename some of the really common license IDs in v3
+ * which broke a lot of tools that we cannot really fix now */
+static GString *
+as_utils_spdx_license_3to2 (const gchar *license3)
+{
+	GString *license2 = g_string_new (license3);
+	as_utils_string_replace (license2, "-only", "");
+	as_utils_string_replace (license2, "-or-later", "+");
+	return license2;
+}
+
 /**
  * as_utils_spdx_license_tokenize:
  * @license: a license string, e.g. "LGPLv2+ and (QPL or GPLv2) and MIT"
@@ -411,32 +422,36 @@ as_utils_spdx_license_tokenize_drop (AsUtilsSpdxHelper *helper)
 gchar **
 as_utils_spdx_license_tokenize (const gchar *license)
 {
-	guint i;
 	AsUtilsSpdxHelper helper;
+	g_autoptr(GString) license2 = NULL;
 
 	/* handle invalid */
 	if (license == NULL)
 		return NULL;
 
+	/* SPDX broke the world with v3 */
+	license2 = as_utils_spdx_license_3to2 (license);
+
 	helper.last_token_literal = FALSE;
 	helper.collect = g_string_new ("");
 	helper.array = g_ptr_array_new_with_free_func (g_free);
-	for (i = 0; license[i] != '\0'; i++) {
+	for (guint i = 0; i < license2->len; i++) {
 
 		/* handle brackets */
-		if (license[i] == '(' || license[i] == ')') {
+		const gchar tmp = license2->str[i];
+		if (tmp == '(' || tmp == ')') {
 			as_utils_spdx_license_tokenize_drop (&helper);
-			g_ptr_array_add (helper.array, g_strdup_printf ("%c", license[i]));
+			g_ptr_array_add (helper.array, g_strdup_printf ("%c", tmp));
 			helper.last_token_literal = FALSE;
 			continue;
 		}
 
 		/* space, so dump queue */
-		if (license[i] == ' ') {
+		if (tmp == ' ') {
 			as_utils_spdx_license_tokenize_drop (&helper);
 			continue;
 		}
-		g_string_append_c (helper.collect, license[i]);
+		g_string_append_c (helper.collect, tmp);
 	}
 
 	/* dump anything remaining */
@@ -1060,7 +1075,8 @@ as_utils_install_icon (AsUtilsLocation location,
 		g_set_error (error,
 			     AS_UTILS_ERROR,
 			     AS_UTILS_ERROR_FAILED,
-			     "Cannot open: %s",
+			     "Cannot open %s: %s",
+			     filename,
 			     archive_error_string (arch));
 		goto out;
 	}
@@ -1352,10 +1368,6 @@ as_utils_search_tokenize (const gchar *search)
 gint
 as_utils_vercmp (const gchar *version_a, const gchar *version_b)
 {
-	gchar *endptr;
-	gint64 ver_a;
-	gint64 ver_b;
-	guint i;
 	guint longest_split;
 	g_autofree gchar *str_a = NULL;
 	g_autofree gchar *str_b = NULL;
@@ -1376,7 +1388,11 @@ as_utils_vercmp (const gchar *version_a, const gchar *version_b)
 	split_a = g_strsplit (str_a, ".", -1);
 	split_b = g_strsplit (str_b, ".", -1);
 	longest_split = MAX (g_strv_length (split_a), g_strv_length (split_b));
-	for (i = 0; i < longest_split; i++) {
+	for (guint i = 0; i < longest_split; i++) {
+		gchar *endptr_a = NULL;
+		gchar *endptr_b = NULL;
+		gint64 ver_a;
+		gint64 ver_b;
 
 		/* we lost or gained a dot */
 		if (split_a[i] == NULL)
@@ -1385,20 +1401,22 @@ as_utils_vercmp (const gchar *version_a, const gchar *version_b)
 			return 1;
 
 		/* compare integers */
-		ver_a = g_ascii_strtoll (split_a[i], &endptr, 10);
-		if (endptr != NULL && endptr[0] != '\0')
-			return G_MAXINT;
-		if (ver_a < 0)
-			return G_MAXINT;
-		ver_b = g_ascii_strtoll (split_b[i], &endptr, 10);
-		if (endptr != NULL && endptr[0] != '\0')
-			return G_MAXINT;
-		if (ver_b < 0)
-			return G_MAXINT;
+		ver_a = g_ascii_strtoll (split_a[i], &endptr_a, 10);
+		ver_b = g_ascii_strtoll (split_b[i], &endptr_b, 10);
 		if (ver_a < ver_b)
 			return -1;
 		if (ver_a > ver_b)
 			return 1;
+
+		/* compare strings */
+		if ((endptr_a != NULL && endptr_a[0] != '\0') ||
+		    (endptr_b != NULL && endptr_b[0] != '\0')) {
+			gint rc = g_strcmp0 (endptr_a, endptr_b);
+			if (rc < 0)
+				return -1;
+			if (rc > 0)
+				return 1;
+		}
 	}
 
 	/* we really shouldn't get here */
@@ -1425,6 +1443,70 @@ as_ptr_array_find_string (GPtrArray *array, const gchar *value)
 			return tmp;
 	}
 	return NULL;
+}
+
+/**
+ * as_utils_guid_from_data:
+ * @namespace_id: A namespace ID, e.g. "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+ * @data: data to hash
+ * @data_len: length of @data
+ * @error: A #GError or %NULL
+ *
+ * Returns a GUID for some data. This uses a hash and so even small
+ * differences in the @data will produce radically different return values.
+ *
+ * The implementation is taken from RFC4122, Section 4.1.3; specifically
+ * using a type-5 SHA-1 hash.
+ *
+ * Returns: A new GUID, or %NULL if the namespace_id was invalid
+ *
+ * Since: 0.6.13
+ **/
+gchar *
+as_utils_guid_from_data (const gchar *namespace_id,
+			 const guint8 *data,
+			 gsize data_len,
+			 GError **error)
+{
+	gchar guid_new[37]; /* 36 plus NUL */
+	gsize digestlen = 20;
+	guint8 hash[20];
+	gint rc;
+	uuid_t uu_namespace;
+	uuid_t uu_new;
+	g_autoptr(GChecksum) csum = NULL;
+
+	g_return_val_if_fail (namespace_id != NULL, FALSE);
+	g_return_val_if_fail (data != NULL, FALSE);
+	g_return_val_if_fail (data_len != 0, FALSE);
+
+	/* convert the namespace to binary */
+	rc = uuid_parse (namespace_id, uu_namespace);
+	if (rc != 0) {
+		g_set_error (error,
+			     AS_UTILS_ERROR,
+			     AS_UTILS_ERROR_FAILED,
+			     "namespace '%s' is invalid",
+			     namespace_id);
+		return FALSE;
+	}
+
+	/* hash the namespace and then the string */
+	csum = g_checksum_new (G_CHECKSUM_SHA1);
+	g_checksum_update (csum, (guchar *) uu_namespace, 16);
+	g_checksum_update (csum, (guchar *) data, (gssize) data_len);
+	g_checksum_get_digest (csum, hash, &digestlen);
+
+	/* copy most parts of the hash 1:1 */
+	memcpy (uu_new, hash, 16);
+
+	/* set specific bits according to Section 4.1.3 */
+	uu_new[6] = (guint8) ((uu_new[6] & 0x0f) | (5 << 4));
+	uu_new[8] = (guint8) ((uu_new[8] & 0x3f) | 0x80);
+
+	/* return as a string */
+	uuid_unparse (uu_new, guid_new);
+	return g_strdup (guid_new);
 }
 
 /**
@@ -1470,40 +1552,13 @@ as_utils_guid_is_valid (const gchar *guid)
 gchar *
 as_utils_guid_from_string (const gchar *str)
 {
-	const gchar *namespace_id = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
-	gchar guid_new[37]; /* 36 plus NUL */
-	gsize digestlen = 20;
-	guint8 hash[20];
-	gint rc;
-	uuid_t uu_namespace;
-	uuid_t uu_new;
-	g_autoptr(GChecksum) csum = NULL;
-
-	/* invalid */
 	if (str == NULL)
 		return NULL;
-
-	/* convert the namespace to binary */
-	rc = uuid_parse (namespace_id, uu_namespace);
-	g_assert (rc == 0);
-
-	/* hash the namespace and then the string */
-	csum = g_checksum_new (G_CHECKSUM_SHA1);
-	g_checksum_update (csum, (guchar *) uu_namespace, 16);
-	g_checksum_update (csum, (guchar *) str, (gssize) strlen (str));
-	g_checksum_get_digest (csum, hash, &digestlen);
-
-	/* copy most parts of the hash 1:1 */
-	memcpy(uu_new, hash, 16);
-
-	/* set specific bits according to Section 4.1.3 */
-	uu_new[6] = (guint8) ((uu_new[6] & 0x0f) | (5 << 4));
-	uu_new[8] = (guint8) ((uu_new[8] & 0x3f) | 0x80);
-
-	/* return as a string */
-	uuid_unparse (uu_new, guid_new);
-	return g_strdup (guid_new);
+	return as_utils_guid_from_data ("6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+					(const guint8 *) str, strlen (str), NULL);
 }
+
+#define AS_UTILS_DECODE_BCD(val)	((((val) >> 4) & 0x0f) * 10 + ((val) & 0x0f))
 
 /**
  * as_utils_version_from_uint32:
@@ -1546,6 +1601,11 @@ as_utils_version_from_uint32 (guint32 val, AsVersionParseFlag flags)
 gchar *
 as_utils_version_from_uint16 (guint16 val, AsVersionParseFlag flags)
 {
+	if (flags & AS_VERSION_PARSE_FLAG_USE_BCD) {
+		return g_strdup_printf ("%u.%u",
+					AS_UTILS_DECODE_BCD(val >> 8),
+					AS_UTILS_DECODE_BCD(val));
+	}
 	return g_strdup_printf ("%u.%u",
 				(guint) (val >> 8) & 0xff,
 				(guint) val & 0xff);
@@ -1573,6 +1633,7 @@ as_utils_version_from_uint16 (guint16 val, AsVersionParseFlag flags)
 gchar *
 as_utils_version_parse (const gchar *version)
 {
+	const gchar *version_noprefix = version;
 	gchar *endptr = NULL;
 	guint64 tmp;
 	guint base;
@@ -1589,7 +1650,7 @@ as_utils_version_parse (const gchar *version)
 
 	/* convert 0x prefixed strings to dotted decimal */
 	if (g_str_has_prefix (version, "0x")) {
-		version += 2;
+		version_noprefix += 2;
 		base = 16;
 	} else {
 		/* for non-numeric content, just return the string */
@@ -1601,10 +1662,10 @@ as_utils_version_parse (const gchar *version)
 	}
 
 	/* convert */
-	tmp = g_ascii_strtoull (version, &endptr, base);
+	tmp = g_ascii_strtoull (version_noprefix, &endptr, base);
 	if (endptr != NULL && endptr[0] != '\0')
 		return g_strdup (version);
-	if (tmp == 0 || tmp < 0xff)
+	if (tmp == 0)
 		return g_strdup (version);
 	return as_utils_version_from_uint32 ((guint32) tmp, AS_VERSION_PARSE_FLAG_USE_TRIPLET);
 }
@@ -1802,20 +1863,23 @@ as_utils_unique_id_is_wildcard_part (const gchar *str, guint len)
 }
 
 /**
- * as_utils_unique_id_equal:
+ * as_utils_unique_id_match:
  * @unique_id1: a unique ID
  * @unique_id2: another unique ID
+ * @match_flags: a #AsUniqueIdMatchFlags bitfield, e.g. %AS_UNIQUE_ID_MATCH_FLAG_ID
  *
- * Checks two unique IDs for equality allowing globs to match.
+ * Checks two unique IDs for equality allowing globs to match, whilst also
+ * allowing clients to whitelist sections that have to match.
  *
  * Returns: %TRUE if the ID's should be considered equal.
  *
- * Since: 0.6.1
+ * Since: 0.7.8
  */
 gboolean
-as_utils_unique_id_equal (const gchar *unique_id1, const gchar *unique_id2)
+as_utils_unique_id_match (const gchar *unique_id1,
+			  const gchar *unique_id2,
+			  AsUniqueIdMatchFlags match_flags)
 {
-	guint i;
 	guint last1 = 0;
 	guint last2 = 0;
 	guint len1;
@@ -1831,7 +1895,7 @@ as_utils_unique_id_equal (const gchar *unique_id1, const gchar *unique_id2)
 		return g_strcmp0 (unique_id1, unique_id2) == 0;
 
 	/* look at each part */
-	for (i = 0; i < AS_UTILS_UNIQUE_ID_PARTS; i++) {
+	for (guint i = 0; i < AS_UTILS_UNIQUE_ID_PARTS; i++) {
 		const gchar *tmp1 = unique_id1 + last1;
 		const gchar *tmp2 = unique_id2 + last2;
 
@@ -1840,7 +1904,8 @@ as_utils_unique_id_equal (const gchar *unique_id1, const gchar *unique_id2)
 		len2 = as_utils_unique_id_find_part (tmp2);
 
 		/* either string was a wildcard */
-		if (!as_utils_unique_id_is_wildcard_part (tmp1, len1) &&
+		if (match_flags & (1 << i) &&
+		    !as_utils_unique_id_is_wildcard_part (tmp1, len1) &&
 		    !as_utils_unique_id_is_wildcard_part (tmp2, len2)) {
 			/* are substrings the same */
 			if (len1 != len2)
@@ -1854,6 +1919,30 @@ as_utils_unique_id_equal (const gchar *unique_id1, const gchar *unique_id2)
 		last2 += len2 + 1;
 	}
 	return TRUE;
+}
+
+/**
+ * as_utils_unique_id_equal:
+ * @unique_id1: a unique ID
+ * @unique_id2: another unique ID
+ *
+ * Checks two unique IDs for equality allowing globs to match.
+ *
+ * Returns: %TRUE if the ID's should be considered equal.
+ *
+ * Since: 0.6.1
+ */
+gboolean
+as_utils_unique_id_equal (const gchar *unique_id1, const gchar *unique_id2)
+{
+	return as_utils_unique_id_match (unique_id1,
+					 unique_id2,
+					 AS_UNIQUE_ID_MATCH_FLAG_SCOPE |
+					 AS_UNIQUE_ID_MATCH_FLAG_BUNDLE_KIND |
+					 AS_UNIQUE_ID_MATCH_FLAG_ORIGIN |
+					 AS_UNIQUE_ID_MATCH_FLAG_KIND |
+					 AS_UNIQUE_ID_MATCH_FLAG_ID |
+					 AS_UNIQUE_ID_MATCH_FLAG_BRANCH);
 }
 
 /**

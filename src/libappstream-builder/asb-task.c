@@ -301,7 +301,7 @@ asb_task_explode_extra_packages (AsbTask *task, GError **error)
 /**
  * asb_task_process:
  * @task: A #AsbTask
- * @error_not_used: A #GError or %NULL
+ * @error: A #GError or %NULL
  *
  * Processes the task.
  *
@@ -310,20 +310,17 @@ asb_task_explode_extra_packages (AsbTask *task, GError **error)
  * Since: 0.1.0
  **/
 gboolean
-asb_task_process (AsbTask *task, GError **error_not_used)
+asb_task_process (AsbTask *task, GError **error)
 {
 	AsRelease *release;
 	AsbApp *app;
 	AsbPlugin *plugin = NULL;
 	AsbTaskPrivate *priv = GET_PRIVATE (task);
 	GList *apps = NULL;
-	GList *l;
 	GPtrArray *array;
 	gboolean ret;
-	gchar *cache_id;
 	guint i;
 	guint nr_added = 0;
-	g_autoptr(GError) error = NULL;
 	g_autofree gchar *basename = NULL;
 
 	/* reset the profile timer */
@@ -332,7 +329,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 	/* ensure nevra read */
 	if (!asb_package_ensure (priv->pkg,
 				 ASB_PACKAGE_ENSURE_NEVRA,
-				 error_not_used))
+				 error))
 		return FALSE;
 
 	g_debug ("starting: %s", asb_package_get_name (priv->pkg));
@@ -343,13 +340,10 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 		GPtrArray *apps_tmp;
 		g_autoptr(AsStore) store = as_store_new ();
 		g_autoptr(GFile) file = g_file_new_for_path (priv->filename);
-		if (!as_store_from_file (store, file, NULL, NULL, &error)) {
-			asb_package_log (priv->pkg,
-					 ASB_PACKAGE_LOG_LEVEL_WARNING,
-					 "Failed to parse %s: %s",
-					 asb_package_get_filename (priv->pkg),
-					 error->message);
-			return TRUE;
+		if (!as_store_from_file (store, file, NULL, NULL, error)) {
+			g_prefix_error (error, "Failed to parse %s: ",
+					asb_package_get_filename (priv->pkg));
+			return FALSE;
 		}
 		apps_tmp = as_store_get_apps (store);
 		for (i = 0; i < apps_tmp->len; i++) {
@@ -358,15 +352,6 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 			app2 = asb_app_new (priv->pkg, as_app_get_id (app_tmp));
 			as_app_subsume (AS_APP (app2), app_tmp);
 			asb_context_add_app (priv->ctx, app2);
-
-			/* set cache-id in case we want to use the metadata directly */
-			if (asb_context_get_flag (priv->ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID)) {
-				cache_id = asb_utils_get_cache_id_for_filename (priv->filename);
-				as_app_add_metadata (AS_APP (app2),
-						     "X-CacheID",
-						     cache_id);
-				g_free (cache_id);
-			}
 			nr_added++;
 		}
 		g_debug ("added %u apps from archive", apps_tmp->len);
@@ -376,7 +361,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 	/* ensure file list read */
 	if (!asb_package_ensure (priv->pkg,
 				 ASB_PACKAGE_ENSURE_FILES,
-				 error_not_used))
+				 error))
 		return FALSE;
 
 	/* did we get a file match on any plugin */
@@ -388,16 +373,17 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 	asb_task_add_suitable_plugins (task);
 	if (priv->plugins_to_run->len == 0) {
 		asb_context_add_app_ignore (priv->ctx, priv->pkg);
-		goto out;
+		asb_package_close (priv->pkg, NULL);
+		asb_package_clear (priv->pkg,
+				   ASB_PACKAGE_ENSURE_DEPS |
+				   ASB_PACKAGE_ENSURE_FILES);
+		return TRUE;
 	}
 
 	/* delete old tree if it exists */
-	ret = asb_utils_ensure_exists_and_empty (priv->tmpdir, &error);
-	if (!ret) {
-		asb_package_log (priv->pkg,
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "Failed to clear: %s", error->message);
-		goto out;
+	if (!asb_utils_ensure_exists_and_empty (priv->tmpdir, error)) {
+		g_prefix_error (error, "Failed to clear: ");
+		return FALSE;
 	}
 
 	/* explode tree */
@@ -406,64 +392,56 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 			 ASB_PACKAGE_LOG_LEVEL_DEBUG,
 			 "Exploding tree for %s",
 			 asb_package_get_name (priv->pkg));
-	ret = asb_package_explode (priv->pkg,
-				   priv->tmpdir,
-				   asb_context_get_file_globs (priv->ctx),
-				   &error);
-	if (!ret) {
-		asb_package_log (priv->pkg,
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "Failed to explode: %s", error->message);
-		g_clear_error (&error);
-		goto skip;
+	if (!asb_package_explode (priv->pkg,
+				  priv->tmpdir,
+				  asb_context_get_file_globs (priv->ctx),
+				  error)) {
+		g_prefix_error (error, "Failed to explode %s: ",
+				asb_package_get_basename (priv->pkg));
+		return FALSE;
 	}
 
 	/* add extra packages */
 	if (!asb_package_ensure (priv->pkg,
 				 ASB_PACKAGE_ENSURE_DEPS |
 				 ASB_PACKAGE_ENSURE_SOURCE,
-				 error_not_used))
+				 error))
 		return FALSE;
-	ret = asb_task_explode_extra_packages (task, &error);
-	if (!ret) {
-		asb_package_log (priv->pkg,
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "Failed to explode extra file: %s",
-				 error->message);
-		g_clear_error (&error);
-		goto skip;
+	if (!asb_task_explode_extra_packages (task, error)) {
+		g_prefix_error (error, "Failed to explode extra files: ");
+		return FALSE;
 	}
 
 	/* run plugins */
 	g_debug ("examining: %s", asb_package_get_name (priv->pkg));
 	for (i = 0; i < priv->plugins_to_run->len; i++) {
 		GList *apps_tmp = NULL;
+		g_autoptr(GError) error_local = NULL;
 		plugin = g_ptr_array_index (priv->plugins_to_run, i);
 		asb_package_log (priv->pkg,
 				 ASB_PACKAGE_LOG_LEVEL_DEBUG,
 				 "Processing %s with %s",
 				 basename,
 				 plugin->name);
-		apps_tmp = asb_plugin_process (plugin, priv->pkg, priv->tmpdir, &error);
+		apps_tmp = asb_plugin_process (plugin, priv->pkg, priv->tmpdir, &error_local);
 		if (apps_tmp == NULL) {
 			asb_package_log (priv->pkg,
 					 ASB_PACKAGE_LOG_LEVEL_WARNING,
 					 "Failed to run process '%s': %s",
-					 plugin->name, error->message);
-			g_clear_error (&error);
+					 plugin->name, error_local->message);
+			continue;
 		}
-		for (l = apps_tmp; l != NULL; l = l->next) {
+		for (GList *l = apps_tmp; l != NULL; l = l->next) {
 			app = ASB_APP (l->data);
 			asb_plugin_add_app (&apps, AS_APP (app));
 		}
 		g_list_free_full (apps_tmp, g_object_unref);
 	}
-	if (apps == NULL)
-		goto skip;
 
 	/* print */
 	g_debug ("processing: %s", asb_package_get_name (priv->pkg));
-	for (l = apps; l != NULL; l = l->next) {
+	for (GList *l = apps; l != NULL; l = l->next) {
+		g_autoptr(GError) error_local = NULL;
 		app = l->data;
 
 		/* never set */
@@ -481,7 +459,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 					 ASB_PACKAGE_ENSURE_RELEASES |
 					 ASB_PACKAGE_ENSURE_VCS |
 					 ASB_PACKAGE_ENSURE_URL,
-					 error_not_used))
+					 error))
 			return FALSE;
 		if (asb_package_get_url (priv->pkg) != NULL &&
 		    as_app_get_url_item (AS_APP (app), AS_URL_KIND_HOMEPAGE) == NULL) {
@@ -516,24 +494,14 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 						     priv->pkg,
 						     app,
 						     priv->tmpdir,
-						     &error);
+						     &error_local);
 		if (!ret) {
 			asb_package_log (priv->pkg,
 					 ASB_PACKAGE_LOG_LEVEL_WARNING,
 					 "Failed to run process on %s: %s",
 					 as_app_get_id (AS_APP (app)),
-					 error->message);
-			g_clear_error (&error);
-			goto skip;
-		}
-
-		/* set cache-id in case we want to use the metadata directly */
-		if (asb_context_get_flag (priv->ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID)) {
-			cache_id = asb_utils_get_cache_id_for_filename (priv->filename);
-			as_app_add_metadata (AS_APP (app),
-					     "X-CacheID",
-					     cache_id);
-			g_free (cache_id);
+					 error_local->message);
+			continue;
 		}
 
 		/* set the VCS information into the metadata */
@@ -547,7 +515,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 		if (array->len == 0) {
 			if (!asb_app_save_resources (ASB_APP (app),
 						     ASB_APP_SAVE_FLAG_SCREENSHOTS,
-						     error_not_used))
+						     error))
 				return FALSE;
 		}
 
@@ -556,31 +524,20 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 		nr_added++;
 	}
 skip:
-	/* add a dummy element to the AppStream metadata so that we don't keep
-	 * parsing this every time */
-	if (asb_context_get_flag (priv->ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID) && nr_added == 0)
-		asb_context_add_app_ignore (priv->ctx, priv->pkg);
-
 	/* delete tree */
 	g_debug ("deleting temp files: %s", asb_package_get_name (priv->pkg));
-	if (!asb_utils_rmtree (priv->tmpdir, &error)) {
-		asb_package_log (priv->pkg,
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "Failed to delete tree: %s",
-				 error->message);
-		goto out;
+	if (!asb_utils_rmtree (priv->tmpdir, error)) {
+		g_prefix_error (error, "Failed to delete tree: ");
+		return FALSE;
 	}
 
 	/* write log */
 	g_debug ("writing log: %s", asb_package_get_name (priv->pkg));
-	if (!asb_package_log_flush (priv->pkg, &error)) {
-		asb_package_log (priv->pkg,
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "Failed to write package log: %s",
-				 error->message);
-		goto out;
+	if (!asb_package_log_flush (priv->pkg, error)) {
+		g_prefix_error (error, "Failed to write package log: ");
+		return FALSE;
 	}
-out:
+
 	/* clear loaded resources */
 	asb_package_close (priv->pkg, NULL);
 	asb_package_clear (priv->pkg,

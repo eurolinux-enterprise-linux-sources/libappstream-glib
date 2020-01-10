@@ -1,3 +1,6 @@
+# Enable hardening in RHEL 7
+%global _hardened_build 1
+
 %global glib2_version 2.45.8
 %global libsoup_version 2.51.92
 %global json_glib_version 1.1.1
@@ -5,14 +8,13 @@
 
 Summary:   Library for AppStream metadata
 Name:      libappstream-glib
-Version:   0.6.10
-Release:   1%{?dist}
+Version:   0.7.8
+Release:   2%{?dist}
 License:   LGPLv2+
 URL:       http://people.freedesktop.org/~hughsient/appstream-glib/
 Source0:   http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
 
 BuildRequires: glib2-devel >= %{glib2_version}
-BuildRequires: libtool
 BuildRequires: docbook-utils
 BuildRequires: gtk-doc
 BuildRequires: gobject-introspection-devel
@@ -25,6 +27,7 @@ BuildRequires: gettext
 BuildRequires: libgcab1-devel
 BuildRequires: libuuid-devel
 BuildRequires: json-glib-devel >= %{json_glib_version}
+BuildRequires: meson
 
 # for the builder component
 BuildRequires: fontconfig-devel
@@ -80,25 +83,17 @@ Requires: %{name}-builder%{?_isa} = %{version}-%{release}
 GLib headers and libraries for appstream-builder.
 
 %prep
-%setup -q -n appstream-glib-%{version}
+%autosetup -p1 -n appstream-glib-%{version}
 
 %build
-%configure \
-        --enable-gtk-doc \
-        --disable-stemmer \
-        --disable-dep11 \
-        --disable-static \
-        --disable-silent-rules \
-        --disable-dependency-tracking
-
-make %{?_smp_mflags}
+%meson \
+    -Dgtk-doc=true \
+    -Dstemmer=false \
+    -Ddep11=false
+%meson_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-
-%__rm -f %{buildroot}%{_libdir}/libappstream-glib*.la
-%__rm -f %{buildroot}%{_libdir}/libappstream-builder*.la
-%__rm -f %{buildroot}%{_libdir}/asb-plugins-%{as_plugin_version}/*.la
+%meson_install
 
 %find_lang appstream-glib
 
@@ -136,7 +131,12 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %license COPYING
 %{_bindir}/appstream-builder
 %{_datadir}/bash-completion/completions/appstream-builder
-%{_libdir}/asb-plugins-%{as_plugin_version}/*.so
+%{_libdir}/asb-plugins-%{as_plugin_version}/libasb_plugin_appdata.so
+%{_libdir}/asb-plugins-%{as_plugin_version}/libasb_plugin_desktop.so
+%{_libdir}/asb-plugins-%{as_plugin_version}/libasb_plugin_font.so
+%{_libdir}/asb-plugins-%{as_plugin_version}/libasb_plugin_gettext.so
+%{_libdir}/asb-plugins-%{as_plugin_version}/libasb_plugin_hardcoded.so
+%{_libdir}/asb-plugins-%{as_plugin_version}/libasb_plugin_shell_extension.so
 %{_libdir}/libappstream-builder.so.8*
 %{_mandir}/man1/appstream-builder.1.gz
 
@@ -149,6 +149,14 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_datadir}/gir-1.0/AppStreamBuilder-1.0.gir
 
 %changelog
+* Wed Sep 05 2018 Kalev Lember <klember@redhat.com> 0.7.8-2
+- Build with full hardening enabled
+- Resolves: #1616185
+
+* Fri Apr 20 2018 Richard Hughes <richard@hughsie.com> 0.7.8-1
+- New upstream release
+- Resolves: #1570025
+
 * Mon Mar 06 2017 Richard Hughes <richard@hughsie.com> 0.6.10-1
 - New upstream release
 - Resolves: #1386997

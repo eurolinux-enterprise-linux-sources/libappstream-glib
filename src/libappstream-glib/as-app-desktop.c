@@ -201,7 +201,7 @@ as_app_parse_file_key (AsApp *app,
 					     G_KEY_FILE_DESKTOP_GROUP,
 					     key,
 					     NULL);
-		if (tmp != NULL && strcasecmp (tmp, "True") == 0)
+		if (tmp != NULL && g_ascii_strcasecmp (tmp, "True") == 0)
 			as_app_add_veto (app, "NoDisplay=true");
 
 	/* Type */
@@ -236,7 +236,7 @@ as_app_parse_file_key (AsApp *app,
 						   G_KEY_FILE_DESKTOP_GROUP,
 						   key,
 						   NULL, NULL);
-		for (i = 0; list[i] != NULL; i++) {
+		for (i = 0; list != NULL && list[i] != NULL; i++) {
 			const gchar *category_blacklist[] = {
 				"X-GNOME-Settings-Panel",
 				"X-Unity-Settings-Panel",
@@ -271,7 +271,7 @@ as_app_parse_file_key (AsApp *app,
 						   G_KEY_FILE_DESKTOP_GROUP,
 						   key,
 						   NULL, NULL);
-		for (i = 0; list[i] != NULL; i++) {
+		for (i = 0; list != NULL && list[i] != NULL; i++) {
 			g_auto(GStrv) kw_split = NULL;
 			kw_split = g_strsplit (list[i], ",", -1);
 			for (j = 0; kw_split[j] != NULL; j++) {
@@ -291,7 +291,7 @@ as_app_parse_file_key (AsApp *app,
 							  key,
 							  locale,
 							  NULL, NULL);
-		for (i = 0; list[i] != NULL; i++) {
+		for (i = 0; list != NULL && list[i] != NULL; i++) {
 			g_auto(GStrv) kw_split = NULL;
 			kw_split = g_strsplit (list[i], ",", -1);
 			for (j = 0; kw_split[j] != NULL; j++) {
@@ -306,7 +306,7 @@ as_app_parse_file_key (AsApp *app,
 						   G_KEY_FILE_DESKTOP_GROUP,
 						   key,
 						   NULL, NULL);
-		for (i = 0; list[i] != NULL; i++)
+		for (i = 0; list != NULL && list[i] != NULL; i++)
 			as_app_add_mimetype (app, list[i]);
 
 	} else if (g_strcmp0 (key, "X-AppInstall-Package") == 0) {
@@ -324,7 +324,10 @@ as_app_parse_file_key (AsApp *app,
 						   G_KEY_FILE_DESKTOP_GROUP,
 						   key,
 						   NULL, NULL);
-		if (g_strv_length (list) == 1)
+		/* "OnlyShowIn=" is the same as "NoDisplay=True" */
+		if (g_strv_length (list) == 0)
+			as_app_add_veto (app, "Empty OnlyShowIn");
+		else if (g_strv_length (list) == 1)
 			as_app_set_project_group (app, list[0]);
 
 	/* Name */

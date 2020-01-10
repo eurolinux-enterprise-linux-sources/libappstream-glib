@@ -86,6 +86,7 @@ add_icons (AsApp *app,
 	im = as_image_new ();
 	if (!as_image_load_filename_full (im, fn,
 					  64, min_icon_size,
+					  AS_IMAGE_LOAD_FLAG_ALWAYS_RESIZE |
 					  AS_IMAGE_LOAD_FLAG_ONLY_SUPPORTED |
 					  AS_IMAGE_LOAD_FLAG_SHARPEN,
 					  error)) {
@@ -138,6 +139,7 @@ add_icons (AsApp *app,
 	g_debug ("trying to load %s", fn_hidpi);
 	if (!as_image_load_filename_full (im, fn_hidpi,
 					  128, 128,
+					  AS_IMAGE_LOAD_FLAG_ALWAYS_RESIZE |
 					  AS_IMAGE_LOAD_FLAG_SHARPEN,
 					  &error_local)) {
 		g_debug ("failed to load HiDPI icon: %s", error_local->message);
@@ -231,10 +233,6 @@ load_desktop (const gchar *prefix,
 		}
 	}
 
-	/* never inherit from the desktop file (they may be prefixed) */
-	g_hash_table_remove_all (as_app_get_names (app));
-	g_hash_table_remove_all (as_app_get_comments (app));
-
 	return g_steal_pointer (&app);
 }
 
@@ -273,7 +271,14 @@ load_appdata (const gchar *prefix, const gchar *app_name, GError **error)
 	guint i;
 
 	appdata_path = get_appdata_filename (prefix, app_name);
-	g_debug ("Looking for %s", appdata_path);
+	if (appdata_path == NULL) {
+		g_set_error (error,
+			     AS_APP_ERROR,
+			     AS_APP_ERROR_FAILED,
+			     "no file found for %s", app_name);
+		return NULL;
+	}
+	g_debug ("looking for %s", appdata_path);
 
 	app = as_app_new ();
 	if (!as_app_parse_file (app, appdata_path,
@@ -402,13 +407,13 @@ main (int argc, char **argv)
 
 	/* load each application specified */
 	for (i = 1; i < (guint) argc; i++) {
+		AsLaunchable *launchable;
 		const gchar *app_name = argv[i];
 		g_auto(GStrv) intl_domains = NULL;
 		g_autoptr(AsApp) app_appdata = NULL;
 		g_autoptr(AsApp) app_desktop = NULL;
-		g_autofree gchar *desktop_basename = NULL;
+		g_autoptr(GString) desktop_basename = NULL;
 		g_autofree gchar *desktop_path = NULL;
-		const gchar *appdata_id;
 
 		/* TRANSLATORS: we're generating the AppStream data */
 		g_print ("%s %s\n", _("Processing application"), app_name);
@@ -459,12 +464,23 @@ main (int argc, char **argv)
 
 		as_store_add_app (store, app_appdata);
 
-		appdata_id = as_app_get_id (app_appdata);
-		if (appdata_id != NULL)
-			desktop_basename = g_strdup (appdata_id);
-		else
-			desktop_basename = g_strconcat (app_name, ".desktop", NULL);
-		desktop_path = g_build_filename (prefix, "share/applications", desktop_basename, NULL);
+		/* use the ID from the AppData file if it was found */
+		launchable = as_app_get_launchable_by_kind (app_appdata,
+							    AS_LAUNCHABLE_KIND_DESKTOP_ID);
+		if (launchable != NULL) {
+			desktop_basename = g_string_new (as_launchable_get_value (launchable));
+		} else {
+			const gchar *appdata_id = as_app_get_id (app_appdata);
+
+			/* append the .desktop suffix if using a new-style name */
+			desktop_basename = g_string_new (appdata_id != NULL ? appdata_id : app_name);
+			if (!g_str_has_suffix (desktop_basename->str, ".desktop"))
+				g_string_append (desktop_basename, ".desktop");
+		}
+
+		desktop_path = g_build_filename (prefix, "share", "applications",
+						 desktop_basename->str, NULL);
+		g_debug ("looking for %s", desktop_path);
 
 		if (g_file_test (desktop_path, G_FILE_TEST_EXISTS)) {
 			app_desktop = load_desktop (prefix,
@@ -480,6 +496,20 @@ main (int argc, char **argv)
 					 error->message);
 				return EXIT_FAILURE;
 			}
+
+			/* if the appdata <name> exists, do not inherit from
+			 * the desktop file as it may be prefixed */
+			if (g_hash_table_size (as_app_get_names (app_appdata)) > 0)
+				g_hash_table_remove_all (as_app_get_names (app_desktop));
+			if (g_hash_table_size (as_app_get_comments (app_appdata)) > 0)
+				g_hash_table_remove_all (as_app_get_comments (app_desktop));
+
+			/* does the app already exist with a launchable that matches this ID */
+			if (g_strcmp0 (as_app_get_id (app_appdata), as_app_get_id (app_desktop)) != 0) {
+				g_debug ("fixing up ID for desktop merge");
+				as_app_set_id (app_desktop, as_app_get_id (app_appdata));
+			}
+
 			as_store_add_app (store, app_desktop);
 		}
 	}

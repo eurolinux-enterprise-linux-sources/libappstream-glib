@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com`
+ * Copyright (C) 2014-2017 Richard Hughes <richard@hughsie.com`
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -91,6 +91,9 @@ G_BEGIN_DECLS
  * @AS_TAG_SUGGESTS:			`suggests`
  * @AS_TAG_REQUIRES:			`requires`
  * @AS_TAG_CUSTOM:			`custom`
+ * @AS_TAG_LAUNCHABLE:			`launchable`
+ * @AS_TAG_AGREEMENT:			`agreement`
+ * @AS_TAG_AGREEMENT_SECTION:		`agreement_section`
  *
  * The tag type.
  **/
@@ -154,6 +157,9 @@ typedef enum {
 	AS_TAG_SUGGESTS,		/* Since: 0.6.1 */
 	AS_TAG_REQUIRES,		/* Since: 0.6.7 */
 	AS_TAG_CUSTOM,			/* Since: 0.6.8 */
+	AS_TAG_LAUNCHABLE,		/* Since: 0.6.13 */
+	AS_TAG_AGREEMENT,		/* Since: 0.7.8 */
+	AS_TAG_AGREEMENT_SECTION,	/* Since: 0.7.8 */
 	/*< private >*/
 	AS_TAG_LAST
 } AsTag;

@@ -107,6 +107,8 @@ as_provide_kind_from_string (const gchar *kind)
 		return AS_PROVIDE_KIND_DBUS_SESSION;
 	if (g_strcmp0 (kind, "dbus-system") == 0)
 		return AS_PROVIDE_KIND_DBUS_SYSTEM;
+	if (g_strcmp0 (kind, "id") == 0)
+		return AS_PROVIDE_KIND_ID;
 	return AS_PROVIDE_KIND_UNKNOWN;
 }
 
@@ -143,6 +145,8 @@ as_provide_kind_to_string (AsProvideKind kind)
 		return "dbus";
 	if (kind == AS_PROVIDE_KIND_DBUS_SYSTEM)
 		return "dbus-system";
+	if (kind == AS_PROVIDE_KIND_ID)
+		return "id";
 	return NULL;
 }
 
@@ -326,7 +330,7 @@ as_provide_node_parse (AsProvide *provide, GNode *node,
 	} else {
 		priv->kind = as_provide_kind_from_string (as_node_get_name (node));
 	}
-	as_ref_string_assign (&priv->value, as_node_get_data (node));
+	as_ref_string_assign (&priv->value, as_node_get_data_as_refstr (node));
 	return TRUE;
 }
 

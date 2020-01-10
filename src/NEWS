@@ -1,3 +1,190 @@
+Version 0.7.8
+~~~~~~~~~~~~~~
+Released: 2018-04-20
+
+New Features:
+ - Add as_store_get_app_by_launchable() (Richard Hughes)
+ - Add as_utils_unique_id_match() (Richard Hughes)
+ - Add as_version_string() for fwupd (Richard Hughes)
+ - Add support for component agreements (Richard Hughes)
+
+Bugfixes:
+ - Correctly compare version numbers like '1.2.3' and '1.2.3a' (Richard Hughes)
+ - Don't include the path component in the name when parsing the package filename (Richard Hughes)
+ - If the launchable is specified don't guess it when composing (Richard Hughes)
+ - Never add more than one component to the AppStream store when composing (Richard Hughes)
+ - Veto apps that have empty OnlyShowIn= (Kalev Lember)
+
+Version 0.7.7
+~~~~~~~~~~~~~~
+Released: 2018-03-12
+
+New Features:
+ - Add AS_IMAGE_LOAD_FLAG_ALWAYS_RESIZE to always resize the pixbuf (Richard Hughes)
+ - Add custom metadata key for shell extension uuid (Kalev Lember)
+
+Bugfixes:
+ - Always resize AppStream icons to fit the destination size (Richard Hughes)
+ - Correctly validate files using OR in the metadata_license (Richard Hughes)
+ - Do not fail to validate if the timestamps are out of order (Richard Hughes)
+ - Don't abort the build if pngquant fails (Richard Hughes)
+ - Update the SPDX license list to v3.0 (Richard Hughes)
+
+Version 0.7.6
+~~~~~~~~~~~~~~
+Released: 2018-02-09
+
+New Features:
+ - Add support for release types (Richard Hughes)
+
+Bugfixes:
+ - Do not deference invalid lists when parsing invalid desktop files (Marco Trevisan)
+ - Fix an invalid read when using as_app_parse_data() from Python (Richard Hughes)
+ - Never include '&' in attribute values (Richard Hughes)
+
+Version 0.7.5
+~~~~~~~~~~~~~~
+Released: 2017-01-22
+
+New Features:
+ - Add as_app_parse_data() (Richard Hughes)
+ - Add as_store_get_apps_by_provide() (Richard Hughes)
+ - Add more GObject Introspection annotations for Python (Richard Hughes)
+ - Support OARS v1.1 additions (Richard Hughes)
+ - Use pngquant to make the application icons take up less space (Richard Hughes)
+
+Bugfixes:
+ - Describe connection problems/HTTP errors when validating images (suve)
+ - Do not try to extract duplicate files in the icon theme packages (Richard Hughes)
+ - Do not use an 'enable' prefix for meson arguments (Richard Hughes)
+ - Don't expect an enum when really passing a bitfield (Richard Hughes)
+ - Don't fall back to English if other languages are available (Peter Oliver)
+ - Explicitly require a new enough json-glib (Richard Hughes)
+ - Fix a crash when calling as_release_add_location() directly (Richard Hughes)
+ - Fix appstream-compose when using new-style desktop IDs (Richard Hughes)
+ - Fix compile with GCab v1.0 (Richard Hughes)
+ - Fix the arithmetic when fitting an image in 16:9 (Joaquim Rocha)
+ - Generate icons and samples for emoji fonts (Peter Oliver)
+ - Never change the default screenshot when processing AppData (Richard Hughes)
+
+Version 0.7.4
+~~~~~~~~~~~~~~
+Released: 2017-11-09
+
+New Features:
+ - Add the 'hardware' requires type (Richard Hughes)
+
+Bugfixes:
+ - Only try to set the file permissions on regular files (Richard Hughes)
+
+Version 0.7.3
+~~~~~~~~~~~~~~
+Released: 2017-10-23
+
+New Features:
+ - Add AS_VERSION_PARSE_FLAG_USE_BCD when formatting version strings (Richard Hughes)
+ - Add as_app_get_release_by_version() (Richard Hughes)
+ - Add as_app_get_screenshot_default() (Richard Hughes)
+ - Add new launchable types (Marius Vollmer, Richard Hughes)
+
+Bugfixes:
+ - Do not assign "flatpak" as an app's origin when no origin was found (Joaquim Rocha)
+ - Fix the inode mode to be sane on extracted files (Richard Hughes)
+ - Prefer /usr/share/metainfo as default path for metainfo files (Jeremy Bicha)
+ - Write XML for newer AppStream specification versions (Richard Hughes)
+
+Version 0.7.2
+~~~~~~~~~~~~~~
+Released: 2017-08-21
+
+Bugfixes:
+ - Allow remote icon types for desktop AppData files (Richard Hughes)
+ - Define _XOPEN_SOURCE in order to expose realpath() in headers (Philip Withnall)
+ - Do not check the suffix of <id> tags (Richard Hughes)
+ - Drop an unreachable branch and add some additional checks (Philip Withnall)
+ - Enable C99 support in meson.build (Philip Withnall)
+ - Prefer /usr/share/metainfo as default path for metainfo files (Matthias Klumpp)
+
+Version 0.7.1
+~~~~~~~~~~~~~~
+Released: 2017-08-03
+
+New Features:
+ - Add <id> kinds for application provides (Richard Hughes)
+ - Support CompulsoryForDesktops in YAML (Iain Lane)
+ - Update the SPDX license list to 2.6 (Richard Hughes)
+
+Bugfixes:
+ - Avoid unnecessary gdk dependency (Patrick Ohly)
+ - Fail to validate if AppData screenshots are duplicated (Richard Hughes)
+ - Have plugins link with asglib along with asbuilder (Neal Gompa)
+ - Install appdata-xml.m4 (Jeremy Bicha)
+ - Make gperf dependency fully required (Philip Withnall)
+ - Make introspection optional (Patrick Ohly)
+ - Skip loading desktop data from Snap directory (Robert Ancell)
+ - Validate the <id> format according to the spec (Richard Hughes)
+
+Version 0.7.0
+~~~~~~~~~~~~~
+Released: 2017-06-22
+
+New Features:
+ - Enable Travis CI for Fedora 25 and Debian Stretch (Richard Hughes)
+ - Remove the cache-id functionality (Richard Hughes)
+ - Switch to the meson build system (Richard Hughes, Emmanuele Bassi)
+
+Bugfixes:
+ - Add the limits in the validation output messages (Richard Hughes)
+ - Do not add the GNOME Software categories or icons (Richard Hughes)
+ - Do not enforce that the project is a valid environment_id (Richard Hughes)
+ - Don't cast gsize to guint32 when getting file length (Iain Lane)
+ - Return failure if the AsbTask fails (Richard Hughes)
+ - Show a warning if adding keywords after the cache creation (Richard Hughes)
+
+Version 0.6.13
+~~~~~~~~~~~~~~
+Released: 2017-05-08
+
+New Features:
+ - Add a 'check-component' command to appstream-util (Richard Hughes)
+ - Add as_app_remove_category() and as_app_remove_kudo() (Richard Hughes)
+ - Add as_utils_guid_from_data() (Richard Hughes)
+ - Add functions for getting the AsApp and AsStore search match (Richard Hughes)
+ - Add support for icon scaling (Richard Hughes)
+ - Add support for <launchable> (Richard Hughes)
+ - Allow using the app origin as a search keyword (Richard Hughes)
+
+Bugfixes:
+ - Casefold all stemmed entries (Richard Hughes)
+ - Support non-numeric version numbers correctly (Richard Hughes)
+
+Version 0.6.12
+~~~~~~~~~~~~~~
+Released: 2017-04-12
+
+New Features:
+ - Validate kudos in AppData and AppStream files (Richard Hughes)
+
+Bugfixes:
+ - Copy hash table keys to avoid a common crash on Ubuntu (Robert Ancell)
+ - Fix the predicate comparison when using globs in metainfo files (Richard Hughes)
+
+Version 0.6.11
+~~~~~~~~~~~~~~
+Released: 2017-03-20
+
+New Features:
+ - Add initial support for Mozilla .xpi translations (Richard Hughes)
+ - Make content_rating required for any component with a 'Game' category (Richard Hughes)
+
+Bugfixes:
+ - Don't crash when using 'appstream-util show-search-tokens' (Richard Hughes)
+ - Fix a problem with appstream-compose with older AppData files (Richard Hughes)
+ - Fix compile with -Wdiscarded-qualifiers (Richard Hughes)
+ - Parse small version numbers correctly (Richard Hughes)
+ - Revert "Enable the stack protection in local builds" (Kalev Lember)
+ - Show a warning if a desktop file is not found when required (Richard Hughes)
+
 Version 0.6.10
 ~~~~~~~~~~~~~~
 Released: 2017-03-06

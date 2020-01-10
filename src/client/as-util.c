@@ -869,9 +869,11 @@ as_util_news_to_appdata_hdr (GString *desc, const gchar *txt, GError **error)
 	/* add markup */
 	as_util_news_add_indent (desc, 2);
 	g_string_append_printf (desc, "<release version=\"%s\" "
-				"timestamp=\"%" G_GINT64_FORMAT "\">\n",
+				"date=\"%s-%s-%s\">\n",
 				version,
-				g_date_time_to_unix (dt));
+				release_split[0],
+				release_split[1],
+				release_split[2]);
 	as_util_news_add_indent (desc, 3);
 	g_string_append (desc, "<description>\n");
 
@@ -925,7 +927,7 @@ as_util_news_to_appdata (AsUtilPrivate *priv, gchar **values, GError **error)
 				     AS_ERROR,
 				     AS_ERROR_INVALID_ARGUMENTS,
 				     "Not enough arguments, "
-				     "expected .appdata.xml");
+				     "expected NEWS");
 		return FALSE;
 	}
 
@@ -1307,6 +1309,7 @@ as_util_search (AsUtilPrivate *priv, gchar **values, GError **error)
 				   AS_APP_SEARCH_MATCH_COMMENT |
 				   AS_APP_SEARCH_MATCH_NAME |
 				   AS_APP_SEARCH_MATCH_KEYWORD |
+				   AS_APP_SEARCH_MATCH_ORIGIN |
 				   AS_APP_SEARCH_MATCH_ID);
 	as_store_load_search_cache (store);
 
@@ -2999,6 +3002,117 @@ as_util_check_root_app (AsApp *app, GPtrArray *problems)
 	}
 }
 
+static void
+as_util_check_component_app (AsApp *app, GPtrArray *problems)
+{
+	AsFormat *format;
+
+	g_print ("\nUsing %s for %s\n",
+		 as_app_get_unique_id (app),
+		 as_app_get_id (app));
+
+	/* has desktop file */
+	if (as_app_get_kind (app) == AS_APP_KIND_DESKTOP) {
+		format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_DESKTOP);
+		if (format == NULL) {
+			g_ptr_array_add (problems, g_strdup ("No desktop file"));
+		} else {
+			g_print ("Checking source: %s\n", as_format_get_filename (format));
+		}
+	}
+
+	/* has AppData file */
+	format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_APPDATA);
+	if (format == NULL)
+		format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_METAINFO);
+	if (format == NULL) {
+		g_ptr_array_add (problems,
+				 g_strdup_printf ("%s has no AppData file",
+						  as_app_get_id (app)));
+	} else {
+		g_print ("Checking source: %s\n", as_format_get_filename (format));
+		if (as_app_get_description (app, NULL) == NULL) {
+			g_ptr_array_add (problems,
+					 g_strdup_printf ("%s has no <description>",
+							  as_app_get_id (app)));
+		}
+		if (as_app_get_comment (app, NULL) == NULL) {
+			g_ptr_array_add (problems,
+					 g_strdup_printf ("%s has no <summary>",
+							  as_app_get_id (app)));
+		}
+	}
+
+	/* check icon exists and is large enough */
+	if (as_app_get_kind (app) == AS_APP_KIND_DESKTOP) {
+		g_autoptr(GError) error_local = NULL;
+		if (!as_util_check_root_app_icon (app, &error_local))
+			g_ptr_array_add (problems, g_strdup (error_local->message));
+	}
+}
+
+static gboolean
+as_util_check_component (AsUtilPrivate *priv, gchar **values, GError **error)
+{
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GPtrArray) problems = NULL;
+
+	/* check args */
+	if (g_strv_length (values) < 1) {
+		g_set_error_literal (error,
+				     AS_ERROR,
+				     AS_ERROR_INVALID_ARGUMENTS,
+				     "Not enough arguments, "
+				     "expected example.desktop");
+		return FALSE;
+	}
+
+	/* load root */
+	store = as_store_new ();
+	as_store_set_add_flags (store, AS_STORE_ADD_FLAG_PREFER_LOCAL);
+	as_store_set_destdir (store, g_getenv ("DESTDIR"));
+	if (!as_store_load (store,
+			    AS_STORE_LOAD_FLAG_DESKTOP |
+			    AS_STORE_LOAD_FLAG_APPDATA |
+			    AS_STORE_LOAD_FLAG_ALLOW_VETO,
+			    NULL,
+			    error))
+		return FALSE;
+
+	/* sanity check each */
+	problems = g_ptr_array_new_with_free_func (g_free);
+	for (guint j = 0; values[j] != NULL; j++) {
+		g_autoptr(GPtrArray) apps = as_store_get_apps_by_id (store, values[j]);
+		if (apps->len == 0) {
+			g_printerr ("Failed to find %s\n", values[j]);
+			continue;
+		}
+		for (guint i = 0; i < apps->len; i++) {
+			AsApp *app = g_ptr_array_index (apps, i);
+			as_util_check_component_app (app, problems);
+		}
+	}
+
+	/* show problems */
+	if (problems->len) {
+		g_printerr ("\n");
+		for (guint i = 0; i < problems->len; i++) {
+			const gchar *tmp = g_ptr_array_index (problems, i);
+			g_printerr ("• %s\n", tmp);
+		}
+		g_set_error (error,
+			     AS_ERROR,
+			     AS_ERROR_FAILED,
+			     "Failed to check component, %u problems detected",
+			     problems->len);
+		return FALSE;
+	}
+
+	/* success */
+	g_print ("\nNo problems found\n");
+	return TRUE;
+}
+
 G_GNUC_PRINTF (2, 3)
 static void
 as_util_app_log (AsApp *app, const gchar *fmt, ...)
@@ -3497,6 +3611,58 @@ as_util_mirror_local_firmware (AsUtilPrivate *priv, gchar **values, GError **err
 }
 
 static gboolean
+as_util_agreement_export (AsUtilPrivate *priv, gchar **values, GError **error)
+{
+	AsAgreement *pp;
+	GPtrArray *sections;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GFile) file = NULL;
+
+	/* check args */
+	if (g_strv_length (values) < 2) {
+		g_set_error_literal (error,
+				     AS_ERROR,
+				     AS_ERROR_INVALID_ARGUMENTS,
+				     "Not enough arguments, expected: file type, "
+				     "e.g. foo.metainfo.xml eula");
+		return FALSE;
+	}
+
+	/* parse file */
+	app = as_app_new ();
+	if (!as_app_parse_file (app, values[0], AS_APP_PARSE_FLAG_NONE, error))
+		return FALSE;
+
+	/* get all policy sections */
+	pp = as_app_get_agreement_by_kind (app, as_agreement_kind_from_string (values[1]));
+	if (pp == NULL) {
+		g_set_error (error,
+			     AS_ERROR,
+			     AS_ERROR_INVALID_ARGUMENTS,
+			     "no privacy policy with type %s",
+			     values[1]);
+		return FALSE;
+	}
+	sections = as_agreement_get_sections (pp);
+	for (guint i = 0; i < sections->len; i++) {
+		AsAgreementSection *ps = g_ptr_array_index (sections, i);
+		const gchar *tmp;
+		g_autofree gchar *plain = NULL;
+
+		g_print ("%s\n^^^\n", as_agreement_section_get_name (ps, NULL));
+		tmp = as_agreement_section_get_description (ps, NULL);
+		if (tmp == NULL)
+			continue;
+		plain = as_markup_convert_simple (tmp, error);
+		if (plain == NULL)
+			return FALSE;
+		g_print ("%s\n\n", plain);
+	}
+
+	return TRUE;
+}
+
+static gboolean
 as_util_replace_screenshots (AsUtilPrivate *priv, gchar **values, GError **error)
 {
 	GPtrArray *screenshots;
@@ -3743,7 +3909,7 @@ as_util_split_appstream (AsUtilPrivate *priv, gchar **values, GError **error)
 		}
 
 		/* save to a file */
-		path = g_build_filename (destdir, "usr", "share", "appdata", fn, NULL);
+		path = g_build_filename (destdir, "usr", "share", "metainfo", fn, NULL);
 		g_debug ("saving %s as %s", id, path);
 		file_app = g_file_new_for_path (path);
 		if (!as_app_to_file (app, file_app, NULL, error))
@@ -4128,6 +4294,40 @@ as_util_markup_import (AsUtilPrivate *priv, gchar **values, GError **error)
 	return TRUE;
 }
 
+static gboolean
+as_util_vercmp (AsUtilPrivate *priv, gchar **values, GError **error)
+{
+	gint rc;
+
+	/* check args */
+	if (g_strv_length (values) != 2) {
+		g_set_error_literal (error,
+				     AS_ERROR,
+				     AS_ERROR_INVALID_ARGUMENTS,
+				     "expected VERSION1 VERSION2");
+		return FALSE;
+	}
+
+	/* compare */
+	rc = as_utils_vercmp (values[0], values[1]);
+	if (rc == G_MAXINT) {
+		g_set_error_literal (error,
+				     AS_ERROR,
+				     AS_ERROR_INVALID_ARGUMENTS,
+				     "failed to compare version numbers");
+		return FALSE;
+	}
+
+	/* print results */
+	if (rc == 0)
+		g_print ("%s = %s\n", values[0], values[1]);
+	else if (rc < 0)
+		g_print ("%s < %s\n", values[0], values[1]);
+	else if (rc > 0)
+		g_print ("%s > %s\n", values[0], values[1]);
+	return TRUE;
+}
+
 static void
 as_util_ignore_cb (const gchar *log_domain, GLogLevelFlags log_level,
 		   const gchar *message, gpointer user_data)
@@ -4150,6 +4350,29 @@ as_util_sigint_cb (gpointer user_data)
 	g_debug ("Handling SIGINT");
 	g_cancellable_cancel (priv->cancellable);
 	return FALSE;
+}
+
+static gboolean
+as_util_regex (AsUtilPrivate *priv, gchar **values, GError **error)
+{
+	/* check args */
+	if (g_strv_length (values) != 2) {
+		g_set_error_literal (error,
+				     AS_ERROR,
+				     AS_ERROR_INVALID_ARGUMENTS,
+				     "expected PATTERN STRING");
+		return FALSE;
+	}
+
+	/* test */
+	if (!g_regex_match_simple (values[0], values[1], 0, 0)) {
+		g_set_error_literal (error,
+				     AS_ERROR,
+				     AS_ERROR_FAILED,
+				     "Failed to match");
+		return FALSE;
+	}
+	return TRUE;
 }
 
 int
@@ -4312,6 +4535,12 @@ main (int argc, char *argv[])
 		     _("Validate an AppData or AppStream file (relaxed)"),
 		     as_util_validate_relax);
 	as_util_add (priv->cmd_array,
+		     "agreement-export",
+		     NULL,
+		     /* TRANSLATORS: command description */
+		     _("Exports the agreement to text"),
+		     as_util_agreement_export);
+	as_util_add (priv->cmd_array,
 		     "validate-strict",
 		     NULL,
 		     /* TRANSLATORS: command description */
@@ -4335,6 +4564,12 @@ main (int argc, char *argv[])
 		     /* TRANSLATORS: command description */
 		     _("Check installed application data"),
 		     as_util_check_root);
+	as_util_add (priv->cmd_array,
+		     "check-component",
+		     NULL,
+		     /* TRANSLATORS: command description */
+		     _("check an installed application"),
+		     as_util_check_component);
 	as_util_add (priv->cmd_array,
 		     "replace-screenshots",
 		     NULL,
@@ -4413,6 +4648,18 @@ main (int argc, char *argv[])
 		     /* TRANSLATORS: command description */
 		     _("Watch AppStream locations for changes"),
 		     as_util_watch);
+	as_util_add (priv->cmd_array,
+		     "vercmp",
+		     NULL,
+		     /* TRANSLATORS: command description */
+		     _("Compare version numbers"),
+		     as_util_vercmp);
+	as_util_add (priv->cmd_array,
+		     "regex",
+		     NULL,
+		     /* TRANSLATORS: command description */
+		     _("Test a regular expression"),
+		     as_util_regex);
 
 	/* sort by command name */
 	g_ptr_array_sort (priv->cmd_array,

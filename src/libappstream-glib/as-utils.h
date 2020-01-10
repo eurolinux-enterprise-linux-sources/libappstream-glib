@@ -83,15 +83,41 @@ typedef enum {
  * AsVersionParseFlag:
  * @AS_VERSION_PARSE_FLAG_NONE:			No flags set
  * @AS_VERSION_PARSE_FLAG_USE_TRIPLET:		Use Microsoft-style version numbers
+ * @AS_VERSION_PARSE_FLAG_USE_BCD:		Use binary coded decimal notation
  *
  * The flags used when parsing version numbers.
  **/
 typedef enum {
 	AS_VERSION_PARSE_FLAG_NONE		= 0,
 	AS_VERSION_PARSE_FLAG_USE_TRIPLET	= 1 << 0,
+	AS_VERSION_PARSE_FLAG_USE_BCD		= 1 << 1,	/* Since: 0.7.3 */
 	/*< private >*/
 	AS_VERSION_PARSE_FLAG_LAST
 } AsVersionParseFlag;
+
+/**
+ * AsUniqueIdMatchFlags:
+ * @AS_UNIQUE_ID_MATCH_FLAG_NONE:		No flags set
+ * @AS_UNIQUE_ID_MATCH_FLAG_SCOPE:		Scope, e.g. a #AsAppScope
+ * @AS_UNIQUE_ID_MATCH_FLAG_BUNDLE_KIND:	Bundle kind, e.g. a #AsBundleKind
+ * @AS_UNIQUE_ID_MATCH_FLAG_ORIGIN:		Origin
+ * @AS_UNIQUE_ID_MATCH_FLAG_KIND:		Component kind, e.g. a #AsAppKind
+ * @AS_UNIQUE_ID_MATCH_FLAG_ID:			Component AppStream ID
+ * @AS_UNIQUE_ID_MATCH_FLAG_BRANCH:		Branch
+ *
+ * The flags used when matching unique IDs.
+ **/
+typedef enum {
+	AS_UNIQUE_ID_MATCH_FLAG_NONE		= 0,
+	AS_UNIQUE_ID_MATCH_FLAG_SCOPE		= 1 << 0,
+	AS_UNIQUE_ID_MATCH_FLAG_BUNDLE_KIND	= 1 << 1,	/* Since: 0.7.8 */
+	AS_UNIQUE_ID_MATCH_FLAG_ORIGIN		= 1 << 2,	/* Since: 0.7.8 */
+	AS_UNIQUE_ID_MATCH_FLAG_KIND		= 1 << 3,	/* Since: 0.7.8 */
+	AS_UNIQUE_ID_MATCH_FLAG_ID		= 1 << 4,	/* Since: 0.7.8 */
+	AS_UNIQUE_ID_MATCH_FLAG_BRANCH		= 1 << 5,	/* Since: 0.7.8 */
+	/*< private >*/
+	AS_UNIQUE_ID_MATCH_FLAG_LAST
+} AsUniqueIdMatchFlags;
 
 GQuark		 as_utils_error_quark		(void);
 gboolean	 as_utils_is_stock_icon_name	(const gchar	*name);
@@ -124,6 +150,10 @@ gint		 as_utils_vercmp		(const gchar	*version_a,
 						 const gchar	*version_b);
 gboolean	 as_utils_guid_is_valid		(const gchar	*guid);
 gchar		*as_utils_guid_from_string	(const gchar	*str);
+gchar		*as_utils_guid_from_data	(const gchar	*namespace_id,
+						 const guint8	*data,
+						 gsize		 data_len,
+						 GError		**error);
 gchar		*as_utils_version_from_uint32	(guint32	 val,
 						 AsVersionParseFlag flags);
 gchar		*as_utils_version_from_uint16	(guint16	 val,
@@ -140,6 +170,9 @@ gchar		*as_utils_unique_id_build	(AsAppScope	 scope,
 						 const gchar	*branch);
 gboolean	 as_utils_unique_id_equal	(const gchar	*unique_id1,
 						 const gchar	*unique_id2);
+gboolean	 as_utils_unique_id_match	(const gchar	*unique_id1,
+						 const gchar	*unique_id2,
+						 AsUniqueIdMatchFlags match_flags);
 gboolean	 as_utils_unique_id_valid	(const gchar	*unique_id);
 guint		 as_utils_unique_id_hash	(const gchar	*unique_id);
 gchar		*as_utils_appstream_id_build	(const gchar	*str);

@@ -104,6 +104,7 @@ asb_font_fix_metadata (AsbApp *app)
 		{ "ta",         "அஆஇ" },
 		{ "te",         "అఆఇ" },
 		{ "ua",		"Аа" },
+		{ "und-zsye",   "😀" },
 		{ "zh-tw",	"漢" },
 		{ NULL, NULL } };
 	struct {
@@ -139,6 +140,7 @@ asb_font_fix_metadata (AsbApp *app)
 		{ "ta",		"மகிழ்ச்சி நீங்கள் சந்தித்த"},
 		{ "te",		"ఆనందం మీరు సమావేశం"},
 		{ "ua",		"Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів!" },
+		{ "und-zsye",   "😀 🤔 ☹ 💩 😺 🙈 💃 🛌 👓 🐳 🌴 🌽 🥐 🍦☕ 🌍 🏠 🚂 🌥 ☃ 🎶 🛠 💯" },
 		{ "zh-tw",	"秋風滑過拔地紅樓角落，誤見釣人低聲吟詠離騷。" },
 		{ NULL, NULL } };
 
@@ -515,7 +517,6 @@ asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 	FcStrSet *langs;
 	FcValue fc_value;
 	gint i;
-	gboolean any_added = FALSE;
 	gboolean skip_langs;
 
 	skip_langs = g_getenv ("ASB_IS_SELF_TEST") != NULL;
@@ -527,7 +528,6 @@ asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 			FcStrListFirst (list);
 			while ((tmp = (const gchar*) FcStrListNext (list)) != NULL) {
 				as_app_add_language (AS_APP (app), 0, tmp);
-				any_added = TRUE;
 			}
 			FcStrListDone (list);
 			FcStrSetDestroy (langs);
@@ -535,7 +535,7 @@ asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 	}
 
 	/* assume 'en' is available */
-	if (!any_added)
+	if (g_list_length (as_app_get_languages (AS_APP (app))) == 0)
 		as_app_add_language (AS_APP (app), 0, "en");
 }
 
@@ -635,8 +635,10 @@ asb_plugin_font_app (AsbPlugin *plugin, AsbApp *app,
 	}
 
 	/* create app that might get merged later */
-	as_app_add_category (AS_APP (app), "Addons");
-	as_app_add_category (AS_APP (app), "Fonts");
+	if (asb_context_get_flag (plugin->ctx, ASB_CONTEXT_FLAG_ADD_DEFAULT_ICONS)) {
+		as_app_add_category (AS_APP (app), "Addons");
+		as_app_add_category (AS_APP (app), "Fonts");
+	}
 	if (as_app_get_name (AS_APP (app), NULL) == NULL)
 		asb_plugin_font_set_name (app, ft_face->family_name);
 	if (as_app_get_comment (AS_APP (app), NULL) == NULL) {

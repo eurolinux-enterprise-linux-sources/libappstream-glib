@@ -74,10 +74,10 @@ typedef struct
 	GHashTable		*metadata_indexes;	/* GHashTable{key} */
 	GHashTable		*appinfo_dirs;	/* GHashTable{path:AsStorePathData} */
 	GHashTable		*search_blacklist;	/* GHashTable{AsRefString:1} */
-	AsStoreAddFlags		 add_flags;
-	AsStoreWatchFlags	 watch_flags;
-	AsStoreProblems		 problems;
-	AsAppSearchMatch	 search_match;
+	guint32			 add_flags;
+	guint32			 watch_flags;
+	guint32			 problems;
+	guint16			 search_match;
 	guint32			 filter;
 	guint			 changed_block_refcnt;
 	gboolean		 is_pending_changed_signal;
@@ -117,8 +117,8 @@ static gboolean	as_store_from_file_internal (AsStore *store,
 					     GFile *file,
 					     AsAppScope scope,
 					     const gchar *arch,
-					     AsStoreLoadFlags load_flags,
-					     AsStoreWatchFlags watch_flags,
+					     guint32 load_flags,
+					     guint32 watch_flags,
 					     GCancellable *cancellable,
 					     GError **error);
 
@@ -477,6 +477,25 @@ as_store_get_apps_by_id (AsStore *store, const gchar *id)
 }
 
 /**
+ * as_store_get_apps_by_id_merge:
+ * @store: a #AsStore instance.
+ * @id: the application full ID.
+ *
+ * Gets an array of all the merge applications that match a specific ID.
+ *
+ * Returns: (element-type AsApp) (transfer none): an array
+ *
+ * Since: 0.7.0
+ **/
+GPtrArray *
+as_store_get_apps_by_id_merge (AsStore *store, const gchar *id)
+{
+	AsStorePrivate *priv = GET_PRIVATE (store);
+	g_return_val_if_fail (AS_IS_STORE (store), NULL);
+	return g_hash_table_lookup (priv->hash_merge_id, id);
+}
+
+/**
  * as_store_add_metadata_index:
  * @store: a #AsStore instance.
  * @key: the metadata key.
@@ -585,7 +604,7 @@ as_store_get_app_by_app (AsStore *store, AsApp *app)
 AsApp *
 as_store_get_app_by_unique_id (AsStore *store,
 			       const gchar *unique_id,
-			       AsStoreSearchFlags search_flags)
+			       guint32 search_flags)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	g_autoptr(AsApp) app_tmp = NULL;
@@ -645,6 +664,81 @@ as_store_get_app_by_provide (AsStore *store, AsProvideKind kind, const gchar *va
 	}
 	return NULL;
 
+}
+
+/**
+ * as_store_get_app_by_launchable:
+ * @store: a #AsStore instance.
+ * @kind: the #AsLaunchableKind
+ * @value: the provide value, e.g. "gimp.desktop"
+ *
+ * Finds an application in the store that provides a specific launchable.
+ *
+ * Returns: (transfer none): a #AsApp or %NULL
+ *
+ * Since: 0.7.8
+ **/
+AsApp *
+as_store_get_app_by_launchable (AsStore *store, AsLaunchableKind kind, const gchar *value)
+{
+	AsStorePrivate *priv = GET_PRIVATE (store);
+
+	g_return_val_if_fail (AS_IS_STORE (store), NULL);
+	g_return_val_if_fail (kind != AS_LAUNCHABLE_KIND_UNKNOWN, NULL);
+	g_return_val_if_fail (value != NULL, NULL);
+
+	for (guint i = 0; i < priv->array->len; i++) {
+		AsApp *app = g_ptr_array_index (priv->array, i);
+		GPtrArray *launchables = as_app_get_launchables (app);
+		for (guint j = 0; j < launchables->len; j++) {
+			AsLaunchable *tmp = g_ptr_array_index (launchables, j);
+			if (kind != as_launchable_get_kind (tmp))
+				continue;
+			if (g_strcmp0 (as_launchable_get_value (tmp), value) != 0)
+				continue;
+			return app;
+		}
+	}
+	return NULL;
+
+}
+
+/**
+ * as_store_get_apps_by_provide:
+ * @store: a #AsStore instance.
+ * @kind: the #AsProvideKind
+ * @value: the provide value, e.g. "com.hughski.ColorHug2.firmware"
+ *
+ * Finds any applications in the store by something that they provides.
+ *
+ * Returns: (transfer container) (element-type AsApp): an array of applications
+ *
+ * Since: 0.7.5
+ **/
+GPtrArray *
+as_store_get_apps_by_provide (AsStore *store, AsProvideKind kind, const gchar *value)
+{
+	AsStorePrivate *priv = GET_PRIVATE (store);
+	GPtrArray *apps = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
+
+	g_return_val_if_fail (AS_IS_STORE (store), NULL);
+	g_return_val_if_fail (kind != AS_PROVIDE_KIND_UNKNOWN, NULL);
+	g_return_val_if_fail (value != NULL, NULL);
+
+	/* find an application that provides something */
+	for (guint i = 0; i < priv->array->len; i++) {
+		AsApp *app = g_ptr_array_index (priv->array, i);
+		GPtrArray *provides = as_app_get_provides (app);
+		for (guint j = 0; j < provides->len; j++) {
+			AsProvide *tmp = g_ptr_array_index (provides, j);
+			if (kind != as_provide_get_kind (tmp))
+				continue;
+			if (g_strcmp0 (as_provide_get_value (tmp), value) != 0)
+				continue;
+			g_ptr_array_add (apps, g_object_ref (app));
+		}
+	}
+	return apps;
 }
 
 /**
@@ -719,6 +813,7 @@ as_store_get_app_by_id_with_fallbacks (AsStore *store, const gchar *id)
 		{ "gnobots2.desktop",		"gnome-robots.desktop" },
 		{ "gnome-2048.desktop",		"org.gnome.gnome-2048.desktop" },
 		{ "gnome-boxes.desktop",	"org.gnome.Boxes.desktop" },
+		{ "gnome-calculator.desktop",	"org.gnome.Calculator.desktop" },
 		{ "gnome-clocks.desktop",	"org.gnome.clocks.desktop" },
 		{ "gnome-contacts.desktop",	"org.gnome.Contacts.desktop" },
 		{ "gnome-dictionary.desktop",	"org.gnome.Dictionary.desktop" },
@@ -743,6 +838,7 @@ as_store_get_app_by_id_with_fallbacks (AsStore *store, const gchar *id)
 		{ "lollypop.desktop",		"org.gnome.Lollypop.desktop" },
 		{ "nautilus.desktop",		"org.gnome.Nautilus.desktop" },
 		{ "polari.desktop",		"org.gnome.Polari.desktop" },
+		{ "sound-juicer.desktop",	"org.gnome.SoundJuicer.desktop" },
 		{ "totem.desktop",		"org.gnome.Totem.desktop" },
 
 		/* KDE */
@@ -757,6 +853,7 @@ as_store_get_app_by_id_with_fallbacks (AsStore *store, const gchar *id)
 		{ "filelight.desktop",		"org.kde.filelight.desktop" },
 		{ "gwenview.desktop",		"org.kde.gwenview.desktop" },
 		{ "juk.desktop",		"org.kde.juk.desktop" },
+		{ "kajongg.desktop",		"org.kde.kajongg.desktop" },
 		{ "kalgebra.desktop",		"org.kde.kalgebra.desktop" },
 		{ "kalzium.desktop",		"org.kde.kalzium.desktop" },
 		{ "kamoso.desktop",		"org.kde.kamoso.desktop" },
@@ -804,6 +901,7 @@ as_store_get_app_by_id_with_fallbacks (AsStore *store, const gchar *id)
 		{ "colorhug-ccmx.desktop",	"com.hughski.ColorHug.CcmxLoader.desktop" },
 		{ "colorhug-flash.desktop",	"com.hughski.ColorHug.FlashLoader.desktop" },
 		{ "dconf-editor.desktop",	"ca.desrt.dconf-editor.desktop" },
+		{ "feedreader.desktop",		"org.gnome.FeedReader.desktop" },
 		{ "qtcreator.desktop",		"org.qt-project.qtcreator.desktop" },
 
 		{ NULL, NULL }
@@ -1065,16 +1163,23 @@ as_store_add_app (AsStore *store, AsApp *app)
 	    as_app_get_merge_kind (app) == AS_APP_MERGE_KIND_REPLACE)
 		as_app_add_quirk (app, AS_APP_QUIRK_MATCH_ANY_PREFIX);
 
+	/* ensure app has format set */
+	if (as_app_get_format_default (app) == NULL) {
+		g_autoptr(AsFormat) format = as_format_new ();
+		as_format_set_kind (format, AS_FORMAT_KIND_UNKNOWN);
+		as_app_add_format (app, format);
+	}
+
 	/* this is a special merge component */
 	if (as_app_has_quirk (app, AS_APP_QUIRK_MATCH_ANY_PREFIX)) {
-		AsAppSubsumeFlags flags = AS_APP_SUBSUME_FLAG_MERGE;
+		guint64 flags = AS_APP_SUBSUME_FLAG_MERGE;
 		AsAppMergeKind merge_kind = as_app_get_merge_kind (app);
 
 		apps = g_hash_table_lookup (priv->hash_merge_id, id);
 		if (apps == NULL) {
 			apps = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 			g_hash_table_insert (priv->hash_merge_id,
-					     (gpointer) as_app_get_id (app),
+					     g_strdup (as_app_get_id (app)),
 					     apps);
 		}
 		g_debug ("added %s merge component: %s",
@@ -1108,7 +1213,7 @@ as_store_add_app (AsStore *store, AsApp *app)
 		for (i = 0; i < apps->len; i++) {
 			AsApp *app_tmp = g_ptr_array_index (apps, i);
 			AsAppMergeKind merge_kind = as_app_get_merge_kind (app_tmp);
-			AsAppSubsumeFlags flags = AS_APP_SUBSUME_FLAG_MERGE;
+			guint64 flags = AS_APP_SUBSUME_FLAG_MERGE;
 			g_debug ("using %s merge component %s on %s",
 				 as_app_merge_kind_to_string (merge_kind),
 				 as_app_get_unique_id (app_tmp),
@@ -1136,10 +1241,12 @@ as_store_add_app (AsStore *store, AsApp *app)
 		if (app_format == NULL) {
 			g_warning ("no format specified in %s",
 				   as_app_get_unique_id (app));
+			return;
 		}
 		if (item_format == NULL) {
 			g_warning ("no format specified in %s",
 				   as_app_get_unique_id (item));
+			return;
 		}
 
 		/* the previously stored app is what we actually want */
@@ -1256,7 +1363,7 @@ as_store_add_app (AsStore *store, AsApp *app)
 	if (apps == NULL) {
 		apps = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 		g_hash_table_insert (priv->hash_id,
-				     (gpointer) as_app_get_id (app),
+				     g_strdup (as_app_get_id (app)),
 				     apps);
 	}
 	g_ptr_array_add (apps, g_object_ref (app));
@@ -1264,7 +1371,7 @@ as_store_add_app (AsStore *store, AsApp *app)
 	/* success, add to array */
 	g_ptr_array_add (priv->array, g_object_ref (app));
 	g_hash_table_insert (priv->hash_unique_id,
-			     (gpointer) as_app_get_unique_id (app),
+			     g_strdup (as_app_get_unique_id (app)),
 			     g_object_ref (app));
 	pkgnames = as_app_get_pkgnames (app);
 	for (i = 0; i < pkgnames->len; i++) {
@@ -1365,7 +1472,7 @@ as_store_from_root (AsStore *store,
 		    const gchar *icon_prefix,
 		    const gchar *source_filename,
 		    const gchar *arch,
-		    AsStoreLoadFlags load_flags,
+		    guint32 load_flags,
 		    GError **error)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
@@ -1384,6 +1491,7 @@ as_store_from_root (AsStore *store,
 	g_autoptr(AsProfileTask) ptask = NULL;
 	g_autoptr(AsRefString) icon_path_str = NULL;
 	g_autoptr(AsRefString) origin_str = NULL;
+	gboolean origin_is_flatpak;
 
 	g_return_val_if_fail (AS_IS_STORE (store), FALSE);
 
@@ -1436,9 +1544,11 @@ as_store_from_root (AsStore *store,
 		}
 	}
 
+	origin_is_flatpak = g_strcmp0 (priv->origin, "flatpak") == 0;
+
 	/* special case flatpak symlinks -- scope:name.xml.gz */
 	if (origin_app == NULL &&
-	    g_strcmp0 (priv->origin, "flatpak") == 0 &&
+	    origin_is_flatpak &&
 	    source_filename != NULL &&
 	    g_file_test (source_filename, G_FILE_TEST_IS_SYMLINK)) {
 		g_autofree gchar *source_basename = NULL;
@@ -1465,7 +1575,7 @@ as_store_from_root (AsStore *store,
 	}
 
 	/* fallback */
-	if (origin_app == NULL) {
+	if (origin_app == NULL && !origin_is_flatpak) {
 		id_prefix_app = g_strdup (as_app_scope_to_string (scope));
 		origin_app = g_strdup (priv->origin);
 		origin_app_icons = g_strdup (priv->origin);
@@ -1863,13 +1973,13 @@ as_store_from_file_internal (AsStore *store,
 			     GFile *file,
 			     AsAppScope scope,
 			     const gchar *arch,
-			     AsStoreLoadFlags load_flags,
-			     AsStoreWatchFlags watch_flags,
+			     guint32 load_flags,
+			     guint32 watch_flags,
 			     GCancellable *cancellable,
 			     GError **error)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
-	AsNodeFromXmlFlags flags = AS_NODE_FROM_XML_FLAG_LITERAL_TEXT;
+	guint32 flags = AS_NODE_FROM_XML_FLAG_LITERAL_TEXT;
 	g_autofree gchar *filename = NULL;
 	g_autofree gchar *icon_prefix = NULL;
 	g_autoptr(GError) error_local = NULL;
@@ -1933,7 +2043,7 @@ as_store_from_file_internal (AsStore *store,
  * as_store_from_file:
  * @store: a #AsStore instance.
  * @file: a #GFile.
- * @icon_root: the icon path, or %NULL for the default (unused)
+ * @icon_root: (nullable): the icon path, or %NULL for the default (unused)
  * @cancellable: a #GCancellable.
  * @error: A #GError or %NULL.
  *
@@ -2007,7 +2117,7 @@ as_store_from_bytes (AsStore *store,
 		g_set_error (error,
 			     AS_STORE_ERROR,
 			     AS_STORE_ERROR_FAILED,
-			     "no firmware support, compiled with --disable-firmware");
+			     "not supported, compiled without gcab");
 		return FALSE;
 #endif
 	}
@@ -2025,7 +2135,7 @@ as_store_from_bytes (AsStore *store,
  * as_store_from_xml:
  * @store: a #AsStore instance.
  * @data: XML data
- * @icon_root: the icon path, or %NULL for the default.
+ * @icon_root: (nullable): the icon path, or %NULL for the default.
  * @error: A #GError or %NULL.
  *
  * Parses AppStream XML file and adds any valid applications to the store.
@@ -2045,7 +2155,7 @@ as_store_from_xml (AsStore *store,
 		   GError **error)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
-	AsNodeFromXmlFlags flags = AS_NODE_FROM_XML_FLAG_LITERAL_TEXT;
+	guint32 flags = AS_NODE_FROM_XML_FLAG_LITERAL_TEXT;
 	g_autoptr(GError) error_local = NULL;
 	g_autoptr(AsNode) root = NULL;
 
@@ -2164,7 +2274,7 @@ as_store_remove_apps_with_veto (AsStore *store)
  * Since: 0.1.0
  **/
 GString *
-as_store_to_xml (AsStore *store, AsNodeToXmlFlags flags)
+as_store_to_xml (AsStore *store, guint32 flags)
 {
 	AsApp *app;
 	AsStorePrivate *priv = GET_PRIVATE (store);
@@ -2264,7 +2374,7 @@ as_store_convert_icons (AsStore *store, AsIconKind kind, GError **error)
 gboolean
 as_store_to_file (AsStore *store,
 		  GFile *file,
-		  AsNodeToXmlFlags flags,
+		  guint32 flags,
 		  GCancellable *cancellable,
 		  GError **error)
 {
@@ -2486,7 +2596,7 @@ as_store_set_api_version (AsStore *store, gdouble api_version)
  *
  * Since: 0.2.2
  **/
-AsStoreAddFlags
+guint32
 as_store_get_add_flags (AsStore *store)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
@@ -2506,7 +2616,7 @@ as_store_get_add_flags (AsStore *store)
  * Since: 0.2.2
  **/
 void
-as_store_set_add_flags (AsStore *store, AsStoreAddFlags add_flags)
+as_store_set_add_flags (AsStore *store, guint32 add_flags)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	priv->add_flags = add_flags;
@@ -2522,7 +2632,7 @@ as_store_set_add_flags (AsStore *store, AsStoreAddFlags add_flags)
  *
  * Since: 0.4.2
  **/
-AsStoreWatchFlags
+guint32
 as_store_get_watch_flags (AsStore *store)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
@@ -2539,7 +2649,7 @@ as_store_get_watch_flags (AsStore *store)
  * Since: 0.4.2
  **/
 void
-as_store_set_watch_flags (AsStore *store, AsStoreWatchFlags watch_flags)
+as_store_set_watch_flags (AsStore *store, guint32 watch_flags)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	priv->watch_flags = watch_flags;
@@ -2581,7 +2691,7 @@ as_store_load_app_info_file (AsStore *store,
 			     AsAppScope scope,
 			     const gchar *path_xml,
 			     const gchar *arch,
-			     AsStoreLoadFlags flags,
+			     guint32 flags,
 			     GCancellable *cancellable,
 			     GError **error)
 {
@@ -2615,7 +2725,7 @@ as_store_load_app_info (AsStore *store,
 			AsAppScope scope,
 			const gchar *path,
 			const gchar *arch,
-			AsStoreLoadFlags flags,
+			guint32 flags,
 			GCancellable *cancellable,
 			GError **error)
 {
@@ -2714,13 +2824,13 @@ as_store_load_installed_file_is_valid (const gchar *filename)
 
 static gboolean
 as_store_load_installed (AsStore *store,
-			 AsStoreLoadFlags flags,
+			 guint32 flags,
 			 AsAppScope scope,
 			 const gchar *path,
 			 GCancellable *cancellable,
 			 GError **error)
 {
-	AsAppParseFlags parse_flags = AS_APP_PARSE_FLAG_USE_HEURISTICS;
+	guint32 parse_flags = AS_APP_PARSE_FLAG_USE_HEURISTICS;
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	GError *error_local = NULL;
 	const gchar *tmp;
@@ -2849,7 +2959,7 @@ as_store_load_path (AsStore *store, const gchar *path,
 
 static gboolean
 as_store_search_installed (AsStore *store,
-			   AsStoreLoadFlags flags,
+			   guint32 flags,
 			   AsAppScope scope,
 			   const gchar *path,
 			   GCancellable *cancellable,
@@ -2867,7 +2977,7 @@ as_store_search_installed (AsStore *store,
 
 static gboolean
 as_store_search_app_info (AsStore *store,
-			  AsStoreLoadFlags flags,
+			  guint32 flags,
 			  AsAppScope scope,
 			  const gchar *path,
 			  GCancellable *cancellable,
@@ -2892,7 +3002,7 @@ as_store_search_app_info (AsStore *store,
 
 static gboolean
 as_store_search_per_system (AsStore *store,
-			    AsStoreLoadFlags flags,
+			    guint32 flags,
 			    GCancellable *cancellable,
 			    GError **error)
 {
@@ -2914,6 +3024,10 @@ as_store_search_per_system (AsStore *store,
 		}
 		if (g_str_has_prefix (data_dirs[i], "/home/")) {
 			g_debug ("skipping %s as invalid", data_dirs[i]);
+			continue;
+		}
+		if (g_strstr_len (data_dirs[i], -1, "snapd/desktop") != NULL) {
+			g_debug ("skippping %s as invalid", data_dirs[i]);
 			continue;
 		}
 		if ((flags & AS_STORE_LOAD_FLAG_APP_INFO_SYSTEM) > 0) {
@@ -2978,7 +3092,7 @@ as_store_search_per_system (AsStore *store,
 
 static gboolean
 as_store_search_per_user (AsStore *store,
-			  AsStoreLoadFlags flags,
+			  guint32 flags,
 			  GCancellable *cancellable,
 			  GError **error)
 {
@@ -3085,10 +3199,7 @@ as_store_load_search_cache (AsStore *store)
  * Since: 0.1.2
  **/
 gboolean
-as_store_load (AsStore *store,
-	       AsStoreLoadFlags flags,
-	       GCancellable *cancellable,
-	       GError **error)
+as_store_load (AsStore *store, guint32 flags, GCancellable *cancellable, GError **error)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	g_autoptr(AsProfileTask) ptask = NULL;
@@ -3175,7 +3286,7 @@ as_store_get_unique_name_app_key (AsApp *app)
  * Since: 0.2.4
  **/
 GPtrArray *
-as_store_validate (AsStore *store, AsAppValidateFlags flags, GError **error)
+as_store_validate (AsStore *store, guint32 flags, GError **error)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	AsApp *app;
@@ -3438,7 +3549,7 @@ as_store_create_search_blacklist (AsStore *store)
 /**
  * as_store_set_search_match:
  * @store: a #AsStore instance.
- * @search_match: the API version
+ * @search_match: the #AsAppSearchMatch, e.g. %AS_APP_SEARCH_MATCH_PKGNAME
  *
  * Sets the token match fields. The bitfield given here is used to choose what
  * is included in the token cache.
@@ -3446,10 +3557,28 @@ as_store_create_search_blacklist (AsStore *store)
  * Since: 0.6.5
  **/
 void
-as_store_set_search_match (AsStore *store, AsAppSearchMatch search_match)
+as_store_set_search_match (AsStore *store, guint16 search_match)
 {
 	AsStorePrivate *priv = GET_PRIVATE (store);
 	priv->search_match = search_match;
+}
+
+/**
+ * as_store_get_search_match:
+ * @store: a #AsStore instance.
+ *
+ * Gets the token match fields. The bitfield given here is used to choose what
+ * is included in the token cache.
+ *
+ * Returns: a #AsAppSearchMatch, e.g. %AS_APP_SEARCH_MATCH_PKGNAME
+ *
+ * Since: 0.6.13
+ **/
+guint16
+as_store_get_search_match (AsStore *store)
+{
+	AsStorePrivate *priv = GET_PRIVATE (store);
+	return priv->search_match;
 }
 
 static void
@@ -3468,15 +3597,15 @@ as_store_init (AsStore *store)
 							NULL);
 	priv->hash_id = g_hash_table_new_full (g_str_hash,
 					       g_str_equal,
-					       NULL,
+					       g_free,
 					       (GDestroyNotify) g_ptr_array_unref);
 	priv->hash_merge_id = g_hash_table_new_full (g_str_hash,
 						     g_str_equal,
-						     NULL,
+						     g_free,
 						     (GDestroyNotify) g_ptr_array_unref);
 	priv->hash_unique_id = g_hash_table_new_full (g_str_hash,
 						      g_str_equal,
-						      NULL,
+						      g_free,
 						      g_object_unref);
 	priv->hash_pkgname = g_hash_table_new_full (g_str_hash,
 						    g_str_equal,

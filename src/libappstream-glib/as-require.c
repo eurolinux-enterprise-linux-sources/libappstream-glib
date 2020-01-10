@@ -95,6 +95,14 @@ as_require_kind_from_string (const gchar *kind)
 		return AS_REQUIRE_KIND_ID;
 	if (g_strcmp0 (kind, "firmware") == 0)
 		return AS_REQUIRE_KIND_FIRMWARE;
+	if (g_strcmp0 (kind, "hardware") == 0)
+		return AS_REQUIRE_KIND_HARDWARE;
+	if (g_strcmp0 (kind, "modalias") == 0)
+		return AS_REQUIRE_KIND_MODALIAS;
+	if (g_strcmp0 (kind, "kernel") == 0)
+		return AS_REQUIRE_KIND_KERNEL;
+	if (g_strcmp0 (kind, "memory") == 0)
+		return AS_REQUIRE_KIND_MEMORY;
 	return AS_REQUIRE_KIND_UNKNOWN;
 }
 
@@ -115,6 +123,14 @@ as_require_kind_to_string (AsRequireKind kind)
 		return "id";
 	if (kind == AS_REQUIRE_KIND_FIRMWARE)
 		return "firmware";
+	if (kind == AS_REQUIRE_KIND_HARDWARE)
+		return "hardware";
+	if (kind == AS_REQUIRE_KIND_MODALIAS)
+		return "modalias";
+	if (kind == AS_REQUIRE_KIND_KERNEL)
+		return "kernel";
+	if (kind == AS_REQUIRE_KIND_MEMORY)
+		return "memory";
 	return NULL;
 }
 
@@ -339,34 +355,52 @@ as_require_version_compare (AsRequire *require,
 {
 	AsRequirePrivate *priv = GET_PRIVATE (require);
 	gboolean ret = FALSE;
+	gint rc = 0;
 
 	switch (priv->compare) {
 	case AS_REQUIRE_COMPARE_EQ:
-		ret = as_utils_vercmp (version, priv->version) == 0;
+		rc = as_utils_vercmp (version, priv->version);
+		ret = rc == 0;
 		break;
 	case AS_REQUIRE_COMPARE_NE:
-		ret = as_utils_vercmp (version, priv->version) != 0;
+		rc = as_utils_vercmp (version, priv->version);
+		ret = rc != 0;
 		break;
 	case AS_REQUIRE_COMPARE_LT:
-		ret = as_utils_vercmp (version, priv->version) < 0;
+		rc = as_utils_vercmp (version, priv->version);
+		ret = rc < 0;
 		break;
 	case AS_REQUIRE_COMPARE_GT:
-		ret = as_utils_vercmp (version, priv->version) > 0;
+		rc = as_utils_vercmp (version, priv->version);
+		ret = rc > 0;
 		break;
 	case AS_REQUIRE_COMPARE_LE:
-		ret = as_utils_vercmp (version, priv->version) <= 0;
+		rc = as_utils_vercmp (version, priv->version);
+		ret = rc <= 0;
 		break;
 	case AS_REQUIRE_COMPARE_GE:
-		ret = as_utils_vercmp (version, priv->version) >= 0;
+		rc = as_utils_vercmp (version, priv->version);
+		ret = rc >= 0;
 		break;
 	case AS_REQUIRE_COMPARE_GLOB:
-		ret = fnmatch (version, priv->version, 0) == 0;
+		ret = fnmatch (priv->version, version, 0) == 0;
 		break;
 	case AS_REQUIRE_COMPARE_REGEX:
-		ret = g_regex_match_simple (version, priv->version, 0, 0);
+		ret = g_regex_match_simple (priv->version, version, 0, 0);
 		break;
 	default:
 		break;
+	}
+
+	/* could not compare */
+	if (rc == G_MAXINT) {
+		g_set_error (error,
+			     AS_UTILS_ERROR,
+			     AS_UTILS_ERROR_FAILED,
+			     "failed to compare [%s] and [%s]",
+			     priv->version,
+			     version);
+		return FALSE;
 	}
 
 	/* set error */
@@ -380,6 +414,41 @@ as_require_version_compare (AsRequire *require,
 			     version);
 	}
 	return ret;
+}
+
+/**
+ * as_require_equal:
+ * @require1: a #AsRequire instance.
+ * @require2: a #AsRequire instance.
+ *
+ * Checks if two requires are the same.
+ *
+ * Returns: %TRUE for success
+ *
+ * Since: 0.7.7
+ **/
+gboolean
+as_require_equal (AsRequire *require1, AsRequire *require2)
+{
+	AsRequirePrivate *priv1 = GET_PRIVATE (require1);
+	AsRequirePrivate *priv2 = GET_PRIVATE (require2);
+
+	/* trivial */
+	if (require1 == require2)
+		return TRUE;
+
+	/* check for equality */
+	if (priv1->kind != priv2->kind)
+		return FALSE;
+	if (priv1->compare != priv2->compare)
+		return FALSE;
+	if (g_strcmp0 (priv1->version, priv2->version) != 0)
+		return FALSE;
+	if (g_strcmp0 (priv1->value, priv2->value) != 0)
+		return FALSE;
+
+	/* success */
+	return TRUE;
 }
 
 /**
@@ -443,8 +512,8 @@ as_require_node_parse (AsRequire *require, GNode *node,
 	tmp = as_node_get_attribute (node, "compare");
 	if (tmp != NULL)
 		as_require_set_compare (require, as_require_compare_from_string (tmp));
-	as_ref_string_assign (&priv->version, as_node_get_attribute (node, "version"));
-	as_ref_string_assign (&priv->value, as_node_get_data (node));
+	as_ref_string_assign (&priv->version, as_node_get_attribute_as_refstr (node, "version"));
+	as_ref_string_assign (&priv->value, as_node_get_data_as_refstr (node));
 	return TRUE;
 }
 

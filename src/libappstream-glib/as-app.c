@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2018 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -40,9 +40,11 @@
 #include "as-app-private.h"
 #include "as-bundle-private.h"
 #include "as-content-rating-private.h"
+#include "as-agreement-private.h"
 #include "as-enums.h"
 #include "as-icon-private.h"
 #include "as-node-private.h"
+#include "as-launchable-private.h"
 #include "as-provide-private.h"
 #include "as-release-private.h"
 #include "as-ref-string.h"
@@ -82,9 +84,11 @@ typedef struct
 	GPtrArray	*formats;			/* of AsFormat */
 	GPtrArray	*releases;			/* of AsRelease */
 	GPtrArray	*provides;			/* of AsProvide */
+	GPtrArray	*launchables;			/* of AsLaunchable */
 	GPtrArray	*screenshots;			/* of AsScreenshot */
 	GPtrArray	*reviews;			/* of AsReview */
 	GPtrArray	*content_ratings;		/* of AsContentRating */
+	GPtrArray	*agreements;			/* of AsAgreement */
 	GPtrArray	*icons;				/* of AsIcon */
 	GPtrArray	*bundles;			/* of AsBundle */
 	GPtrArray	*translations;			/* of AsTranslation */
@@ -94,9 +98,9 @@ typedef struct
 	AsAppScope	 scope;
 	AsAppMergeKind	 merge_kind;
 	AsAppState	 state;
-	AsAppTrustFlags	 trust_flags;
+	guint32		 trust_flags;
 	AsAppQuirk	 quirk;
-	AsAppSearchMatch search_match;
+	guint16		 search_match;
 	AsRefString	*icon_path;
 	AsRefString	*id_filename;
 	AsRefString	*id;
@@ -452,6 +456,7 @@ as_app_finalize (GObject *object)
 	g_ptr_array_unref (priv->categories);
 	g_ptr_array_unref (priv->compulsory_for_desktops);
 	g_ptr_array_unref (priv->content_ratings);
+	g_ptr_array_unref (priv->agreements);
 	g_ptr_array_unref (priv->extends);
 	g_ptr_array_unref (priv->kudos);
 	g_ptr_array_unref (priv->permissions);
@@ -461,6 +466,7 @@ as_app_finalize (GObject *object)
 	g_ptr_array_unref (priv->architectures);
 	g_ptr_array_unref (priv->releases);
 	g_ptr_array_unref (priv->provides);
+	g_ptr_array_unref (priv->launchables);
 	g_ptr_array_unref (priv->screenshots);
 	g_ptr_array_unref (priv->reviews);
 	g_ptr_array_unref (priv->icons);
@@ -480,6 +486,7 @@ as_app_init (AsApp *app)
 	priv->categories = g_ptr_array_new_with_free_func ((GDestroyNotify) as_ref_string_unref);
 	priv->compulsory_for_desktops = g_ptr_array_new_with_free_func ((GDestroyNotify) as_ref_string_unref);
 	priv->content_ratings = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
+	priv->agreements = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	priv->extends = g_ptr_array_new_with_free_func ((GDestroyNotify) as_ref_string_unref);
 	priv->keywords = g_hash_table_new_full (g_str_hash, g_str_equal,
 						(GDestroyNotify) as_ref_string_unref,
@@ -493,6 +500,7 @@ as_app_init (AsApp *app)
 	priv->addons = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	priv->releases = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	priv->provides = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
+	priv->launchables = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	priv->screenshots = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	priv->reviews = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	priv->icons = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
@@ -960,7 +968,7 @@ as_app_get_format_by_kind (AsApp *app, AsFormatKind kind)
 /**
  * as_app_get_keywords:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets any keywords the application should match against.
  *
@@ -1116,6 +1124,29 @@ as_app_get_release_default (AsApp *app)
 }
 
 /**
+ * as_app_get_release_by_version:
+ * @app: a #AsApp instance.
+ * @version: a release version number, e.g. "1.2.3"
+ *
+ * Gets a specific release from the application.
+ *
+ * Returns: (transfer none): a release, or %NULL
+ *
+ * Since: 0.7.3
+ **/
+AsRelease *
+as_app_get_release_by_version (AsApp *app, const gchar *version)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	for (guint i = 0; i < priv->releases->len; i++) {
+		AsRelease *release_tmp = g_ptr_array_index (priv->releases, i);
+		if (g_strcmp0 (version, as_release_get_version (release_tmp)) == 0)
+			return release_tmp;
+	}
+	return NULL;
+}
+
+/**
  * as_app_get_provides:
  * @app: a #AsApp instance.
  *
@@ -1133,6 +1164,67 @@ as_app_get_provides (AsApp *app)
 }
 
 /**
+ * as_app_get_launchables:
+ * @app: a #AsApp instance.
+ *
+ * Gets all the launchables the application has.
+ *
+ * Returns: (element-type AsLaunchable) (transfer none): an array
+ *
+ * Since: 0.6.13
+ **/
+GPtrArray *
+as_app_get_launchables (AsApp *app)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	return priv->launchables;
+}
+
+/**
+ * as_app_get_launchable_by_kind:
+ * @app: a #AsApp instance.
+ * @kind: a #AsLaunchableKind, e.g. %AS_FORMAT_KIND_APPDATA
+ *
+ * Searches the list of launchables for a specific launchable kind.
+ *
+ * Returns: (transfer none): A #AsLaunchable, or %NULL if not found
+ *
+ * Since: 0.6.13
+ */
+AsLaunchable *
+as_app_get_launchable_by_kind (AsApp *app, AsLaunchableKind kind)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	for (guint i = 0; i < priv->launchables->len; i++) {
+		AsLaunchable *launchable = g_ptr_array_index (priv->launchables, i);
+		if (as_launchable_get_kind (launchable) == kind)
+			return launchable;
+	}
+	return NULL;
+}
+
+/**
+ * as_app_get_launchable_default:
+ * @app: a #AsApp instance.
+ *
+ * Returns the default launchable.
+ *
+ * Returns: (transfer none): A #AsLaunchable, or %NULL if not found
+ *
+ * Since: 0.6.13
+ */
+AsLaunchable *
+as_app_get_launchable_default (AsApp *app)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	if (priv->launchables->len > 0) {
+		AsLaunchable *launchable = g_ptr_array_index (priv->launchables, 0);
+		return launchable;
+	}
+	return NULL;
+}
+
+/**
  * as_app_get_screenshots:
  * @app: a #AsApp instance.
  *
@@ -1147,6 +1239,25 @@ as_app_get_screenshots (AsApp *app)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	return priv->screenshots;
+}
+
+/**
+ * as_app_get_screenshot_default:
+ * @app: a #AsApp instance.
+ *
+ * Gets the default screenshot for the component.
+ *
+ * Returns: (transfer none): a screenshot or %NULL
+ *
+ * Since: 0.7.3
+ **/
+AsScreenshot *
+as_app_get_screenshot_default (AsApp *app)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	if (priv->screenshots->len == 0)
+		return NULL;
+	return AS_SCREENSHOT (g_ptr_array_index (priv->screenshots, 0));
 }
 
 /**
@@ -1207,6 +1318,68 @@ as_app_get_content_rating (AsApp *app, const gchar *kind)
 			return content_rating;
 	}
 	return NULL;
+}
+
+/**
+ * as_app_get_agreements:
+ * @app: a #AsApp instance.
+ *
+ * Gets any agreements the application has defined.
+ *
+ * Returns: (element-type AsAgreement) (transfer none): an array
+ *
+ * Since: 0.7.8
+ **/
+GPtrArray *
+as_app_get_agreements (AsApp *app)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	return priv->agreements;
+}
+
+/**
+ * as_app_get_agreement_by_kind:
+ * @app: a #AsApp instance.
+ * @kind: an agreement kind, e.g. %AS_AGREEMENT_KIND_EULA
+ *
+ * Gets a agreement the application has defined of a specific type.
+ *
+ * Returns: (transfer none): a #AsAgreement or NULL for not found
+ *
+ * Since: 0.7.8
+ **/
+AsAgreement *
+as_app_get_agreement_by_kind (AsApp *app, AsAgreementKind kind)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	guint i;
+
+	for (i = 0; i < priv->agreements->len; i++) {
+		AsAgreement *agreement;
+		agreement = g_ptr_array_index (priv->agreements, i);
+		if (as_agreement_get_kind (agreement) == kind)
+			return agreement;
+	}
+	return NULL;
+}
+
+/**
+ * as_app_get_agreement_default:
+ * @app: a #AsApp instance.
+ *
+ * Gets a privacy policys the application has defined of a specific type.
+ *
+ * Returns: (transfer none): a #AsAgreement or NULL for not found
+ *
+ * Since: 0.7.8
+ **/
+AsAgreement *
+as_app_get_agreement_default (AsApp *app)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	if (priv->agreements->len < 1)
+		return NULL;
+	return g_ptr_array_index (priv->agreements, 0);
 }
 
 /**
@@ -1378,7 +1551,7 @@ as_app_get_developer_names (AsApp *app)
  *
  * Gets the metadata set for the application.
  *
- * Returns: (transfer none): hash table of metadata
+ * Returns: (transfer none) (element-type utf8 utf8): hash table of metadata
  *
  * Since: 0.1.6
  **/
@@ -1661,7 +1834,7 @@ as_app_get_state (AsApp *app)
  *
  * Since: 0.2.2
  **/
-AsAppTrustFlags
+guint32
 as_app_get_trust_flags (AsApp *app)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
@@ -1743,7 +1916,7 @@ as_app_get_icon_path (AsApp *app)
 /**
  * as_app_get_name:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets the application name for a specific locale.
  *
@@ -1761,7 +1934,7 @@ as_app_get_name (AsApp *app, const gchar *locale)
 /**
  * as_app_get_comment:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets the application summary for a specific locale.
  *
@@ -1779,7 +1952,7 @@ as_app_get_comment (AsApp *app, const gchar *locale)
 /**
  * as_app_get_developer_name:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets the application developer name for a specific locale.
  *
@@ -1797,7 +1970,7 @@ as_app_get_developer_name (AsApp *app, const gchar *locale)
 /**
  * as_app_get_description:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets the application description markup for a specific locale.
  *
@@ -1815,7 +1988,7 @@ as_app_get_description (AsApp *app, const gchar *locale)
 /**
  * as_app_get_language:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets the language coverage for the specific language.
  *
@@ -2097,6 +2270,7 @@ as_app_set_id (AsApp *app, const gchar *id)
 		".desktop",
 		".addon",
 		".firmware",
+		".shell-extension",
 		NULL };
 
 	/* handle untrusted */
@@ -2214,7 +2388,7 @@ as_app_set_state (AsApp *app, AsAppState state)
  * Since: 0.2.2
  **/
 void
-as_app_set_trust_flags (AsApp *app, AsAppTrustFlags trust_flags)
+as_app_set_trust_flags (AsApp *app, guint32 trust_flags)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	priv->trust_flags = trust_flags;
@@ -2314,7 +2488,7 @@ as_app_set_project_group (AsApp *app, const gchar *project_group)
 
 	/* check value */
 	if (priv->trust_flags != AS_APP_TRUST_FLAG_COMPLETE) {
-		if (!as_utils_is_environment_id (project_group)) {
+		if (g_strcmp0 (project_group, "") == 0) {
 			priv->problems |= AS_APP_PROBLEM_INVALID_PROJECT_GROUP;
 			return;
 		}
@@ -2540,7 +2714,7 @@ as_app_set_icon_path (AsApp *app, const gchar *icon_path)
 /**
  * as_app_set_name:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  * @name: the application name.
  *
  * Sets the application name for a specific locale.
@@ -2574,7 +2748,7 @@ as_app_set_name (AsApp *app,
 /**
  * as_app_set_comment:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  * @comment: the application summary.
  *
  * Sets the application summary for a specific locale.
@@ -2610,7 +2784,7 @@ as_app_set_comment (AsApp *app,
 /**
  * as_app_set_developer_name:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  * @developer_name: the application developer name.
  *
  * Sets the application developer name for a specific locale.
@@ -2646,7 +2820,7 @@ as_app_set_developer_name (AsApp *app,
 /**
  * as_app_set_description:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  * @description: the application description.
  *
  * Sets the application descrption markup for a specific locale.
@@ -2726,6 +2900,27 @@ as_app_add_category (AsApp *app, const gchar *category)
 	g_ptr_array_add (priv->categories, as_ref_string_new (category));
 }
 
+/**
+ * as_app_remove_category:
+ * @app: a #AsApp instance.
+ * @category: the category.
+ *
+ * Removed a menu category from the application.
+ *
+ * Since: 0.6.13
+ **/
+void
+as_app_remove_category (AsApp *app, const gchar *category)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	for (guint i = 0; i < priv->categories->len; i++) {
+		const gchar *tmp = g_ptr_array_index (priv->categories, i);
+		if (g_strcmp0 (tmp, category) == 0) {
+			g_ptr_array_remove (priv->categories, (gpointer) tmp);
+			break;
+		}
+	}
+}
 
 /**
  * as_app_add_compulsory_for_desktop:
@@ -2762,7 +2957,7 @@ as_app_add_compulsory_for_desktop (AsApp *app, const gchar *compulsory_for_deskt
 /**
  * as_app_add_keyword:
  * @app: a #AsApp instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  * @keyword: the keyword.
  *
  * Add a keyword the application should match against.
@@ -2801,6 +2996,14 @@ as_app_add_keyword (AsApp *app,
 			return;
 	}
 	g_ptr_array_add (tmp, as_ref_string_new (keyword));
+
+	/* cache already populated */
+	if (priv->token_cache_valid) {
+		g_warning ("%s has token cache, invaliding as %s was added",
+			   as_app_get_unique_id (app), keyword);
+		g_hash_table_remove_all (priv->token_cache);
+		priv->token_cache_valid = FALSE;
+	}
 }
 
 /**
@@ -2829,6 +3032,28 @@ as_app_add_kudo (AsApp *app, const gchar *kudo)
 		return;
 	}
 	g_ptr_array_add (priv->kudos, as_ref_string_new (kudo));
+}
+
+/**
+ * as_app_remove_kudo:
+ * @app: a #AsApp instance.
+ * @kudo: the kudo.
+ *
+ * Remove a kudo the application has obtained.
+ *
+ * Since: 0.6.13
+ **/
+void
+as_app_remove_kudo (AsApp *app, const gchar *kudo)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	for (guint i = 0; i < priv->kudos->len; i++) {
+		const gchar *tmp = g_ptr_array_index (priv->kudos, i);
+		if (g_strcmp0 (tmp, kudo) == 0) {
+			g_ptr_array_remove (priv->kudos, (gpointer) tmp);
+			break;
+		}
+	}
 }
 
 /**
@@ -3091,11 +3316,43 @@ as_app_add_provide (AsApp *app, AsProvide *provide)
 	g_ptr_array_add (priv->provides, g_object_ref (provide));
 }
 
+/**
+ * as_app_add_launchable:
+ * @app: a #AsApp instance.
+ * @launchable: a #AsLaunchable instance.
+ *
+ * Adds a launchable to an application.
+ *
+ * Since: 0.6.13
+ **/
+void
+as_app_add_launchable (AsApp *app, AsLaunchable *launchable)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+
+	/* check for duplicates */
+	if (priv->trust_flags & AS_APP_TRUST_FLAG_CHECK_DUPLICATES) {
+		for (guint i = 0; i < priv->launchables->len; i++) {
+			AsLaunchable *lau = g_ptr_array_index (priv->launchables, i);
+			if (as_launchable_get_kind (lau) == as_launchable_get_kind (launchable) &&
+			    g_strcmp0 (as_launchable_get_value (lau),
+				       as_launchable_get_value (launchable)) == 0)
+				return;
+		}
+	}
+
+	g_ptr_array_add (priv->launchables, g_object_ref (launchable));
+}
+
 static gint
 as_app_sort_screenshots (gconstpointer a, gconstpointer b)
 {
 	AsScreenshot *ss1 = *((AsScreenshot **) a);
 	AsScreenshot *ss2 = *((AsScreenshot **) b);
+	if (as_screenshot_get_kind (ss1) < as_screenshot_get_kind (ss2))
+		return 1;
+	if (as_screenshot_get_kind (ss1) > as_screenshot_get_kind (ss2))
+		return -1;
 	if (as_screenshot_get_priority (ss1) < as_screenshot_get_priority (ss2))
 		return 1;
 	if (as_screenshot_get_priority (ss1) > as_screenshot_get_priority (ss2))
@@ -3124,8 +3381,10 @@ as_app_add_screenshot (AsApp *app, AsScreenshot *screenshot)
 	if ((priv->trust_flags & AS_APP_TRUST_FLAG_CHECK_DUPLICATES) > 0) {
 		for (i = 0; i < priv->screenshots->len; i++) {
 			ss = g_ptr_array_index (priv->screenshots, i);
-			if (as_screenshot_equal (ss, screenshot))
+			if (as_screenshot_equal (ss, screenshot)) {
+				priv->problems |= AS_APP_PROBLEM_DUPLICATE_SCREENSHOT;
 				return;
+			}
 		}
 	}
 
@@ -3181,7 +3440,46 @@ void
 as_app_add_content_rating (AsApp *app, AsContentRating *content_rating)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
+
+	/* handle untrusted */
+	if ((priv->trust_flags & AS_APP_TRUST_FLAG_CHECK_DUPLICATES) > 0) {
+		for (guint i = 0; i < priv->content_ratings->len; i++) {
+			AsContentRating *cr_tmp = g_ptr_array_index (priv->content_ratings, i);
+			if (g_strcmp0 (as_content_rating_get_kind (cr_tmp),
+				       as_content_rating_get_kind (content_rating)) == 0) {
+				priv->problems |= AS_APP_PROBLEM_DUPLICATE_CONTENT_RATING;
+				return;
+			}
+		}
+	}
 	g_ptr_array_add (priv->content_ratings, g_object_ref (content_rating));
+}
+
+/**
+ * as_app_add_agreement:
+ * @app: a #AsApp instance.
+ * @agreement: a #AsAgreement instance.
+ *
+ * Adds a agreement to an application.
+ *
+ * Since: 0.7.8
+ **/
+void
+as_app_add_agreement (AsApp *app, AsAgreement *agreement)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+
+	/* handle untrusted */
+	if ((priv->trust_flags & AS_APP_TRUST_FLAG_CHECK_DUPLICATES) > 0) {
+		for (guint i = 0; i < priv->agreements->len; i++) {
+			AsAgreement *cr_tmp = g_ptr_array_index (priv->agreements, i);
+			if (as_agreement_get_kind (cr_tmp) == as_agreement_get_kind (agreement)) {
+				priv->problems |= AS_APP_PROBLEM_DUPLICATE_AGREEMENT;
+				return;
+			}
+		}
+	}
+	g_ptr_array_add (priv->agreements, g_object_ref (agreement));
 }
 
 static gboolean
@@ -3377,6 +3675,15 @@ void
 as_app_add_require (AsApp *app, AsRequire *require)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
+
+	/* handle untrusted */
+	if ((priv->trust_flags & AS_APP_TRUST_FLAG_CHECK_DUPLICATES) > 0) {
+		for (guint i = 0; i < priv->requires->len; i++) {
+			AsRequire *req_tmp = g_ptr_array_index (priv->requires, i);
+			if (as_require_equal (require, req_tmp))
+				return;
+		}
+	}
 	g_ptr_array_add (priv->requires, g_object_ref (require));
 }
 
@@ -3447,7 +3754,7 @@ as_app_add_arch (AsApp *app, const gchar *arch)
  * as_app_add_language:
  * @app: a #AsApp instance.
  * @percentage: the percentage completion of the translation, or 0 for unknown
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Adds a language to the application.
  *
@@ -3605,7 +3912,7 @@ as_app_add_addon (AsApp *app, AsApp *addon)
 
 
 static void
-as_app_subsume_dict (GHashTable *dest, GHashTable *src, AsAppSubsumeFlags flags)
+as_app_subsume_dict (GHashTable *dest, GHashTable *src, guint64 flags)
 {
 	GList *l;
 	const gchar *tmp;
@@ -3687,7 +3994,7 @@ as_app_subsume_icon (AsApp *app, AsIcon *icon)
 }
 
 static void
-as_app_subsume_private (AsApp *app, AsApp *donor, AsAppSubsumeFlags flags)
+as_app_subsume_private (AsApp *app, AsApp *donor, guint64 flags)
 {
 	AsAppPrivate *priv = GET_PRIVATE (donor);
 	AsAppPrivate *papp = GET_PRIVATE (app);
@@ -3873,6 +4180,18 @@ as_app_subsume_private (AsApp *app, AsApp *donor, AsAppSubsumeFlags flags)
 		}
 	}
 
+	/* agreements */
+	if (flags & AS_APP_SUBSUME_FLAG_AGREEMENTS) {
+		if ((flags & AS_APP_SUBSUME_FLAG_REPLACE) > 0 &&
+		    priv->agreements->len > 0)
+			g_ptr_array_set_size (papp->agreements, 0);
+		for (i = 0; i < priv->agreements->len; i++) {
+			AsAgreement *agreement;
+			agreement = g_ptr_array_index (priv->agreements, i);
+			as_app_add_agreement (app, agreement);
+		}
+	}
+
 	/* provides */
 	if (flags & AS_APP_SUBSUME_FLAG_PROVIDES) {
 		if ((flags & AS_APP_SUBSUME_FLAG_REPLACE) > 0 &&
@@ -3881,6 +4200,17 @@ as_app_subsume_private (AsApp *app, AsApp *donor, AsAppSubsumeFlags flags)
 		for (i = 0; i < priv->provides->len; i++) {
 			AsProvide *pr = g_ptr_array_index (priv->provides, i);
 			as_app_add_provide (app, pr);
+		}
+	}
+
+	/* launchables */
+	if (flags & AS_APP_SUBSUME_FLAG_LAUNCHABLES) {
+		if ((flags & AS_APP_SUBSUME_FLAG_REPLACE) > 0 &&
+		    priv->launchables->len > 0)
+			g_ptr_array_set_size (papp->launchables, 0);
+		for (i = 0; i < priv->launchables->len; i++) {
+			AsLaunchable *lau = g_ptr_array_index (priv->launchables, i);
+			as_app_add_launchable (app, lau);
 		}
 	}
 
@@ -3999,14 +4329,14 @@ as_app_subsume_private (AsApp *app, AsApp *donor, AsAppSubsumeFlags flags)
  * as_app_subsume_full:
  * @app: a #AsApp instance.
  * @donor: the donor.
- * @flags: any optional flags, e.g. %AS_APP_SUBSUME_FLAG_NO_OVERWRITE
+ * @flags: any optional #AsAppSubsumeFlags, e.g. %AS_APP_SUBSUME_FLAG_NO_OVERWRITE
  *
  * Copies information from the donor to the application object.
  *
  * Since: 0.1.4
  **/
 void
-as_app_subsume_full (AsApp *app, AsApp *donor, AsAppSubsumeFlags flags)
+as_app_subsume_full (AsApp *app, AsApp *donor, guint64 flags)
 {
 	g_assert (app != donor);
 
@@ -4096,6 +4426,20 @@ as_app_provides_sort_cb (gconstpointer a, gconstpointer b)
 		return 1;
 	return g_strcmp0 (as_provide_get_value (prov1),
 			  as_provide_get_value (prov2));
+}
+
+static gint
+as_app_launchables_sort_cb (gconstpointer a, gconstpointer b)
+{
+	AsLaunchable *lau1 = *((AsLaunchable **) a);
+	AsLaunchable *lau2 = *((AsLaunchable **) b);
+
+	if (as_launchable_get_kind (lau1) < as_launchable_get_kind (lau2))
+		return -1;
+	if (as_launchable_get_kind (lau1) > as_launchable_get_kind (lau2))
+		return 1;
+	return g_strcmp0 (as_launchable_get_value (lau1),
+			  as_launchable_get_value (lau2));
 }
 
 static gint
@@ -4418,6 +4762,15 @@ as_app_node_insert (AsApp *app, GNode *parent, AsNodeContext *ctx)
 		}
 	}
 
+	/* <agreements> */
+	if (priv->agreements->len > 0) {
+		for (i = 0; i < priv->agreements->len; i++) {
+			AsAgreement *agreement;
+			agreement = g_ptr_array_index (priv->agreements, i);
+			as_agreement_node_insert (agreement, node_app, ctx);
+		}
+	}
+
 	/* <releases> */
 	if (priv->releases->len > 0) {
 		g_ptr_array_sort (priv->releases, as_app_releases_sort_cb);
@@ -4436,6 +4789,15 @@ as_app_node_insert (AsApp *app, GNode *parent, AsNodeContext *ctx)
 		for (i = 0; i < priv->provides->len; i++) {
 			provide = g_ptr_array_index (priv->provides, i);
 			as_provide_node_insert (provide, node_tmp, ctx);
+		}
+	}
+
+	/* <launchables> */
+	if (priv->launchables->len > 0) {
+		g_ptr_array_sort (priv->launchables, as_app_launchables_sort_cb);
+		for (i = 0; i < priv->launchables->len; i++) {
+			AsLaunchable *launchable = g_ptr_array_index (priv->launchables, i);
+			as_launchable_node_insert (launchable, node_app, ctx);
 		}
 	}
 
@@ -4464,10 +4826,11 @@ as_app_node_insert (AsApp *app, GNode *parent, AsNodeContext *ctx)
 }
 
 static gboolean
-as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
+as_app_node_parse_child (AsApp *app, GNode *n, guint32 flags,
 			 AsNodeContext *ctx, GError **error)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
+	AsRefString *str;
 	GNode *c;
 	const gchar *tmp;
 	g_autoptr(AsRefString) xml_lang = NULL;
@@ -4496,9 +4859,9 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 
 	/* <pkgname> */
 	case AS_TAG_PKGNAME:
-		tmp = as_node_get_data (n);
-		if (tmp != NULL)
-			g_ptr_array_add (priv->pkgnames, as_ref_string_ref (tmp));
+		str = as_node_get_data_as_refstr (n);
+		if (str != NULL)
+			g_ptr_array_add (priv->pkgnames, as_ref_string_ref (str));
 		break;
 
 	/* <bundle> */
@@ -4554,11 +4917,11 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		xml_lang = as_node_fix_locale (as_node_get_attribute (n, "xml:lang"));
 		if (xml_lang == NULL)
 			break;
-		tmp = as_node_get_data (n);
-		if (tmp != NULL) {
+		str = as_node_get_data_as_refstr (n);
+		if (str != NULL) {
 			g_hash_table_insert (priv->names,
 					     as_ref_string_ref (xml_lang),
-					     as_ref_string_ref (tmp));
+					     as_ref_string_ref (str));
 		}
 		break;
 
@@ -4567,11 +4930,11 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		xml_lang = as_node_fix_locale (as_node_get_attribute (n, "xml:lang"));
 		if (xml_lang == NULL)
 			break;
-		tmp = as_node_get_data (n);
-		if (tmp != NULL) {
+		str = as_node_get_data_as_refstr (n);
+		if (str != NULL) {
 			g_hash_table_insert (priv->comments,
 					     as_ref_string_ref (xml_lang),
-					     as_ref_string_ref (tmp));
+					     as_ref_string_ref (str));
 		}
 		break;
 
@@ -4580,11 +4943,11 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		xml_lang = as_node_fix_locale (as_node_get_attribute (n, "xml:lang"));
 		if (xml_lang == NULL)
 			break;
-		tmp = as_node_get_data (n);
-		if (tmp != NULL) {
+		str = as_node_get_data_as_refstr (n);
+		if (str != NULL) {
 			g_hash_table_insert (priv->developer_names,
 					     as_ref_string_ref (xml_lang),
-					     as_ref_string_ref (tmp));
+					     as_ref_string_ref (str));
 		}
 		break;
 
@@ -4653,7 +5016,7 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		for (c = n->children; c != NULL; c = c->next) {
 			if (as_node_get_tag (c) != AS_TAG_CATEGORY)
 				continue;
-			tmp = as_node_get_data (c);
+			tmp = as_node_get_data_as_refstr (c);
 			if (tmp == NULL)
 				continue;
 			as_app_add_category (app, tmp);
@@ -4669,11 +5032,11 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		for (c = n->children; c != NULL; c = c->next) {
 			if (as_node_get_tag (c) != AS_TAG_ARCH)
 				continue;
-			tmp = as_node_get_data (c);
-			if (tmp == NULL)
+			str = as_node_get_data_as_refstr (c);
+			if (str == NULL)
 				continue;
 			g_ptr_array_add (priv->architectures,
-					 as_ref_string_ref (tmp));
+					 as_ref_string_ref (str));
 		}
 		if (n->children == NULL)
 			priv->problems |= AS_APP_PROBLEM_EXPECTED_CHILDREN;
@@ -4708,10 +5071,10 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		for (c = n->children; c != NULL; c = c->next) {
 			if (as_node_get_tag (c) != AS_TAG_KUDO)
 				continue;
-			tmp = as_node_get_data (c);
-			if (tmp == NULL)
+			str = as_node_get_data_as_refstr (c);
+			if (str == NULL)
 				continue;
-			g_ptr_array_add (priv->kudos, as_ref_string_ref (tmp));
+			g_ptr_array_add (priv->kudos, as_ref_string_ref (str));
 		}
 		if (n->children == NULL)
 			priv->problems |= AS_APP_PROBLEM_EXPECTED_CHILDREN;
@@ -4724,10 +5087,10 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		for (c = n->children; c != NULL; c = c->next) {
 			if (as_node_get_tag (c) != AS_TAG_PERMISSION)
 				continue;
-			tmp = as_node_get_data (c);
-			if (tmp == NULL)
+			str = as_node_get_data_as_refstr (c);
+			if (str == NULL)
 				continue;
-			g_ptr_array_add (priv->permissions, as_ref_string_ref (tmp));
+			g_ptr_array_add (priv->permissions, as_ref_string_ref (str));
 		}
 		if (n->children == NULL)
 			priv->problems |= AS_APP_PROBLEM_EXPECTED_CHILDREN;
@@ -4740,10 +5103,10 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		for (c = n->children; c != NULL; c = c->next) {
 			if (as_node_get_tag (c) != AS_TAG_VETO)
 				continue;
-			tmp = as_node_get_data (c);
-			if (tmp == NULL)
+			str = as_node_get_data_as_refstr (c);
+			if (str == NULL)
 				continue;
-			g_ptr_array_add (priv->vetos, as_ref_string_ref (tmp));
+			g_ptr_array_add (priv->vetos, as_ref_string_ref (str));
 		}
 		if (n->children == NULL)
 			priv->problems |= AS_APP_PROBLEM_EXPECTED_CHILDREN;
@@ -4756,10 +5119,10 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		for (c = n->children; c != NULL; c = c->next) {
 			if (as_node_get_tag (c) != AS_TAG_MIMETYPE)
 				continue;
-			tmp = as_node_get_data (c);
-			if (tmp == NULL)
+			str = as_node_get_data_as_refstr (c);
+			if (str == NULL)
 				continue;
-			g_ptr_array_add (priv->mimetypes, as_ref_string_ref (tmp));
+			g_ptr_array_add (priv->mimetypes, as_ref_string_ref (str));
 		}
 		if (n->children == NULL)
 			priv->problems |= AS_APP_PROBLEM_EXPECTED_CHILDREN;
@@ -4771,7 +5134,7 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 			priv->problems |= AS_APP_PROBLEM_TRANSLATED_LICENSE;
 			break;
 		}
-		as_ref_string_assign (&priv->project_license, as_node_get_data (n));
+		as_ref_string_assign (&priv->project_license, as_node_get_data_as_refstr (n));
 		break;
 
 	/* <project_license> */
@@ -4817,19 +5180,19 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 
 	/* <compulsory_for_desktop> */
 	case AS_TAG_COMPULSORY_FOR_DESKTOP:
-		tmp = as_node_get_data (n);
-		if (tmp == NULL)
+		str = as_node_get_data_as_refstr (n);
+		if (str == NULL)
 			break;
 		g_ptr_array_add (priv->compulsory_for_desktops,
-				 as_ref_string_ref (tmp));
+				 as_ref_string_ref (str));
 		break;
 
 	/* <extends> */
 	case AS_TAG_EXTENDS:
-		tmp = as_node_get_data (n);
-		if (tmp == NULL)
+		str = as_node_get_data_as_refstr (n);
+		if (str == NULL)
 			break;
-		g_ptr_array_add (priv->extends, as_ref_string_ref (tmp));
+		g_ptr_array_add (priv->extends, as_ref_string_ref (str));
 		break;
 
 	/* <screenshots> */
@@ -4878,6 +5241,17 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		break;
 	}
 
+	/* <agreements> */
+	case AS_TAG_AGREEMENT:
+	{
+		g_autoptr(AsAgreement) agreement = NULL;
+		agreement = as_agreement_new ();
+		if (!as_agreement_node_parse (agreement, n, ctx, error))
+			return FALSE;
+		as_app_add_agreement (app, agreement);
+		break;
+	}
+
 	/* <releases> */
 	case AS_TAG_RELEASES:
 		if (!(flags & AS_APP_PARSE_FLAG_APPEND_DATA))
@@ -4908,6 +5282,17 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 		}
 		break;
 
+	/* <launchables> */
+	case AS_TAG_LAUNCHABLE:
+	{
+		g_autoptr(AsLaunchable) lau = NULL;
+		lau = as_launchable_new ();
+		if (!as_launchable_node_parse (lau, n, ctx, error))
+			return FALSE;
+		as_app_add_launchable (app, lau);
+		break;
+	}
+
 	/* <languages> */
 	case AS_TAG_LANGUAGES:
 		if (!(flags & AS_APP_PARSE_FLAG_APPEND_DATA))
@@ -4936,8 +5321,8 @@ as_app_node_parse_child (AsApp *app, GNode *n, AsAppParseFlags flags,
 			AsRefString *value;
 			if (as_node_get_tag (c) != AS_TAG_VALUE)
 				continue;
-			key = as_node_get_attribute (c, "key");
-			value = as_node_get_data (c);
+			key = as_node_get_attribute_as_refstr (c, "key");
+			value = as_node_get_data_as_refstr (c);
 			if (value == NULL) {
 				g_hash_table_insert (priv->metadata,
 						     as_ref_string_ref (key),
@@ -4985,7 +5370,7 @@ as_app_check_for_hidpi_icons (AsApp *app)
 }
 
 static gboolean
-as_app_node_parse_full (AsApp *app, GNode *node, AsAppParseFlags flags,
+as_app_node_parse_full (AsApp *app, GNode *node, guint32 flags,
 			AsNodeContext *ctx, GError **error)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
@@ -5020,6 +5405,8 @@ as_app_node_parse_full (AsApp *app, GNode *node, AsAppParseFlags flags,
 		g_ptr_array_set_size (priv->suggests, 0);
 		g_ptr_array_set_size (priv->requires, 0);
 		g_ptr_array_set_size (priv->content_ratings, 0);
+		g_ptr_array_set_size (priv->agreements, 0);
+		g_ptr_array_set_size (priv->launchables, 0);
 		g_hash_table_remove_all (priv->keywords);
 	}
 	for (n = node->children; n != NULL; n = n->next) {
@@ -5030,6 +5417,22 @@ as_app_node_parse_full (AsApp *app, GNode *node, AsAppParseFlags flags,
 	/* if only one icon is listed, look for HiDPI versions too */
 	if (as_app_get_icons(app)->len == 1)
 		as_app_check_for_hidpi_icons (app);
+
+	/* add the launchable if missing for desktop apps */
+	if (priv->launchables->len == 0 &&
+	    priv->kind == AS_APP_KIND_DESKTOP &&
+	    priv->id != NULL) {
+		AsLaunchable *lau = as_launchable_new ();
+		as_launchable_set_kind (lau, AS_LAUNCHABLE_KIND_DESKTOP_ID);
+		if (g_str_has_suffix (priv->id, ".desktop")) {
+			as_launchable_set_value (lau, priv->id);
+		} else {
+			g_autofree gchar *id_tmp = NULL;
+			id_tmp = g_strdup_printf ("%s.desktop", priv->id);
+			as_launchable_set_value (lau, id_tmp);
+		}
+		g_ptr_array_add (priv->launchables, lau);
+	}
 
 	return TRUE;
 }
@@ -5357,6 +5760,17 @@ as_app_node_parse_dep11 (AsApp *app, GNode *node,
 			as_app_set_project_group (app, as_yaml_node_get_value (n));
 			continue;
 		}
+		if (g_strcmp0 (tmp, "CompulsoryForDesktops") == 0) {
+			for (c = n->children; c != NULL; c = c->next) {
+				tmp = as_yaml_node_get_key (c);
+				if (tmp == NULL) {
+					nonfatal_str = "contained empty desktop";
+					continue;
+				}
+				as_app_add_compulsory_for_desktop (app, tmp);
+			}
+			continue;
+		}
 	}
 	if (nonfatal_str != NULL) {
 		g_debug ("nonfatal warning from %s: %s",
@@ -5377,7 +5791,7 @@ as_app_value_tokenize (const gchar *value)
 static void
 as_app_add_token_internal (AsApp *app,
 			   const gchar *value,
-			   AsAppSearchMatch match_flag)
+			   guint16 match_flag)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	AsAppTokenType *match_pval;
@@ -5417,7 +5831,7 @@ static void
 as_app_add_token (AsApp *app,
 		  const gchar *value,
 		  gboolean allow_split,
-		  AsAppSearchMatch match_flag)
+		  guint16 match_flag)
 {
 	/* add extra tokens for names like x-plane or half-life */
 	if (allow_split && g_strstr_len (value, -1, "-") != NULL) {
@@ -5448,7 +5862,7 @@ as_app_add_tokens (AsApp *app,
 		   const gchar *value,
 		   const gchar *locale,
 		   gboolean allow_split,
-		   AsAppSearchMatch match_flag)
+		   guint16 match_flag)
 {
 	guint i;
 	g_auto(GStrv) values_utf8 = NULL;
@@ -5544,6 +5958,12 @@ as_app_create_token_cache_target (AsApp *app, AsApp *donor)
 			as_app_add_token (app, tmp, FALSE, AS_APP_SEARCH_MATCH_PKGNAME);
 		}
 	}
+	if (priv->search_match & AS_APP_SEARCH_MATCH_ORIGIN) {
+		if (priv->origin != NULL) {
+			as_app_add_token (app, priv->origin, TRUE,
+					  AS_APP_SEARCH_MATCH_ORIGIN);
+		}
+	}
 }
 
 static void
@@ -5577,7 +5997,7 @@ as_app_search_matches (AsApp *app, const gchar *search)
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	AsAppTokenType *match_pval;
 	GList *l;
-	AsAppSearchMatch result = 0;
+	guint16 result = 0;
 	g_autoptr(GList) keys = NULL;
 	g_autoptr(AsRefString) search_stem = NULL;
 
@@ -5618,7 +6038,7 @@ as_app_search_matches (AsApp *app, const gchar *search)
  *
  * Returns all the search tokens for the application. These are unsorted.
  *
- * Returns: (transfer full): The string search tokens
+ * Returns: (transfer container): The string search tokens
  *
  * Since: 0.3.4
  */
@@ -5638,9 +6058,9 @@ as_app_get_search_tokens (AsApp *app)
 
 	/* return all the token cache */
 	keys = g_hash_table_get_keys (priv->token_cache);
-	array = g_ptr_array_new_with_free_func (g_free);
+	array = g_ptr_array_new_with_free_func ((GDestroyNotify) as_ref_string_unref);
 	for (l = keys; l != NULL; l = l->next)
-		g_ptr_array_add (array, as_ref_string_new (l->data));
+		g_ptr_array_add (array, as_ref_string_ref (l->data));
 	return array;
 }
 
@@ -5762,55 +6182,56 @@ as_app_parse_appdata_guess_project_group (AsApp *app)
 	}
 }
 
-static gboolean
-as_app_parse_appdata_file (AsApp *app,
-			   const gchar *filename,
-			   AsAppParseFlags flags,
-			   GError **error)
+static int
+as_utils_fnmatch (const gchar *pattern, const gchar *text, gsize text_sz, gint flags)
+{
+	if (text_sz != -1 && text[text_sz-1] != '\0') {
+		g_autofree gchar *text_with_nul = g_strndup (text, text_sz);
+		return fnmatch (pattern, text_with_nul, flags);
+	}
+	return fnmatch (pattern, text, flags);
+}
+
+/**
+ * as_app_parse_data:
+ * @app: a #AsApp instance.
+ * @data: data to parse.
+ * @flags: #AsAppParseFlags, e.g. %AS_APP_PARSE_FLAG_USE_HEURISTICS
+ * @error: A #GError or %NULL.
+ *
+ * Parses an AppData file and populates the application state.
+ *
+ * Returns: %TRUE for success
+ *
+ * Since: 0.7.5
+ **/
+gboolean
+as_app_parse_data (AsApp *app, GBytes *data, guint32 flags, GError **error)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	AsNodeFromXmlFlags from_xml_flags = AS_NODE_FROM_XML_FLAG_NONE;
-	GNode *l;
 	GNode *node;
+	const gchar *data_raw;
 	gboolean seen_application = FALSE;
-	gchar *tmp;
-	gsize len;
-	g_autoptr(GError) error_local = NULL;
+	gsize len = 0;
 	g_autoptr(AsNodeContext) ctx = NULL;
-	g_autofree gchar *data = NULL;
 	g_autoptr(AsNode) root = NULL;
 
-	/* open file */
-	if (!g_file_get_contents (filename, &data, &len, &error_local)) {
-		g_set_error (error,
-			     AS_APP_ERROR,
-			     AS_APP_ERROR_INVALID_TYPE,
-			     "%s could not be read: %s",
-			     filename, error_local->message);
-		return FALSE;
-	}
-
 	/* validate */
-	tmp = g_strstr_len (data, (gssize) len, "<?xml version=");
-	if (tmp == NULL)
+	data_raw = g_bytes_get_data (data, &len);
+	if (g_strstr_len (data_raw, (gssize) len, "<?xml version=") == NULL)
 		priv->problems |= AS_APP_PROBLEM_NO_XML_HEADER;
 
 	/* check for copyright */
-	if (fnmatch("*<!--*Copyright*-->*", data, 0) != 0)
+	if (as_utils_fnmatch ("*<!--*Copyright*-->*", data_raw, len, 0) != 0)
 		priv->problems |= AS_APP_PROBLEM_NO_COPYRIGHT_INFO;
 
 	/* parse */
 	if (flags & AS_APP_PARSE_FLAG_KEEP_COMMENTS)
 		from_xml_flags |= AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS;
-	root = as_node_from_xml (data, from_xml_flags, &error_local);
-	if (root == NULL) {
-		g_set_error (error,
-			     AS_APP_ERROR,
-			     AS_APP_ERROR_INVALID_TYPE,
-			     "failed to parse %s: %s",
-			     filename, error_local->message);
+	root = as_node_from_bytes (data, from_xml_flags, error);
+	if (root == NULL)
 		return FALSE;
-	}
 
 	/* make the <_summary> tags into <summary> */
 	if (flags & AS_APP_PARSE_FLAG_CONVERT_TRANSLATABLE) {
@@ -5826,14 +6247,13 @@ as_app_parse_appdata_file (AsApp *app,
 	if (node == NULL)
 		node = as_node_find (root, "component");
 	if (node == NULL) {
-		g_set_error (error,
-			     AS_APP_ERROR,
-			     AS_APP_ERROR_INVALID_TYPE,
-			     "%s has an unrecognised contents",
-			     filename);
+		g_set_error_literal (error,
+				     AS_APP_ERROR,
+				     AS_APP_ERROR_INVALID_TYPE,
+				     "no <component> node");
 		return FALSE;
 	}
-	for (l = node->children; l != NULL; l = l->next) {
+	for (GNode *l = node->children; l != NULL; l = l->next) {
 		if (g_strcmp0 (as_node_get_name (l), "licence") == 0 ||
 		    g_strcmp0 (as_node_get_name (l), "license") == 0) {
 			as_node_set_name (l, "metadata_license");
@@ -5860,6 +6280,38 @@ as_app_parse_appdata_file (AsApp *app,
 	return TRUE;
 }
 
+static gboolean
+as_app_parse_appdata_file (AsApp *app,
+			   const gchar *filename,
+			   guint32 flags,
+			   GError **error)
+{
+	gsize len;
+	g_autofree gchar *data_raw = NULL;
+	g_autoptr(GBytes) data = NULL;
+	g_autoptr(GError) error_local = NULL;
+
+	/* open file */
+	if (!g_file_get_contents (filename, &data_raw, &len, &error_local)) {
+		g_set_error (error,
+			     AS_APP_ERROR,
+			     AS_APP_ERROR_INVALID_TYPE,
+			     "%s could not be read: %s",
+			     filename, error_local->message);
+		return FALSE;
+	}
+	data = g_bytes_new_take (g_steal_pointer (&data_raw), len);
+	if (!as_app_parse_data (app, data, flags, &error_local)) {
+		g_set_error (error,
+			     AS_APP_ERROR,
+			     AS_APP_ERROR_INVALID_TYPE,
+			     "failed to parse %s: %s",
+			     filename, error_local->message);
+		return FALSE;
+	}
+	return TRUE;
+}
+
 /**
  * as_app_parse_file:
  * @app: a #AsApp instance.
@@ -5876,10 +6328,7 @@ as_app_parse_appdata_file (AsApp *app,
  * Since: 0.1.2
  **/
 gboolean
-as_app_parse_file (AsApp *app,
-		   const gchar *filename,
-		   AsAppParseFlags flags,
-		   GError **error)
+as_app_parse_file (AsApp *app, const gchar *filename, guint32 flags, GError **error)
 {
 	GPtrArray *vetos;
 	g_autoptr(AsFormat) format = as_format_new ();
@@ -5945,7 +6394,7 @@ as_app_parse_file (AsApp *app,
  * as_app_to_file:
  * @app: a #AsApp instance.
  * @file: a #GFile
- * @cancellable: A #GCancellable, or %NULL
+ * @cancellable: (nullable): A #GCancellable
  * @error: A #GError or %NULL
  *
  * Exports a DOM tree to an XML file.
@@ -6197,13 +6646,38 @@ as_app_set_search_blacklist (AsApp *app, GHashTable *search_blacklist)
 }
 
 /**
- * as_app_set_search_match: (skip)
+ * as_app_set_search_match:
+ * @app: a #AsApp instance.
+ * @search_match: the #AsAppSearchMatch, e.g. %AS_APP_SEARCH_MATCH_PKGNAME
+ *
+ * Sets the token match fields. The bitfield given here is used to choose what
+ * is included in the token cache.
+ *
+ * Since: 0.6.13
  **/
 void
-as_app_set_search_match (AsApp *app, AsAppSearchMatch search_match)
+as_app_set_search_match (AsApp *app, guint16 search_match)
 {
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	priv->search_match = search_match;
+}
+
+/**
+ * as_app_get_search_match:
+ * @app: a #AsApp instance.
+ *
+ * Gets the token match fields. The bitfield given here is used to choose what
+ * is included in the token cache.
+ *
+ * Returns: a #AsAppSearchMatch, e.g. %AS_APP_SEARCH_MATCH_PKGNAME
+ *
+ * Since: 0.6.13
+ **/
+guint16
+as_app_get_search_match (AsApp *app)
+{
+	AsAppPrivate *priv = GET_PRIVATE (app);
+	return priv->search_match;
 }
 
 /**

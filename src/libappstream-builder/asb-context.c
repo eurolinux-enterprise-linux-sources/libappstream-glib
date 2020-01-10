@@ -53,17 +53,14 @@ typedef struct
 {
 	AsStore			*store_failed;
 	AsStore			*store_ignore;
-	AsStore			*store_old;
 	GList			*apps;			/* of AsbApp */
 	GMutex			 apps_mutex;		/* for ->apps */
 	GPtrArray		*file_globs;		/* of AsbPackage */
 	GPtrArray		*packages;		/* of AsbPackage */
 	AsbPluginLoader		*plugin_loader;
 	AsbContextFlags		 flags;
-	guint			 max_threads;
 	guint			 min_icon_size;
 	gdouble			 api_version;
-	gchar			*old_metadata;
 	gchar			*log_dir;
 	gchar			*cache_dir;
 	gchar			*temp_dir;
@@ -115,9 +112,9 @@ asb_context_set_api_version (AsbContext *ctx, gdouble api_version)
 /**
  * asb_context_set_flags:
  * @ctx: A #AsbContext
- * @flags: #AsbContextFlags, e.g. %ASB_CONTEXT_FLAG_ADD_CACHE_ID
+ * @flags: #AsbContextFlags, e.g. %ASB_CONTEXT_FLAG_NO_NETWORK
  *
- * Sets if the cache id should be included in the metadata.
+ * Sets flags to be used when building the metadata.
  *
  * Since: 0.3.5
  **/
@@ -125,11 +122,6 @@ void
 asb_context_set_flags (AsbContext *ctx, AsbContextFlags flags)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	if (flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		as_store_add_metadata_index (priv->store_failed, "X-CacheID");
-		as_store_add_metadata_index (priv->store_ignore, "X-CacheID");
-		as_store_add_metadata_index (priv->store_old, "X-CacheID");
-	}
 	priv->flags = flags;
 }
 
@@ -139,14 +131,13 @@ asb_context_set_flags (AsbContext *ctx, AsbContextFlags flags)
  * @max_threads: integer
  *
  * Sets the maximum number of threads to use when processing packages.
+ * This function now has no affect as only one thread is ever used.
  *
  * Since: 0.1.0
  **/
 void
 asb_context_set_max_threads (AsbContext *ctx, guint max_threads)
 {
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->max_threads = max_threads;
 }
 
 /**
@@ -188,15 +179,13 @@ asb_context_get_min_icon_size (AsbContext *ctx)
  * @old_metadata: filename, or %NULL
  *
  * Sets the filename location of the old metadata file.
- * Note: the old metadata must have been built with cache-ids to be useful.
+ * This function now has no affect as no cache ID is available.
  *
  * Since: 0.1.0
  **/
 void
 asb_context_set_old_metadata (AsbContext *ctx, const gchar *old_metadata)
 {
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->old_metadata = asb_context_realpath (old_metadata);
 }
 
 /**
@@ -464,12 +453,6 @@ asb_context_add_filename (AsbContext *ctx, const gchar *filename, GError **error
 {
 	g_autoptr(AsbPackage) pkg = NULL;
 
-	/* can find in existing metadata */
-	if (asb_context_find_in_cache (ctx, filename)) {
-		g_debug ("Found %s in old metadata", filename);
-		return TRUE;
-	}
-
 	/* open */
 #ifdef HAVE_RPM
 	if (g_str_has_suffix (filename, ".rpm"))
@@ -606,21 +589,6 @@ asb_context_setup (AsbContext *ctx, GError **error)
 			return FALSE;
 	}
 
-	/* decompress the icons */
-	if (priv->old_metadata != NULL) {
-		g_autofree gchar *icons_fn = NULL;
-		icons_fn = g_strdup_printf ("%s/%s-icons.tar.gz",
-					    priv->old_metadata,
-					    priv->basename);
-		if (g_file_test (icons_fn, G_FILE_TEST_EXISTS)) {
-			if (!asb_utils_explode (icons_fn,
-						priv->icons_dir,
-						NULL,
-						error))
-				return FALSE;
-		}
-	}
-
 	/* load plugins */
 	if (!asb_plugin_loader_setup (priv->plugin_loader, error))
 		return FALSE;
@@ -628,82 +596,7 @@ asb_context_setup (AsbContext *ctx, GError **error)
 	/* get a cache of the file globs */
 	priv->file_globs = asb_plugin_loader_get_globs (priv->plugin_loader);
 
-	/* add old metadata */
-	if (priv->old_metadata != NULL) {
-		g_autofree gchar *builder_id = NULL;
-		g_autofree gchar *fn_failed = NULL;
-		g_autofree gchar *fn_ignore = NULL;
-		g_autofree gchar *fn_old = NULL;
-		g_autoptr(GFile) file_failed = NULL;
-		g_autoptr(GFile) file_ignore = NULL;
-		g_autoptr(GFile) file_old = NULL;
-
-		builder_id = asb_utils_get_builder_id ();
-		fn_old = g_strdup_printf ("%s/%s.xml.gz",
-					  priv->old_metadata,
-					  priv->basename);
-		file_old = g_file_new_for_path (fn_old);
-		if (g_file_query_exists (file_old, NULL)) {
-			if (!as_store_from_file (priv->store_old, file_old,
-						 NULL, NULL, error))
-				return FALSE;
-			/* check builder-id matches */
-			if (g_strcmp0 (as_store_get_builder_id (priv->store_old),
-				       builder_id) != 0) {
-				g_debug ("builder ID does not match: %s:%s",
-					 as_store_get_builder_id (priv->store_old),
-					 builder_id);
-				as_store_remove_all (priv->store_old);
-			}
-		}
-		fn_ignore = g_strdup_printf ("%s/%s-ignore.xml.gz",
-					     priv->old_metadata,
-					     priv->basename);
-		file_ignore = g_file_new_for_path (fn_ignore);
-		if (g_file_query_exists (file_ignore, NULL)) {
-			if (!as_store_from_file (priv->store_ignore, file_ignore,
-						 NULL, NULL, error))
-				return FALSE;
-			/* check builder-id matches */
-			if (g_strcmp0 (as_store_get_builder_id (priv->store_ignore),
-				       builder_id) != 0) {
-				g_debug ("builder ID does not match: %s:%s",
-					 as_store_get_builder_id (priv->store_ignore),
-					 builder_id);
-				as_store_remove_all (priv->store_ignore);
-			}
-		}
-		fn_failed = g_strdup_printf ("%s/%s-failed.xml.gz",
-					     priv->old_metadata,
-					     priv->basename);
-		file_failed = g_file_new_for_path (fn_failed);
-		if (g_file_query_exists (file_failed, NULL)) {
-			if (!as_store_from_file (priv->store_failed, file_failed,
-						 NULL, NULL, error))
-				return FALSE;
-			/* check builder-id matches */
-			if (g_strcmp0 (as_store_get_builder_id (priv->store_failed),
-				       builder_id) != 0) {
-				g_debug ("builder ID does not match: %s:%s",
-					 as_store_get_builder_id (priv->store_failed),
-					 builder_id);
-				as_store_remove_all (priv->store_failed);
-			}
-		}
-	}
-
 	return TRUE;
-}
-
-static void
-asb_task_process_func (gpointer data, gpointer user_data)
-{
-	AsbTask *task = (AsbTask *) data;
-	g_autoptr(GError) error = NULL;
-
-	/* just run the task */
-	if (!asb_task_process (task, &error))
-		g_warning ("Failed to run task: %s", error->message);
 }
 
 static gboolean
@@ -796,10 +689,6 @@ asb_context_write_xml (AsbContext *ctx, GError **error)
 	g_print ("Writing %s...\n", filename);
 	as_store_set_origin (store, priv->origin);
 	as_store_set_api_version (store, priv->api_version);
-	if (priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		g_autofree gchar *builder_id = asb_utils_get_builder_id ();
-		as_store_set_builder_id (store, builder_id);
-	}
 	return as_store_to_file (store,
 				 file,
 				 AS_NODE_TO_XML_FLAG_ADD_HEADER |
@@ -932,6 +821,9 @@ asb_context_detect_missing_data (AsbContext *ctx, GError **error)
 		case AS_APP_KIND_DRIVER:
 		case AS_APP_KIND_GENERIC:
 		case AS_APP_KIND_LOCALIZATION:
+		case AS_APP_KIND_CODEC:
+		case AS_APP_KIND_INPUT_METHOD:
+		case AS_APP_KIND_SHELL_EXTENSION:
 			break;
 		default:
 			if (as_app_get_icon_default (AS_APP (app)) == NULL)
@@ -982,9 +874,6 @@ asb_context_detect_missing_parents (AsbContext *ctx, GError **error)
 		found = g_hash_table_lookup (hash, tmp);
 		if (found != NULL)
 			continue;
-		found = as_store_get_app_by_id (priv->store_old, tmp);
-		if (found != NULL)
-			continue;
 
 		/* do not add the addon */
 		as_app_add_veto (app, "%s has no parent of '%s'",
@@ -1028,10 +917,6 @@ asb_context_write_xml_fail (AsbContext *ctx, GError **error)
 	basename_failed = g_strdup_printf ("%s-failed", priv->origin);
 	as_store_set_origin (priv->store_failed, basename_failed);
 	as_store_set_api_version (priv->store_failed, priv->api_version);
-	if (priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		g_autofree gchar *builder_id = asb_utils_get_builder_id ();
-		as_store_set_builder_id (priv->store_failed, builder_id);
-	}
 	return as_store_to_file (priv->store_failed,
 				 file,
 				 AS_NODE_TO_XML_FLAG_ADD_HEADER |
@@ -1048,10 +933,6 @@ asb_context_write_xml_ignore (AsbContext *ctx, GError **error)
 	g_autofree gchar *filename = NULL;
 	g_autoptr(GFile) file = NULL;
 
-	/* no need to create */
-	if ((priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) == 0)
-		return TRUE;
-
 	/* the store is already populated */
 	filename = g_strdup_printf ("%s/%s-ignore.xml.gz",
 				    priv->output_dir, priv->basename);
@@ -1061,10 +942,6 @@ asb_context_write_xml_ignore (AsbContext *ctx, GError **error)
 	basename_cache = g_strdup_printf ("%s-ignore", priv->origin);
 	as_store_set_origin (priv->store_ignore, basename_cache);
 	as_store_set_api_version (priv->store_ignore, priv->api_version);
-	if (priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		g_autofree gchar *builder_id = asb_utils_get_builder_id ();
-		as_store_set_builder_id (priv->store_ignore, builder_id);
-	}
 	return as_store_to_file (priv->store_ignore,
 				 file,
 				 AS_NODE_TO_XML_FLAG_ADD_HEADER |
@@ -1175,31 +1052,16 @@ gboolean
 asb_context_process (AsbContext *ctx, GError **error)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	AsbPackage *pkg;
-	AsbTask *task;
-	GThreadPool *pool;
-	gboolean ret;
-	guint i;
-	g_autoptr(GPtrArray) tasks = NULL;
 
 	/* only process the newest packages */
 	asb_context_disable_multiarch_pkgs (ctx);
 	asb_context_disable_older_pkgs (ctx);
 
-	/* create thread pool */
-	pool = g_thread_pool_new (asb_task_process_func,
-				  ctx,
-				  (gint) priv->max_threads,
-				  TRUE,
-				  error);
-	if (pool == NULL)
-		return FALSE;
-
 	/* add each package */
 	g_print ("Processing packages...\n");
-	tasks = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
-	for (i = 0; i < priv->packages->len; i++) {
-		pkg = g_ptr_array_index (priv->packages, i);
+	for (guint i = 0; i < priv->packages->len; i++) {
+		g_autoptr(AsbTask) task = NULL;
+		AsbPackage *pkg = g_ptr_array_index (priv->packages, i);
 		if (!asb_package_get_enabled (pkg)) {
 			asb_package_log (pkg,
 					 ASB_PACKAGE_LOG_LEVEL_DEBUG,
@@ -1219,20 +1081,11 @@ asb_context_process (AsbContext *ctx, GError **error)
 		/* create task */
 		task = asb_task_new (ctx);
 		asb_task_set_package (task, pkg);
-		g_ptr_array_add (tasks, task);
 
 		/* run the task */
-		if (priv->max_threads == 1) {
-			if (!asb_task_process (task, error))
-				return FALSE;
-		} else {
-			if (!g_thread_pool_push (pool, task, error))
-				return FALSE;
-		}
+		if (!asb_task_process (task, error))
+			return FALSE;
 	}
-
-	/* wait for them to finish */
-	g_thread_pool_free (pool, FALSE, TRUE);
 
 	/* merge */
 	g_print ("Merging applications...\n");
@@ -1258,37 +1111,28 @@ asb_context_process (AsbContext *ctx, GError **error)
 	asb_context_write_app_xml (ctx);
 
 	/* write XML file */
-	ret = asb_context_write_xml (ctx, error);
-	if (!ret)
+	if (!asb_context_write_xml (ctx, error))
 		return FALSE;
 
 	/* write XML file */
-	ret = asb_context_write_xml_fail (ctx, error);
-	if (!ret)
+	if (!asb_context_write_xml_fail (ctx, error))
 		return FALSE;
 
 	/* write XML file */
-	ret = asb_context_write_xml_ignore (ctx, error);
-	if (!ret)
+	if (!asb_context_write_xml_ignore (ctx, error))
 		return FALSE;
 
 	/* write icons archive */
-	ret = asb_context_write_icons (ctx,
-				       priv->temp_dir,
-				       error);
-	if (!ret)
+	if (!asb_context_write_icons (ctx, priv->temp_dir, error))
 		return FALSE;
 
 	/* write screenshots archive */
-	ret = asb_context_write_screenshots (ctx,
-					     priv->temp_dir,
-					     error);
-	if (!ret)
+	if (!asb_context_write_screenshots (ctx, priv->temp_dir, error))
 		return FALSE;
 
 	/* ensure all packages are flushed */
-	for (i = 0; i < priv->packages->len; i++) {
-		pkg = g_ptr_array_index (priv->packages, i);
+	for (guint i = 0; i < priv->packages->len; i++) {
+		AsbPackage *pkg = g_ptr_array_index (priv->packages, i);
 		if (!asb_package_log_flush (pkg, error))
 			return FALSE;
 	}
@@ -1300,44 +1144,15 @@ asb_context_process (AsbContext *ctx, GError **error)
  * @ctx: A #AsbContext
  * @filename: cache-id
  *
- * Finds an application in the cache. This will only return results if
- * asb_context_set_old_metadata() has been used.
+ * This function used to find an application in the cache, and now does nothing.
  *
- * Returns: %TRUE to skip exploding the package
+ * Returns: always %FALSE
  *
  * Since: 0.1.0
  **/
 gboolean
 asb_context_find_in_cache (AsbContext *ctx, const gchar *filename)
 {
-	AsApp *app;
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	guint i;
-	g_autofree gchar *cache_id = NULL;
-	g_autofree gchar *builder_id = NULL;
-	g_autoptr(GPtrArray) apps = NULL;
-	g_autoptr(GPtrArray) apps_ignore = NULL;
-
-	/* the package was successfully parsed last time */
-	cache_id = asb_utils_get_cache_id_for_filename (filename);
-	apps = as_store_get_apps_by_metadata (priv->store_old,
-					      "X-CacheID",
-					      cache_id);
-	if (apps->len > 0) {
-		for (i = 0; i < apps->len; i++) {
-			app = g_ptr_array_index (apps, i);
-			asb_context_add_app (ctx, (AsbApp *) app);
-		}
-		return TRUE;
-	}
-
-	/* the package was ignored last time */
-	apps_ignore = as_store_get_apps_by_metadata (priv->store_ignore,
-						     "X-CacheID",
-						     cache_id);
-	if (apps_ignore->len > 0)
-		return TRUE;
-
 	return FALSE;
 }
 
@@ -1390,43 +1205,17 @@ asb_context_add_app (AsbContext *ctx, AsbApp *app)
 void
 asb_context_add_app_ignore (AsbContext *ctx, AsbPackage *pkg)
 {
-	AsApp *app_tmp;
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	g_autofree gchar *name_arch = NULL;
 	g_autoptr(AsApp) app = NULL;
-	g_autoptr(GPtrArray) apps = NULL;
-
-	/* only do this when we are using a cache-id */
-	if ((priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) == 0)
-		return;
-
-	/* check not already added a dummy application for this package */
-	apps = as_store_get_apps_by_metadata (priv->store_ignore,
-					      "X-CacheID",
-					      asb_package_get_basename (pkg));
-	if (apps->len > 0) {
-		g_debug ("already found CacheID of %s",
-			 asb_package_get_basename (pkg));
-		return;
-	}
-
-	/* package name already exists, but with a different CacheID */
-	name_arch = g_strdup_printf ("%s.%s",
-				     asb_package_get_name (pkg),
-				     asb_package_get_arch (pkg));
-	app_tmp = as_store_get_app_by_id (priv->store_ignore, name_arch);
-	if (app_tmp != NULL) {
-		as_app_add_metadata (AS_APP (app_tmp), "X-CacheID",
-				     asb_package_get_basename (pkg));
-		return;
-	}
 
 	/* never encountered before, so add */
 	app = as_app_new ();
+	name_arch = g_strdup_printf ("%s.%s",
+				     asb_package_get_name (pkg),
+				     asb_package_get_arch (pkg));
 	as_app_set_id (app, name_arch);
 	as_app_add_pkgname (app, asb_package_get_name (pkg));
-	as_app_add_metadata (app, "X-CacheID",
-			     asb_package_get_basename (pkg));
 	as_store_add_app (priv->store_ignore, app);
 }
 
@@ -1438,7 +1227,6 @@ asb_context_finalize (GObject *object)
 
 	g_object_unref (priv->store_failed);
 	g_object_unref (priv->store_ignore);
-	g_object_unref (priv->store_old);
 	g_object_unref (priv->plugin_loader);
 	g_ptr_array_unref (priv->packages);
 	g_list_foreach (priv->apps, (GFunc) g_object_unref, NULL);
@@ -1446,7 +1234,6 @@ asb_context_finalize (GObject *object)
 	if (priv->file_globs != NULL)
 		g_ptr_array_unref (priv->file_globs);
 	g_mutex_clear (&priv->apps_mutex);
-	g_free (priv->old_metadata);
 	g_free (priv->log_dir);
 	g_free (priv->cache_dir);
 	g_free (priv->temp_dir);
@@ -1468,8 +1255,6 @@ asb_context_init (AsbContext *ctx)
 	g_mutex_init (&priv->apps_mutex);
 	priv->store_failed = as_store_new ();
 	priv->store_ignore = as_store_new ();
-	priv->store_old = as_store_new ();
-	priv->max_threads = 1;
 	priv->min_icon_size = 32;
 }
 

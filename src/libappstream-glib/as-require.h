@@ -52,6 +52,10 @@ struct _AsRequireClass
  * @AS_REQUIRE_KIND_UNKNOWN:		Type invalid or not known
  * @AS_REQUIRE_KIND_ID:			Component ID
  * @AS_REQUIRE_KIND_FIRMWARE:		Device firmware version
+ * @AS_REQUIRE_KIND_HARDWARE:		Hardware device, typically a GUID
+ * @AS_REQUIRE_KIND_MODALIAS:		Modalias string
+ * @AS_REQUIRE_KIND_KERNEL:		Kernel version
+ * @AS_REQUIRE_KIND_MEMORY:		Amount of installed memory in MiB
  *
  * The require type.
  **/
@@ -59,6 +63,10 @@ typedef enum {
 	AS_REQUIRE_KIND_UNKNOWN,
 	AS_REQUIRE_KIND_ID,
 	AS_REQUIRE_KIND_FIRMWARE,
+	AS_REQUIRE_KIND_HARDWARE,		/* Since: 0.7.4 */
+	AS_REQUIRE_KIND_MODALIAS,		/* Since: 0.7.8 */
+	AS_REQUIRE_KIND_KERNEL,			/* Since: 0.7.8 */
+	AS_REQUIRE_KIND_MEMORY,			/* Since: 0.7.8 */
 	/*< private >*/
 	AS_REQUIRE_KIND_LAST
 } AsRequireKind;
@@ -72,6 +80,8 @@ typedef enum {
  * @AS_REQUIRE_COMPARE_GT:			Greater than
  * @AS_REQUIRE_COMPARE_LE:			Less than or equal to
  * @AS_REQUIRE_COMPARE_GE:			Greater than or equal to
+ * @AS_REQUIRE_COMPARE_GLOB:			Filename glob, e.g. `test*`
+ * @AS_REQUIRE_COMPARE_REGEX:			A regular expression, e.g. `fw[0-255]`
  *
  * The relational comparison type.
  **/
@@ -117,6 +127,8 @@ void		 as_require_set_value		(AsRequire	*require,
 gboolean	 as_require_version_compare	(AsRequire	*require,
 						 const gchar	*version,
 						 GError		**error);
+gboolean	 as_require_equal		(AsRequire	*require1,
+						 AsRequire	*require2);
 
 G_END_DECLS
 

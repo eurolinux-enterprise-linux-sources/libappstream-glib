@@ -454,8 +454,8 @@ as_image_node_parse (AsImage *image, GNode *node,
 		as_image_set_kind (image, AS_IMAGE_KIND_SOURCE);
 	else
 		as_image_set_kind (image, as_image_kind_from_string (tmp));
-	as_ref_string_assign (&priv->url, as_node_get_data (node));
-	as_ref_string_assign (&priv->locale, as_node_get_attribute (node, "xml:lang"));
+	as_ref_string_assign (&priv->url, as_node_get_data_as_refstr (node));
+	as_ref_string_assign (&priv->locale, as_node_get_attribute_as_refstr (node, "xml:lang"));
 	return TRUE;
 }
 
@@ -534,6 +534,7 @@ as_image_load_filename_full (AsImage *image,
 	/* only support non-deprecated types */
 	if (flags & AS_IMAGE_LOAD_FLAG_ONLY_SUPPORTED) {
 		GdkPixbufFormat *fmt;
+		g_autofree gchar *name = NULL;
 		fmt = gdk_pixbuf_get_file_info (filename, NULL, NULL);
 		if (fmt == NULL) {
 			g_set_error_literal (error,
@@ -542,15 +543,16 @@ as_image_load_filename_full (AsImage *image,
 					     "image format was not recognized");
 			return FALSE;
 		}
-		if (g_strcmp0 (gdk_pixbuf_format_get_name (fmt), "png") != 0 &&
-		    g_strcmp0 (gdk_pixbuf_format_get_name (fmt), "jpeg") != 0 &&
-		    g_strcmp0 (gdk_pixbuf_format_get_name (fmt), "xpm") != 0 &&
-		    g_strcmp0 (gdk_pixbuf_format_get_name (fmt), "svg") != 0) {
+		name = gdk_pixbuf_format_get_name (fmt);
+		if (g_strcmp0 (name, "png") != 0 &&
+		    g_strcmp0 (name, "jpeg") != 0 &&
+		    g_strcmp0 (name, "xpm") != 0 &&
+		    g_strcmp0 (name, "svg") != 0) {
 			g_set_error (error,
 				     AS_UTILS_ERROR,
 				     AS_UTILS_ERROR_FAILED,
 				     "image format %s is not supported",
-				     gdk_pixbuf_format_get_name (fmt));
+				     name);
 			return FALSE;
 		}
 	}
@@ -615,6 +617,17 @@ as_image_load_filename_full (AsImage *image,
 	pixbuf_height = (guint) gdk_pixbuf_get_height (pixbuf_src);
 	if (pixbuf_width == dest_size && pixbuf_height == dest_size) {
 		as_image_set_pixbuf (image, pixbuf_src);
+		return TRUE;
+	}
+
+	/* this makes icons look blurry, but allows the software center to look
+	 * good as icons are properly aligned in the UI layout */
+	if (flags & AS_IMAGE_LOAD_FLAG_ALWAYS_RESIZE) {
+		pixbuf = gdk_pixbuf_scale_simple (pixbuf_src,
+						  (gint) dest_size,
+						  (gint) dest_size,
+						  GDK_INTERP_HYPER);
+		as_image_set_pixbuf (image, pixbuf);
 		return TRUE;
 	}
 
@@ -764,7 +777,9 @@ as_image_save_pixbuf (AsImage *image,
 				 (gint) width,
 				 (gint) height);
 	gdk_pixbuf_fill (pixbuf, 0x00000000);
-	if ((pixbuf_width / 16) * 9 > pixbuf_height) {
+	/* check the ratio to see which property needs to be fitted and which needs
+	 * to be reduced */
+	if (pixbuf_width * 9 > pixbuf_height * 16) {
 		tmp_width = width;
 		tmp_height = width * pixbuf_height / pixbuf_width;
 	} else {

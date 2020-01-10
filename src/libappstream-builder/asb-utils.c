@@ -281,6 +281,40 @@ asb_utils_explode_file (struct archive_entry *entry, const gchar *dir)
 }
 
 /**
+ * asb_utils_optimize_png:
+ * @filename: package filename
+ * @error: A #GError or %NULL
+ *
+ * Optimises a PNG if pngquant is installed on the system.
+ *
+ * Returns: %TRUE for success, %FALSE otherwise
+ **/
+gboolean
+asb_utils_optimize_png (const gchar *filename, GError **error)
+{
+	g_autofree gchar *standard_error = NULL;
+	gint exit_status = 0;
+	const gchar *argv[] = { "/usr/bin/pngquant", "--skip-if-larger",
+				"--strip", "--ext", ".png",
+				"--force", "--speed", "1", filename, NULL };
+	if (!g_file_test (argv[0], G_FILE_TEST_IS_EXECUTABLE))
+		return TRUE;
+	if (!g_spawn_sync (NULL, (gchar **) argv, NULL, G_SPAWN_DEFAULT,
+			   NULL, NULL, NULL, &standard_error, &exit_status, error))
+		return FALSE;
+	if (exit_status != 0 && exit_status != 98) {
+		g_autofree gchar *argv_str = g_strjoinv (" ", (gchar **) argv);
+		g_set_error (error,
+			     AS_APP_ERROR,
+			     AS_APP_ERROR_FAILED,
+			     "failed to run %s: %s (%i)",
+			     argv_str, standard_error, exit_status);
+		return FALSE;
+	}
+	return TRUE;
+}
+
+/**
  * asb_utils_explode:
  * @filename: package filename
  * @dir: directory to decompress into
@@ -411,13 +445,23 @@ asb_utils_explode (const gchar *filename,
 		valid = asb_utils_explode_file (entry, dir);
 		if (!valid)
 			continue;
+		if (g_file_test (archive_entry_pathname (entry), G_FILE_TEST_EXISTS)) {
+			g_debug ("skipping as %s already exists",
+				 archive_entry_pathname (entry));
+			continue;
+		}
+		if (archive_entry_symlink (entry) == NULL) {
+			archive_entry_set_mode (entry, S_IRGRP | S_IWGRP |
+						       S_IRUSR | S_IWUSR);
+		}
 		r = archive_read_extract (arch, entry, 0);
 		if (r != ARCHIVE_OK) {
 			ret = FALSE;
 			g_set_error (error,
 				     ASB_PLUGIN_ERROR,
 				     ASB_PLUGIN_ERROR_FAILED,
-				     "Cannot extract: %s",
+				     "Cannot extract %s: %s",
+				     archive_entry_pathname (entry),
 				     archive_error_string (arch));
 			goto out;
 		}
@@ -632,10 +676,6 @@ asb_glob_value_search (GPtrArray *array, const gchar *search)
 
 	g_return_val_if_fail (array != NULL, NULL);
 	g_return_val_if_fail (search != NULL, NULL);
-
-	/* invalid */
-	if (search == NULL)
-		return NULL;
 
 	for (i = 0; i < array->len; i++) {
 		tmp = g_ptr_array_index (array, i);

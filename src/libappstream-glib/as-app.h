@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2018 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -32,6 +32,7 @@
 #include "as-enums.h"
 #include "as-format.h"
 #include "as-icon.h"
+#include "as-launchable.h"
 #include "as-provide.h"
 #include "as-release.h"
 #include "as-screenshot.h"
@@ -39,6 +40,7 @@
 #include "as-review.h"
 #include "as-suggest.h"
 #include "as-content-rating.h"
+#include "as-agreement.h"
 #include "as-translation.h"
 
 G_BEGIN_DECLS
@@ -107,6 +109,7 @@ typedef enum {
  * @AS_APP_SUBSUME_FLAG_SCREENSHOTS:	Copy the screenshots
  * @AS_APP_SUBSUME_FLAG_REVIEWS:	Copy the reviews
  * @AS_APP_SUBSUME_FLAG_CONTENT_RATINGS: Copy the content ratings
+ * @AS_APP_SUBSUME_FLAG_AGREEMENTS:	Copy the agreements
  * @AS_APP_SUBSUME_FLAG_PROVIDES:	Copy the provides
  * @AS_APP_SUBSUME_FLAG_ICONS:		Copy the icons
  * @AS_APP_SUBSUME_FLAG_MIMETYPES:	Copy the mimetypes
@@ -126,6 +129,7 @@ typedef enum {
  * @AS_APP_SUBSUME_FLAG_PROJECT_LICENSE: Copy the project license
  * @AS_APP_SUBSUME_FLAG_PROJECT_GROUP:	Copy the project group
  * @AS_APP_SUBSUME_FLAG_SOURCE_KIND:	Copy the source kind
+ * @AS_APP_SUBSUME_FLAG_LAUNCHABLES:	Copy the launchables
  *
  * The flags to use when subsuming applications.
  **/
@@ -167,6 +171,8 @@ typedef enum {
 	AS_APP_SUBSUME_FLAG_PROJECT_GROUP	= 1ull << 33,	/* Since: 0.6.1 */
 	AS_APP_SUBSUME_FLAG_SOURCE_KIND		= 1ull << 34,	/* Since: 0.6.1 */
 	AS_APP_SUBSUME_FLAG_SUGGESTS		= 1ull << 35,	/* Since: 0.6.3 */
+	AS_APP_SUBSUME_FLAG_LAUNCHABLES		= 1ull << 36,	/* Since: 0.6.13 */
+	AS_APP_SUBSUME_FLAG_AGREEMENTS		= 1ull << 37,	/* Since: 0.7.8 */
 	/*< private >*/
 	AS_APP_SUBSUME_FLAG_LAST,
 } AsAppSubsumeFlags;
@@ -179,6 +185,7 @@ typedef enum {
 					 AS_APP_SUBSUME_FLAG_COMMENT | \
 					 AS_APP_SUBSUME_FLAG_COMPULSORY | \
 					 AS_APP_SUBSUME_FLAG_CONTENT_RATINGS | \
+					 AS_APP_SUBSUME_FLAG_AGREEMENTS | \
 					 AS_APP_SUBSUME_FLAG_DESCRIPTION | \
 					 AS_APP_SUBSUME_FLAG_DEVELOPER_NAME | \
 					 AS_APP_SUBSUME_FLAG_EXTENDS | \
@@ -198,6 +205,7 @@ typedef enum {
 					 AS_APP_SUBSUME_FLAG_SUGGESTS | \
 					 AS_APP_SUBSUME_FLAG_TRANSLATIONS | \
 					 AS_APP_SUBSUME_FLAG_SOURCE_KIND | \
+					 AS_APP_SUBSUME_FLAG_LAUNCHABLES | \
 					 AS_APP_SUBSUME_FLAG_URL)
 
 /* deprecated name */
@@ -442,6 +450,7 @@ typedef enum {
  * @AS_APP_SEARCH_MATCH_NAME:			Use the app name
  * @AS_APP_SEARCH_MATCH_KEYWORD:		Use the app keyword
  * @AS_APP_SEARCH_MATCH_ID:			Use the app application ID
+ * @AS_APP_SEARCH_MATCH_ORIGIN:			Use the app origin
  *
  * The token match kind, which we want to be exactly 16 bits for storage
  * reasons.
@@ -455,6 +464,7 @@ typedef enum __attribute__((__packed__)) {
 	AS_APP_SEARCH_MATCH_NAME	= 1 << 4,	/* Since: 0.6.5 */
 	AS_APP_SEARCH_MATCH_KEYWORD	= 1 << 5,	/* Since: 0.6.5 */
 	AS_APP_SEARCH_MATCH_ID		= 1 << 6,	/* Since: 0.6.5 */
+	AS_APP_SEARCH_MATCH_ORIGIN	= 1 << 7,	/* Since: 0.6.13 */
 	/*< private >*/
 	AS_APP_SEARCH_MATCH_LAST	= 0xffff
 } AsAppSearchMatch;
@@ -476,7 +486,8 @@ AsAppKind	 as_app_get_kind		(AsApp		*app);
 AsAppScope	 as_app_get_scope		(AsApp		*app);
 AsAppMergeKind	 as_app_get_merge_kind		(AsApp		*app);
 AsAppState	 as_app_get_state		(AsApp		*app);
-AsAppTrustFlags	 as_app_get_trust_flags		(AsApp		*app);
+guint32		 as_app_get_trust_flags		(AsApp		*app);
+guint16		 as_app_get_search_match	(AsApp		*app);
 GList		*as_app_get_languages		(AsApp		*app);
 GPtrArray	*as_app_get_addons		(AsApp		*app);
 GPtrArray	*as_app_get_categories		(AsApp		*app);
@@ -492,6 +503,7 @@ GPtrArray	*as_app_get_pkgnames		(AsApp		*app);
 GPtrArray	*as_app_get_architectures	(AsApp		*app);
 GPtrArray	*as_app_get_releases		(AsApp		*app);
 GPtrArray	*as_app_get_provides		(AsApp		*app);
+GPtrArray	*as_app_get_launchables		(AsApp		*app);
 GPtrArray	*as_app_get_screenshots		(AsApp		*app);
 GPtrArray	*as_app_get_reviews		(AsApp		*app);
 GPtrArray	*as_app_get_content_ratings	(AsApp		*app);
@@ -552,6 +564,9 @@ gboolean	 as_app_has_compulsory_for_desktop (AsApp	*app,
 						 const gchar	*desktop);
 gboolean	 as_app_has_quirk		(AsApp		*app,
 						 AsAppQuirk	 quirk);
+AsLaunchable	*as_app_get_launchable_default	(AsApp		*app);
+AsLaunchable	*as_app_get_launchable_by_kind	(AsApp		*app,
+						 AsLaunchableKind kind);
 
 /* setters */
 void		 as_app_set_id			(AsApp		*app,
@@ -565,7 +580,9 @@ void		 as_app_set_merge_kind		(AsApp		*app,
 void		 as_app_set_state		(AsApp		*app,
 						 AsAppState	 state);
 void		 as_app_set_trust_flags		(AsApp		*app,
-						 AsAppTrustFlags trust_flags);
+						 guint32	 trust_flags);
+void		 as_app_set_search_match	(AsApp		*app,
+						 guint16	 search_match);
 void		 as_app_set_origin		(AsApp		*app,
 						 const gchar	*origin);
 void		 as_app_set_project_group	(AsApp		*app,
@@ -598,10 +615,14 @@ void		 as_app_set_priority		(AsApp		*app,
 						 gint		 priority);
 void		 as_app_add_category		(AsApp		*app,
 						 const gchar	*category);
+void		 as_app_remove_category		(AsApp		*app,
+						 const gchar	*category);
 void		 as_app_add_keyword		(AsApp		*app,
 						 const gchar	*locale,
 						 const gchar	*keyword);
 void		 as_app_add_kudo		(AsApp		*app,
+						 const gchar	*kudo);
+void		 as_app_remove_kudo		(AsApp		*app,
 						 const gchar	*kudo);
 void		 as_app_add_kudo_kind		(AsApp		*app,
 						 AsKudoKind	 kudo_kind);
@@ -621,12 +642,16 @@ void		 as_app_add_release		(AsApp		*app,
 						 AsRelease	*release);
 void		 as_app_add_provide		(AsApp		*app,
 						 AsProvide	*provide);
+void		 as_app_add_launchable		(AsApp		*app,
+						 AsLaunchable	*launchable);
 void		 as_app_add_screenshot		(AsApp		*app,
 						 AsScreenshot	*screenshot);
 void		 as_app_add_review		(AsApp		*app,
 						 AsReview	*review);
 void		 as_app_add_content_rating	(AsApp		*app,
 						 AsContentRating *content_rating);
+void		 as_app_add_agreement		(AsApp		*app,
+						 AsAgreement	*agreement);
 void		 as_app_add_icon		(AsApp		*app,
 						 AsIcon		*icon);
 void		 as_app_add_bundle		(AsApp		*app,
@@ -659,13 +684,13 @@ void		 as_app_add_quirk		(AsApp		*app,
 
 /* object methods */
 GPtrArray	*as_app_validate		(AsApp		*app,
-						 AsAppValidateFlags flags,
+						 guint32	 flags,
 						 GError		**error);
 void		 as_app_subsume			(AsApp		*app,
 						 AsApp		*donor);
 void		 as_app_subsume_full		(AsApp		*app,
 						 AsApp		*donor,
-						 AsAppSubsumeFlags flags);
+						 guint64	 flags);
 void		 as_app_add_veto		(AsApp		*app,
 						 const gchar	*fmt,
 						 ...)
@@ -678,7 +703,11 @@ guint		 as_app_search_matches		(AsApp		*app,
 						 const gchar	*search);
 gboolean	 as_app_parse_file		(AsApp		*app,
 						 const gchar	*filename,
-						 AsAppParseFlags flags,
+						 guint32	 flags,
+						 GError		**error);
+gboolean	 as_app_parse_data		(AsApp		*app,
+						 GBytes		*data,
+						 guint32	 flags,
 						 GError		**error);
 gboolean	 as_app_to_file			(AsApp		*app,
 						 GFile		*file,
@@ -686,6 +715,10 @@ gboolean	 as_app_to_file			(AsApp		*app,
 						 GError		**error);
 AsContentRating	*as_app_get_content_rating	(AsApp		*app,
 						 const gchar 	*kind);
+AsAgreement	*as_app_get_agreement_by_kind	(AsApp		*app,
+						 AsAgreementKind kind);
+AsAgreement	*as_app_get_agreement_default	(AsApp		*app);
+AsScreenshot	*as_app_get_screenshot_default	(AsApp		*app);
 AsIcon		*as_app_get_icon_default	(AsApp		*app);
 AsIcon		*as_app_get_icon_for_size	(AsApp		*app,
 						 guint		 width,
@@ -694,6 +727,8 @@ AsBundle	*as_app_get_bundle_default	(AsApp		*app);
 AsRelease	*as_app_get_release		(AsApp		*app,
 						 const gchar	*version);
 AsRelease	*as_app_get_release_default	(AsApp		*app);
+AsRelease	*as_app_get_release_by_version	(AsApp		*app,
+						 const gchar	*version);
 AsRequire	*as_app_get_require_by_value	(AsApp		*app,
 						 AsRequireKind	 kind,
 						 const gchar	*value);

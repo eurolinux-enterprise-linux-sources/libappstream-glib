@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2018 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -24,8 +24,10 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fnmatch.h>
 
+#include "as-agreement-private.h"
 #include "as-app-private.h"
 #include "as-app-builder.h"
 #include "as-bundle-private.h"
@@ -41,6 +43,7 @@
 #include "as-monitor.h"
 #include "as-node-private.h"
 #include "as-problem.h"
+#include "as-launchable-private.h"
 #include "as-provide-private.h"
 #include "as-ref-string.h"
 #include "as-release-private.h"
@@ -226,7 +229,7 @@ as_test_monitor_dir_func (void)
 
 	/* rename the file */
 	cnt_added = cnt_removed = cnt_changed = 0;
-	g_rename (tmpfile, tmpfile_new);
+	g_assert_cmpint (g_rename (tmpfile, tmpfile_new), ==, 0);
 	as_test_loop_run_with_timeout (2000);
 	as_test_loop_quit ();
 	g_assert_cmpint (cnt_added, ==, 1);
@@ -453,7 +456,7 @@ as_test_release_func (void)
 	AsNode *n;
 	AsNode *root;
 	GString *xml;
-	const gchar *src = "<release timestamp=\"123\" urgency=\"critical\" version=\"0.1.2\"/>";
+	const gchar *src = "<release type=\"stable\" timestamp=\"123\" urgency=\"critical\" version=\"0.1.2\"/>";
 	gboolean ret;
 	g_autoptr(AsNodeContext) ctx = NULL;
 	g_autoptr(AsRelease) release = NULL;
@@ -476,6 +479,7 @@ as_test_release_func (void)
 	g_assert_cmpint ((gint32) as_release_get_timestamp (release), ==, 123);
 	g_assert_cmpint (as_release_get_urgency (release), ==, AS_URGENCY_KIND_CRITICAL);
 	g_assert_cmpint (as_release_get_state (release), ==, AS_RELEASE_STATE_UNKNOWN);
+	g_assert_cmpint (as_release_get_kind (release), ==, AS_RELEASE_KIND_STABLE);
 	g_assert_cmpstr (as_release_get_version (release), ==, "0.1.2");
 
 	/* state is not stored in the XML */
@@ -557,6 +561,48 @@ as_test_provide_func (void)
 	root = as_node_new ();
 	as_node_context_set_version (ctx, 0.4);
 	n = as_provide_node_insert (provide, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
+static void
+as_test_launchable_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src = "<launchable type=\"desktop-id\">gnome-software.desktop</launchable>";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsLaunchable) launchable = NULL;
+
+	launchable = as_launchable_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "launchable");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_launchable_node_parse (launchable, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_launchable_get_kind (launchable), ==, AS_LAUNCHABLE_KIND_DESKTOP_ID);
+	g_assert_cmpstr (as_launchable_get_value (launchable), ==, "gnome-software.desktop");
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_launchable_node_insert (launchable, root, ctx);
 	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
 	ret = as_test_compare_lines (xml->str, src, &error);
 	g_assert_no_error (error);
@@ -916,6 +962,7 @@ as_test_icon_func (void)
 	g_assert_cmpstr (as_icon_get_url (icon), ==, NULL);
 	g_assert_cmpint (as_icon_get_height (icon), ==, 64);
 	g_assert_cmpint (as_icon_get_width (icon), ==, 64);
+	g_assert_cmpint (as_icon_get_scale (icon), ==, 1);
 	g_assert (as_icon_get_pixbuf (icon) == NULL);
 	g_assert (as_icon_get_data (icon) == NULL);
 
@@ -924,7 +971,7 @@ as_test_icon_func (void)
 	as_node_context_set_version (ctx, 0.4);
 	n = as_icon_node_insert (icon, root, ctx);
 	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
-	ret = as_test_compare_lines (xml->str, src, &error);
+	ret = as_test_compare_lines (xml->str, "<icon type=\"cached\" height=\"64\" width=\"64\">app.png</icon>", &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 	g_string_free (xml, TRUE);
@@ -945,13 +992,63 @@ as_test_icon_func (void)
 }
 
 static void
+as_test_icon_scale_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src = "<icon type=\"cached\" height=\"128\" scale=\"2\" width=\"128\">app.png</icon>";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsIcon) icon = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
+
+	icon = as_icon_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "icon");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_icon_node_parse (icon, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_icon_get_kind (icon), ==, AS_ICON_KIND_CACHED);
+	g_assert_cmpstr (as_icon_get_name (icon), ==, "app.png");
+	g_assert_cmpstr (as_icon_get_filename (icon), ==, NULL);
+	g_assert_cmpstr (as_icon_get_url (icon), ==, NULL);
+	g_assert_cmpint (as_icon_get_height (icon), ==, 128);
+	g_assert_cmpint (as_icon_get_width (icon), ==, 128);
+	g_assert_cmpint (as_icon_get_scale (icon), ==, 2);
+	g_assert (as_icon_get_pixbuf (icon) == NULL);
+	g_assert (as_icon_get_data (icon) == NULL);
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.9);
+	n = as_icon_node_insert (icon, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
+static void
 as_test_checksum_func (void)
 {
 	GError *error = NULL;
 	AsNode *n;
 	AsNode *root;
 	GString *xml;
-	const gchar *src = "<checksum type=\"sha1\" filename=\"fn.cab\" target=\"container\">12345</checksum>";
+	const gchar *src = "<checksum type=\"sha1\" filename=\"f&amp;n.cab\" target=\"container\">12&amp;45</checksum>";
 	gboolean ret;
 	g_autoptr(AsNodeContext) ctx = NULL;
 	g_autoptr(AsChecksum) csum = NULL;
@@ -981,8 +1078,8 @@ as_test_checksum_func (void)
 	/* verify */
 	g_assert_cmpint (as_checksum_get_kind (csum), ==, G_CHECKSUM_SHA1);
 	g_assert_cmpint (as_checksum_get_target (csum), ==, AS_CHECKSUM_TARGET_CONTAINER);
-	g_assert_cmpstr (as_checksum_get_filename (csum), ==, "fn.cab");
-	g_assert_cmpstr (as_checksum_get_value (csum), ==, "12345");
+	g_assert_cmpstr (as_checksum_get_filename (csum), ==, "f&n.cab");
+	g_assert_cmpstr (as_checksum_get_value (csum), ==, "12&45");
 
 	/* back to node */
 	root = as_node_new ();
@@ -1004,7 +1101,7 @@ as_test_icon_embedded_func (void)
 	AsNode *root;
 	GString *xml;
 	const gchar *src =
-"<icon type=\"embedded\"><name>app.png</name>"
+"<icon type=\"embedded\" height=\"32\" width=\"32\"><name>app.png</name>"
 "<filecontent>\n"
 "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJ\n"
 "TUUH1gsaCxQZBldDDAAACLxJREFUWIW9lmtsHNUVx/8zd3Zm9uFd73ptZ/3Gid+OoUlwyAscSJw4\n"
@@ -1177,6 +1274,57 @@ as_test_image_func (void)
 	g_assert (ret);
 }
 
+static void
+as_test_agreement_func (void)
+{
+	GError *error = NULL;
+	AsAgreementSection *sect;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src =
+		"<agreement type=\"eula\" version_id=\"1.2.3a\">\n"
+		"<agreement_section type=\"intro\">\n"
+		"<description><p>Mighty Fine</p></description>\n"
+		"</agreement_section>\n"
+		"</agreement>\n";
+	gboolean ret;
+	g_autoptr(AsAgreement) agreement = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+
+	agreement = as_agreement_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "agreement");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_agreement_node_parse (agreement, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_agreement_get_kind (agreement), ==, AS_AGREEMENT_KIND_EULA);
+	g_assert_cmpstr (as_agreement_get_version_id (agreement), ==, "1.2.3a");
+	sect = as_agreement_get_section_default (agreement);
+	g_assert_nonnull (sect);
+	g_assert_cmpstr (as_agreement_section_get_kind (sect), ==, "intro");
+	g_assert_cmpstr (as_agreement_section_get_description (sect, NULL), ==, "<p>Mighty Fine</p>");
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_agreement_node_insert (agreement, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
 
 static void
 as_test_review_func (void)
@@ -1252,6 +1400,7 @@ as_test_require_func (void)
 		"<id>gimp.desktop</id>\n"
 		"<firmware compare=\"ge\" version=\"0.1.2\">bootloader</firmware>\n"
 		"<firmware compare=\"eq\" version=\"1.0.0\">runtime</firmware>\n"
+		"<hardware>4be0643f-1d98-573b-97cd-ca98a65347dd</hardware>\n"
 		"</requires>\n"
 		"</component>\n";
 	gboolean ret;
@@ -1276,7 +1425,7 @@ as_test_require_func (void)
 
 	/* verify */
 	requires = as_app_get_requires (app);
-	g_assert_cmpint (requires->len, ==, 3);
+	g_assert_cmpint (requires->len, ==, 4);
 	require = g_ptr_array_index (requires, 0);
 	g_assert_cmpint (as_require_get_kind (require), ==, AS_REQUIRE_KIND_ID);
 	g_assert_cmpint (as_require_get_compare (require), ==, AS_REQUIRE_COMPARE_UNKNOWN);
@@ -1287,6 +1436,11 @@ as_test_require_func (void)
 	g_assert_cmpint (as_require_get_compare (require), ==, AS_REQUIRE_COMPARE_GE);
 	g_assert_cmpstr (as_require_get_version (require), ==, "0.1.2");
 	g_assert_cmpstr (as_require_get_value (require), ==, "bootloader");
+	require = g_ptr_array_index (requires, 3);
+	g_assert_cmpint (as_require_get_kind (require), ==, AS_REQUIRE_KIND_HARDWARE);
+	g_assert_cmpint (as_require_get_compare (require), ==, AS_REQUIRE_COMPARE_UNKNOWN);
+	g_assert_cmpstr (as_require_get_version (require), ==, NULL);
+	g_assert_cmpstr (as_require_get_value (require), ==, "4be0643f-1d98-573b-97cd-ca98a65347dd");
 
 	/* back to node */
 	root = as_node_new ();
@@ -1308,15 +1462,29 @@ as_test_require_func (void)
 	require = as_require_new ();
 	as_require_set_version (require, "0.1.2");
 	as_require_set_compare (require, AS_REQUIRE_COMPARE_EQ);
-	g_assert (as_require_version_compare (require, "0.1.2", NULL));
+	ret = as_require_version_compare (require, "0.1.2", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 	as_require_set_compare (require, AS_REQUIRE_COMPARE_LT);
-	g_assert (as_require_version_compare (require, "0.1.1", NULL));
+	ret = as_require_version_compare (require, "0.1.1", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 	as_require_set_compare (require, AS_REQUIRE_COMPARE_LE);
-	g_assert (as_require_version_compare (require, "0.1.2", NULL));
+	ret = as_require_version_compare (require, "0.1.2", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	as_require_set_version (require, "0.1.?");
 	as_require_set_compare (require, AS_REQUIRE_COMPARE_GLOB);
-	g_assert (as_require_version_compare (require, "0.?.*", NULL));
+	ret = as_require_version_compare (require, "0.1.9", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	as_require_set_version (require, "0.1.[0-9]");
 	as_require_set_compare (require, AS_REQUIRE_COMPARE_REGEX);
-	g_assert (as_require_version_compare (require, "0.1.[0-9]", NULL));
+	ret = as_require_version_compare (require, "0.1.9", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 }
 
 static void
@@ -1577,6 +1745,7 @@ as_test_app_func (void)
 	AsIcon *ic;
 	AsBundle *bu;
 	AsRelease *rel;
+	AsLaunchable *lau;
 	GError *error = NULL;
 	AsNode *n;
 	AsNode *root;
@@ -1652,13 +1821,14 @@ as_test_app_func (void)
 		"<dbus type=\"session\">org.gnome.Software</dbus>\n"
 		"<dbus type=\"system\">org.gnome.Software2</dbus>\n"
 		"</provides>\n"
+		"<launchable type=\"desktop-id\">gnome-software.desktop</launchable>\n"
 		"<languages>\n"
 		"<lang percentage=\"90\">en_GB</lang>\n"
 		"<lang>pl</lang>\n"
 		"</languages>\n"
-		"<metadata>\n"
+		"<custom>\n"
 		"<value key=\"SomethingRandom\"/>\n"
-		"</metadata>\n"
+		"</custom>\n"
 		"</component>\n";
 	g_autoptr(AsNodeContext) ctx = NULL;
 	g_autoptr(AsApp) app = NULL;
@@ -1693,6 +1863,7 @@ as_test_app_func (void)
 	g_assert_cmpint (as_app_get_priority (app), ==, -4);
 	g_assert_cmpint (as_app_get_screenshots(app)->len, ==, 2);
 	g_assert_cmpint (as_app_get_releases(app)->len, ==, 2);
+	g_assert_cmpint (as_app_get_launchables(app)->len, ==, 1);
 	g_assert_cmpint (as_app_get_provides(app)->len, ==, 3);
 	g_assert_cmpint (as_app_get_kudos(app)->len, ==, 1);
 	g_assert_cmpint (as_app_get_permissions(app)->len, ==, 1);
@@ -1717,6 +1888,11 @@ as_test_app_func (void)
 	g_assert (rel != NULL);
 	g_assert_cmpstr (as_release_get_version (rel), ==, "3.11.91");
 
+	/* check specific release */
+	rel = as_app_get_release_by_version (app, "3.11.91");
+	g_assert (rel != NULL);
+	g_assert_cmpstr (as_release_get_version (rel), ==, "3.11.91");
+
 	/* check icons */
 	icons = as_app_get_icons (app);
 	g_assert (icons != NULL);
@@ -1727,6 +1903,12 @@ as_test_app_func (void)
 	g_assert (bu != NULL);
 	g_assert_cmpint (as_bundle_get_kind (bu), ==, AS_BUNDLE_KIND_FLATPAK);
 	g_assert_cmpstr (as_bundle_get_id (bu), ==, "app/org.gnome.Software/x86_64/master");
+
+	/* check launchable */
+	lau = as_app_get_launchable_by_kind (app, AS_LAUNCHABLE_KIND_DESKTOP_ID);
+	g_assert (lau != NULL);
+	g_assert_cmpint (as_launchable_get_kind (lau), ==, AS_LAUNCHABLE_KIND_DESKTOP_ID);
+	g_assert_cmpstr (as_launchable_get_value (lau), ==, "gnome-software.desktop");
 
 	/* check we can get a specific icon */
 	ic = as_app_get_icon_for_size (app, 999, 999);
@@ -1742,7 +1924,7 @@ as_test_app_func (void)
 
 	/* back to node */
 	root = as_node_new ();
-	as_node_context_set_version (ctx, 0.8);
+	as_node_context_set_version (ctx, 1.0);
 	n = as_app_node_insert (app, root, ctx);
 	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
 	ret = as_test_compare_lines (xml->str, src, &error);
@@ -1754,6 +1936,43 @@ as_test_app_func (void)
 	/* test contact demunging */
 	as_app_set_update_contact (app, "richard_at_hughsie_dot_co_dot_uk");
 	g_assert_cmpstr (as_app_get_update_contact (app), ==, "richard@hughsie.co.uk");
+}
+
+static void
+as_test_app_launchable_fallback_func (void)
+{
+	AsLaunchable *lau;
+	AsNode *n;
+	gboolean ret;
+	const gchar *src =
+		"<component type=\"desktop\">\n"
+		"<id>org.gnome.Software</id>\n"
+		"</component>\n";
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsNode) root = NULL;
+	g_autoptr(GError) error = NULL;
+
+	app = as_app_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "component");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_app_node_parse (app, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* verify */
+	g_assert_cmpstr (as_app_get_id (app), ==, "org.gnome.Software");
+	g_assert_cmpint (as_app_get_launchables(app)->len, ==, 1);
+	lau = as_app_get_launchable_by_kind (app, AS_LAUNCHABLE_KIND_DESKTOP_ID);
+	g_assert (lau != NULL);
+	g_assert_cmpint (as_launchable_get_kind (lau), ==, AS_LAUNCHABLE_KIND_DESKTOP_ID);
+	g_assert_cmpstr (as_launchable_get_value (lau), ==, "org.gnome.Software.desktop");
 }
 
 static void
@@ -1772,6 +1991,9 @@ as_test_app_validate_check (GPtrArray *array,
 			continue;
 		message_no_data = g_strdup (as_problem_get_message (problem));
 		tmp = g_strrstr (message_no_data, " [");
+		if (tmp != NULL)
+			*tmp = '\0';
+		tmp = g_strrstr (message_no_data, ", ");
 		if (tmp != NULL)
 			*tmp = '\0';
 		if (g_strcmp0 (message_no_data, message) == 0)
@@ -1834,7 +2056,7 @@ as_test_app_validate_appdata_good_func (void)
 	/* check screenshots were loaded */
 	screenshots = as_app_get_screenshots (app);
 	g_assert_cmpint (screenshots->len, ==, 1);
-	ss = g_ptr_array_index (screenshots, 0);
+	ss = as_app_get_screenshot_default (app);
 	g_assert_cmpint (as_screenshot_get_kind (ss), ==, AS_SCREENSHOT_KIND_DEFAULT);
 	images = as_screenshot_get_images (ss);
 	g_assert_cmpint (images->len, ==, 1);
@@ -1973,9 +2195,7 @@ as_test_app_validate_file_bad_func (void)
 	}
 
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
-				    "<id> has invalid type attribute");
-	as_test_app_validate_check (probs, AS_PROBLEM_KIND_MARKUP_INVALID,
-				    "<id> does not have correct extension for kind");
+				    "<component> has invalid type attribute");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
 				    "<metadata_license> is not valid");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
@@ -2021,25 +2241,27 @@ as_test_app_validate_file_bad_func (void)
 				    "<p> requires sentence case");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_STYLE_INCORRECT,
 				    "<li> requires sentence case");
-	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
-				    "<project_group> is not valid");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_MISSING,
 				    "<translation> not specified");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
 				    "<release> versions are not in order");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
-				    "<release> timestamps are not in order");
-	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
 				    "<release> version was duplicated");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
 				    "<release> timestamp is in the future");
-	g_assert_cmpint (probs->len, ==, 35);
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_MISSING,
+				    "<content_rating> required for game");
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_MARKUP_INVALID,
+				    "<id> has invalid character");
+	g_assert_cmpint (probs->len, ==, 34);
 
 	/* again, harder */
 	probs2 = as_app_validate (app, AS_APP_VALIDATE_FLAG_STRICT, &error);
+	g_assert_no_error (error);
+	g_assert (probs2 != NULL);
 	as_test_app_validate_check (probs2, AS_PROBLEM_KIND_TAG_INVALID,
 				    "XML data contains unknown tag");
-	g_assert_cmpint (probs2->len, ==, 41);
+	g_assert_cmpint (probs2->len, ==, 40);
 }
 
 static void
@@ -2163,7 +2385,7 @@ as_test_store_validate_func (void)
 static void
 _as_app_add_format_kind (AsApp *app, AsFormatKind kind)
 {
-	AsFormat *format = as_format_new ();
+	g_autoptr(AsFormat) format = as_format_new ();
 	as_format_set_kind (format, kind);
 	as_app_add_format (app, format);
 }
@@ -2209,8 +2431,6 @@ as_test_app_validate_style_func (void)
 				    "<name> cannot end in '.'");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_STYLE_INCORRECT,
 				    "<summary> is too short");
-	as_test_app_validate_check (probs, AS_PROBLEM_KIND_MARKUP_INVALID,
-				    "<id> does not have correct extension for kind");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_STYLE_INCORRECT,
 				    "Not enough <screenshot> tags");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_STYLE_INCORRECT,
@@ -2219,7 +2439,7 @@ as_test_app_validate_style_func (void)
 				    "<url> is not present");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_MISSING,
 				    "<translation> not specified");
-	g_assert_cmpint (probs->len, ==, 12);
+	g_assert_cmpint (probs->len, ==, 11);
 }
 
 static void
@@ -2303,6 +2523,7 @@ as_test_app_no_markup_func (void)
 		"<component type=\"desktop\">\n"
 		"<id>org.gnome.Software.desktop</id>\n"
 		"<description>Software is awesome:\n\n * Bada\n * Boom!</description>\n"
+		"<launchable type=\"desktop-id\">org.gnome.Software.desktop</launchable>\n"
 		"</component>\n";
 	g_autoptr(AsNodeContext) ctx = NULL;
 	g_autoptr(AsApp) app = NULL;
@@ -2809,18 +3030,45 @@ as_test_app_subsume_func (void)
 }
 
 static void
+as_test_app_screenshot_func (void)
+{
+	AsScreenshot *ss;
+	GPtrArray *screenshots;
+	g_autoptr(AsApp) app = as_app_new ();
+	g_autoptr(AsScreenshot) ss1 = as_screenshot_new ();
+	g_autoptr(AsScreenshot) ss2 = as_screenshot_new ();
+
+	as_screenshot_set_kind (ss1, AS_SCREENSHOT_KIND_DEFAULT);
+	as_screenshot_set_caption (ss1, NULL, "bbb");
+	as_app_add_screenshot (app, ss1);
+
+	as_screenshot_set_kind (ss2, AS_SCREENSHOT_KIND_NORMAL);
+	as_screenshot_set_caption (ss2, NULL, "aaa");
+	as_app_add_screenshot (app, ss2);
+
+	screenshots = as_app_get_screenshots (app);
+	ss = g_ptr_array_index (screenshots, 0);
+	g_assert (ss == ss1);
+	g_assert_cmpint (as_screenshot_get_kind (ss), ==, AS_SCREENSHOT_KIND_DEFAULT);
+	ss = g_ptr_array_index (screenshots, 1);
+	g_assert (ss == ss2);
+	g_assert_cmpint (as_screenshot_get_kind (ss), ==, AS_SCREENSHOT_KIND_NORMAL);
+}
+
+static void
 as_test_app_search_func (void)
 {
 	const gchar *all[] = { "gnome", "install", "software", NULL };
 	const gchar *none[] = { "gnome", "xxx", "software", NULL };
 	const gchar *mime[] = { "application/vnd.oasis.opendocument.text", NULL };
+	g_auto(GStrv) tokens = NULL;
 	g_autoptr(AsApp) app = NULL;
 	g_autoptr(GHashTable) search_blacklist = NULL;
 	g_autoptr(AsStemmer) stemmer = as_stemmer_new ();
 
 	app = as_app_new ();
 	as_app_set_stemmer (app, stemmer);
-	as_app_set_id (app, "gnome-software");
+	as_app_set_id (app, "org.gnome.Software.desktop");
 	as_app_add_pkgname (app, "gnome-software");
 	as_app_set_name (app, NULL, "GNOME Software X-Plane");
 	as_app_set_comment (app, NULL, "Install and remove software");
@@ -2844,6 +3092,12 @@ as_test_app_search_func (void)
 	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) all), ==, 96);
 	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) none), ==, 0);
 	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) mime), ==, 4);
+
+	/* test searching for all tokenized tokens */
+	tokens = as_utils_search_tokenize ("org.gnome.Software");
+	g_assert_cmpstr (tokens[0], ==, "org.gnome.software");
+	g_assert_cmpstr (tokens[1], ==, NULL);
+	g_assert_cmpint (as_app_search_matches_all (app, tokens), ==, 256);
 
 	/* test tokenization of hyphenated name */
 	g_assert_cmpint (as_app_search_matches (app, "x-plane"), ==, 64);
@@ -2869,7 +3123,7 @@ as_test_store_embedded_func (void)
 "<id>eog.desktop</id>"
 "<pkgname>eog</pkgname>"
 "<name>Image Viewer</name>"
-"<icon type=\"embedded\">"
+"<icon type=\"embedded\" height=\"32\" width=\"32\">"
 "<name>eog.png</name>"
 "<filecontent>\n"
 "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJ\n"
@@ -2915,6 +3169,7 @@ as_test_store_embedded_func (void)
 "xxVXYLZ16ADU690D3JzxXLG581caBWBep/71278AZpn8hFce4VcAAAAASUVORK5CYII=\n"
 "</filecontent>"
 "</icon>"
+"<launchable type=\"desktop-id\">eog.desktop</launchable>"
 "</component>"
 "</components>";
 
@@ -3596,13 +3851,13 @@ static void
 as_test_store_unique_func (void)
 {
 	AsApp *app;
-	GPtrArray *apps;
 	g_autoptr(AsApp) app1 = NULL;
 	g_autoptr(AsApp) app2 = NULL;
 	g_autoptr(AsApp) app3 = NULL;
 	g_autoptr(AsBundle) bundle2 = NULL;
 	g_autoptr(AsBundle) bundle3 = NULL;
 	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GPtrArray) apps = NULL;
 
 	/* create a store and add a single app */
 	store = as_store_new ();
@@ -3659,6 +3914,8 @@ as_test_store_provides_func (void)
 	gboolean ret;
 	g_autoptr(GError) error = NULL;
 	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GPtrArray) apps1 = NULL;
+	g_autoptr(GPtrArray) apps2 = NULL;
 
 	/* create a store and add a single app */
 	store = as_store_new ();
@@ -3687,6 +3944,18 @@ as_test_store_provides_func (void)
 					   AS_PROVIDE_KIND_FIRMWARE_FLASHED,
 					   "beefdead");
 	g_assert (app == NULL);
+
+	/* arrays of apps */
+	apps1 = as_store_get_apps_by_provide (store,
+					      AS_PROVIDE_KIND_FIRMWARE_FLASHED,
+					      "deadbeef");
+	g_assert_cmpint (apps1->len, ==, 1);
+	app = g_ptr_array_index (apps1, 0);
+	g_assert_cmpstr (as_app_get_id (app), ==, "test.desktop");
+	apps2 = as_store_get_apps_by_provide (store,
+					      AS_PROVIDE_KIND_FIRMWARE_FLASHED,
+					      "beefdead");
+	g_assert_cmpint (apps2->len, ==, 0);
 }
 
 static void
@@ -3740,30 +4009,12 @@ as_test_store_versions_func (void)
 		"<description><p>Hello</p></description>\n"
 		"</release>\n"
 		"</releases>\n"
+		"<launchable type=\"desktop-id\">test.desktop</launchable>\n"
 		"</component>\n"
 		"</components>\n", &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 	g_string_free (xml, TRUE);
-
-	/* test with legacy options */
-	as_store_set_api_version (store, 0.6);
-	xml = as_store_to_xml (store, 0);
-	g_assert_cmpstr (xml->str, ==,
-		"<components version=\"0.6\">"
-		"<component type=\"desktop\">"
-		"<id>test.desktop</id>"
-		"<description><p>Hello world</p></description>"
-		"<architectures><arch>i386</arch></architectures>"
-		"<releases>"
-		"<release timestamp=\"123\" version=\"0.1.2\">"
-		"<description><p>Hello</p></description>"
-		"</release>"
-		"</releases>"
-		"</component>"
-		"</components>");
-	g_string_free (xml, TRUE);
-
 	g_object_unref (store);
 
 	/* load a version 0.6 file to the store */
@@ -3783,6 +4034,7 @@ as_test_store_versions_func (void)
 		"<components version=\"0.6\">"
 		"<component type=\"desktop\">"
 		"<id>test.desktop</id>"
+		"<launchable type=\"desktop-id\">test.desktop</launchable>"
 		"</component>"
 		"</components>");
 	g_string_free (xml, TRUE);
@@ -3808,6 +4060,7 @@ as_test_store_addons_func (void)
 		"</component>"
 		"<component type=\"desktop\">"
 		"<id>eclipse.desktop</id>"
+		"<launchable type=\"desktop-id\">eclipse.desktop</launchable>"
 		"</component>"
 		"</components>";
 	g_autoptr(AsStore) store = NULL;
@@ -3890,6 +4143,7 @@ as_test_node_no_dup_c_func (void)
 		"<component type=\"desktop\">"
 		"<id>test.desktop</id>"
 		"<name>Krita</name>"
+		"<launchable type=\"desktop-id\">test.desktop</launchable>"
 		"</component>");
 	g_string_free (xml, TRUE);
 	as_node_unref (root);
@@ -4184,6 +4438,13 @@ as_test_utils_spdx_token_func (void)
 	g_strfreev (tok);
 	g_free (tmp);
 
+	/* multiple licences, using the new style */
+	tok = as_utils_spdx_license_tokenize ("LGPL-2.0-or-later AND GPL-2.0-only");
+	tmp = g_strjoinv ("  ", tok);
+	g_assert_cmpstr (tmp, ==, "@LGPL-2.0+  &  @GPL-2.0");
+	g_strfreev (tok);
+	g_free (tmp);
+
 	/* multiple licences, deprectated 'and' & 'or' */
 	tok = as_utils_spdx_license_tokenize ("LGPL-2.0+ and GPL-2.0 or LGPL-3.0");
 	tmp = g_strjoinv ("  ", tok);
@@ -4428,16 +4689,31 @@ as_test_utils_version_func (void)
 		{ 0,		NULL }
 	};
 	struct {
+		guint16 val;
+		const gchar *ver;
+		AsVersionParseFlag flags;
+	} version_from_uint16[] = {
+		{ 0x0,		"0.0",		AS_VERSION_PARSE_FLAG_NONE },
+		{ 0xff,		"0.255",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0xff01,	"255.1",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0x0,		"0.0",		AS_VERSION_PARSE_FLAG_USE_BCD },
+		{ 0x0110,	"1.10",		AS_VERSION_PARSE_FLAG_USE_BCD },
+		{ 0x9999,	"99.99",	AS_VERSION_PARSE_FLAG_USE_BCD },
+		{ 0,		NULL }
+	};
+	struct {
 		const gchar *old;
 		const gchar *new;
 	} version_parse[] = {
 		{ "0",		"0" },
+		{ "0x1a",	"0.0.26" },
 		{ "257",	"0.0.257" },
 		{ "1.2.3",	"1.2.3" },
 		{ "0xff0001",	"0.255.1" },
 		{ "16711681",	"0.255.1" },
 		{ "20150915",	"20150915" },
 		{ "dave",	"dave" },
+		{ "0x1x",	"0x1x" },
 		{ NULL,		NULL }
 	};
 
@@ -4447,6 +4723,12 @@ as_test_utils_version_func (void)
 		ver = as_utils_version_from_uint32 (version_from_uint32[i].val,
 						    version_from_uint32[i].flags);
 		g_assert_cmpstr (ver, ==, version_from_uint32[i].ver);
+	}
+	for (i = 0; version_from_uint16[i].ver != NULL; i++) {
+		g_autofree gchar *ver = NULL;
+		ver = as_utils_version_from_uint16 (version_from_uint16[i].val,
+						    version_from_uint16[i].flags);
+		g_assert_cmpstr (ver, ==, version_from_uint16[i].ver);
 	}
 
 	/* check version parsing */
@@ -4697,7 +4979,7 @@ as_test_store_yaml_func (void)
 		"<id>iceweasel.desktop</id>\n"
 		"<pkgname>iceweasel</pkgname>\n"
 		"<name>Iceweasel</name>\n"
-		"<icon type=\"cached\">iceweasel.png</icon>\n"
+		"<icon type=\"cached\" height=\"64\" width=\"64\">iceweasel.png</icon>\n"
 		"<keywords>\n"
 		"<keyword>browser</keyword>\n"
 		"</keywords>\n"
@@ -4785,6 +5067,7 @@ as_test_utils_vercmp_func (void)
 {
 	/* same */
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.3"), ==, 0);
+	g_assert_cmpint (as_utils_vercmp ("001.002.003", "001.002.003"), ==, 0);
 
 	/* same, not dotted decimal */
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "0x1020003"), ==, 0);
@@ -4792,16 +5075,32 @@ as_test_utils_vercmp_func (void)
 
 	/* upgrade and downgrade */
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.4"), <, 0);
+	g_assert_cmpint (as_utils_vercmp ("001.002.000", "001.002.009"), <, 0);
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.2"), >, 0);
+	g_assert_cmpint (as_utils_vercmp ("001.002.009", "001.002.000"), >, 0);
 
 	/* unequal depth */
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.3.1"), <, 0);
 	g_assert_cmpint (as_utils_vercmp ("1.2.3.1", "1.2.4"), <, 0);
 
-	/* non-numeric */
-	g_assert_cmpint (as_utils_vercmp ("1.2xxx.3", "1.2.3"), ==, G_MAXINT);
-	g_assert_cmpint (as_utils_vercmp ("1.2a.3", "1.2b.3"), ==, G_MAXINT);
-	g_assert_cmpint (as_utils_vercmp ("1.2.-3", "1.2.3"), ==, G_MAXINT);
+	/* mixed-alpha-numeric */
+	g_assert_cmpint (as_utils_vercmp ("1.2.3a", "1.2.3a"), ==, 0);
+	g_assert_cmpint (as_utils_vercmp ("1.2.3a", "1.2.3b"), <, 0);
+	g_assert_cmpint (as_utils_vercmp ("1.2.3b", "1.2.3a"), >, 0);
+
+	/* alpha version append */
+	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.3a"), <, 0);
+	g_assert_cmpint (as_utils_vercmp ("1.2.3a", "1.2.3"), >, 0);
+
+	/* alpha only */
+	g_assert_cmpint (as_utils_vercmp ("alpha", "alpha"), ==, 0);
+	g_assert_cmpint (as_utils_vercmp ("alpha", "beta"), <, 0);
+	g_assert_cmpint (as_utils_vercmp ("beta", "alpha"), >, 0);
+
+	/* alpha-compare */
+	g_assert_cmpint (as_utils_vercmp ("1.2a.3", "1.2a.3"), ==, 0);
+	g_assert_cmpint (as_utils_vercmp ("1.2a.3", "1.2b.3"), <, 0);
+	g_assert_cmpint (as_utils_vercmp ("1.2b.3", "1.2a.3"), >, 0);
 
 	/* invalid */
 	g_assert_cmpint (as_utils_vercmp ("1", NULL), ==, G_MAXINT);
@@ -5011,6 +5310,22 @@ as_test_utils_unique_id_func (void)
 	}
 	duration_ns = g_timer_elapsed (timer, NULL) * 1000000000.f;
 	g_print ("%.0f ns: ", duration_ns / (loops * 4));
+
+	/* allow ignoring using bitfields */
+	g_assert (as_utils_unique_id_match ("aa/bb/cc/dd/ee/ff",
+					    "aa/bb/cc/dd/ee/XXXXXXXXXXXXX",
+					    AS_UNIQUE_ID_MATCH_FLAG_SCOPE |
+					    AS_UNIQUE_ID_MATCH_FLAG_BUNDLE_KIND |
+					    AS_UNIQUE_ID_MATCH_FLAG_ORIGIN |
+					    AS_UNIQUE_ID_MATCH_FLAG_KIND |
+					    AS_UNIQUE_ID_MATCH_FLAG_ID));
+	g_assert (as_utils_unique_id_match ("XXXXXXXXXXXXX/bb/cc/dd/ee/ff",
+					    "aa/bb/cc/dd/ee/ff",
+					    AS_UNIQUE_ID_MATCH_FLAG_BUNDLE_KIND |
+					    AS_UNIQUE_ID_MATCH_FLAG_ORIGIN |
+					    AS_UNIQUE_ID_MATCH_FLAG_KIND |
+					    AS_UNIQUE_ID_MATCH_FLAG_ID |
+					    AS_UNIQUE_ID_MATCH_FLAG_BRANCH));
 }
 
 static void
@@ -5122,6 +5437,43 @@ as_test_store_merge_replace_func (void)
 	g_assert (!as_app_has_category (app2, "Family"));
 }
 
+static void
+as_test_store_merge_then_replace_func (void)
+{
+	g_autoptr (AsApp) app1 = NULL;
+	g_autoptr (AsApp) app2 = NULL;
+	g_autoptr (AsApp) app3 = NULL;
+	g_autoptr (AsStore) store = NULL;
+
+	store = as_store_new ();
+
+	/* this test case checks that a memory error using app names as keys is fixed */
+
+	/* add app */
+	app1 = as_app_new ();
+	as_app_set_id (app1, "org.gnome.Software.desktop");
+	_as_app_add_format_kind (app1, AS_FORMAT_KIND_DESKTOP);
+	as_app_set_priority (app1, 0);
+	as_store_add_app (store, app1);
+	g_clear_object (&app1);
+
+	/* add app that merges with the first */
+	app2 = as_app_new ();
+	as_app_set_id (app2, "org.gnome.Software.desktop");
+	_as_app_add_format_kind (app2, AS_FORMAT_KIND_DESKTOP);
+	as_app_set_priority (app2, 0);
+	as_store_add_app (store, app2);
+	g_clear_object (&app2);
+
+	/* add app that replaces the second */
+	app3 = as_app_new ();
+	as_app_set_id (app3, "org.gnome.Software.desktop");
+	_as_app_add_format_kind (app3, AS_FORMAT_KIND_DESKTOP);
+	as_app_set_priority (app3, 1);
+	as_store_add_app (store, app3);
+	g_clear_object (&app3);
+}
+
 /* shows the unique-id globbing functions at work */
 static void
 as_test_utils_unique_id_hash_func (void)
@@ -5193,7 +5545,7 @@ as_test_utils_unique_id_hash_safe_func (void)
 	/* add to hash table using the unique ID as a key */
 	hash = g_hash_table_new ((GHashFunc) as_utils_unique_id_hash,
 				 (GEqualFunc) as_utils_unique_id_equal);
-	g_hash_table_insert (hash, "dave", app);
+	g_hash_table_insert (hash, (gpointer) "dave", app);
 
 	/* get with exact key */
 	found = g_hash_table_lookup (hash, "dave");
@@ -5202,6 +5554,22 @@ as_test_utils_unique_id_hash_safe_func (void)
 	/* different key */
 	found = g_hash_table_lookup (hash, "frank");
 	g_assert (found == NULL);
+}
+
+static void
+as_test_app_parse_data_func (void)
+{
+	const gchar *data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			    "<component>\n</component>\n     ";
+	gboolean ret;
+	g_autoptr(GBytes) blob = NULL;
+	g_autoptr(AsApp) app = as_app_new ();
+	g_autoptr(GError) error = NULL;
+
+	blob = g_bytes_new (data, strlen (data));
+	ret = as_app_parse_data (app, blob, AS_APP_PARSE_FLAG_NONE, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 }
 
 static void
@@ -5246,6 +5614,7 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/utils{locale-compat}", as_test_utils_locale_compat_func);
 	g_test_add_func ("/AppStream/utils{string-replace}", as_test_utils_string_replace_func);
 	g_test_add_func ("/AppStream/tag", as_test_tag_func);
+	g_test_add_func ("/AppStream/launchable", as_test_launchable_func);
 	g_test_add_func ("/AppStream/provide", as_test_provide_func);
 	g_test_add_func ("/AppStream/require", as_test_require_func);
 	g_test_add_func ("/AppStream/checksum", as_test_checksum_func);
@@ -5255,9 +5624,11 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/release{appdata}", as_test_release_appdata_func);
 	g_test_add_func ("/AppStream/release{appstream}", as_test_release_appstream_func);
 	g_test_add_func ("/AppStream/icon", as_test_icon_func);
+	g_test_add_func ("/AppStream/icon{scale}", as_test_icon_scale_func);
 	g_test_add_func ("/AppStream/icon{embedded}", as_test_icon_embedded_func);
 	g_test_add_func ("/AppStream/bundle", as_test_bundle_func);
 	g_test_add_func ("/AppStream/review", as_test_review_func);
+	g_test_add_func ("/AppStream/agreement", as_test_agreement_func);
 	g_test_add_func ("/AppStream/translation", as_test_translation_func);
 	g_test_add_func ("/AppStream/suggest", as_test_suggest_func);
 	g_test_add_func ("/AppStream/image", as_test_image_func);
@@ -5265,6 +5636,7 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/image{alpha}", as_test_image_alpha_func);
 	g_test_add_func ("/AppStream/screenshot", as_test_screenshot_func);
 	g_test_add_func ("/AppStream/app", as_test_app_func);
+	g_test_add_func ("/AppStream/app{launchable:fallback}", as_test_app_launchable_fallback_func);
 	g_test_add_func ("/AppStream/app{builder:gettext}", as_test_app_builder_gettext_func);
 	g_test_add_func ("/AppStream/app{builder:gettext-nodomain}", as_test_app_builder_gettext_nodomain_func);
 	g_test_add_func ("/AppStream/app{builder:qt}", as_test_app_builder_qt_func);
@@ -5275,10 +5647,12 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/app{validate-file-bad}", as_test_app_validate_file_bad_func);
 	g_test_add_func ("/AppStream/app{validate-meta-bad}", as_test_app_validate_meta_bad_func);
 	g_test_add_func ("/AppStream/app{validate-intltool}", as_test_app_validate_intltool_func);
+	g_test_add_func ("/AppStream/app{parse-data}", as_test_app_parse_data_func);
 	g_test_add_func ("/AppStream/app{parse-file:desktop}", as_test_app_parse_file_desktop_func);
 	g_test_add_func ("/AppStream/app{no-markup}", as_test_app_no_markup_func);
 	g_test_add_func ("/AppStream/app{subsume}", as_test_app_subsume_func);
 	g_test_add_func ("/AppStream/app{search}", as_test_app_search_func);
+	g_test_add_func ("/AppStream/app{screenshot}", as_test_app_screenshot_func);
 	g_test_add_func ("/AppStream/markup{import-html}", as_test_markup_import_html);
 	g_test_add_func ("/AppStream/node", as_test_node_func);
 	g_test_add_func ("/AppStream/node{reflow}", as_test_node_reflow_text_func);
@@ -5309,6 +5683,7 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/store{unique}", as_test_store_unique_func);
 	g_test_add_func ("/AppStream/store{merge}", as_test_store_merge_func);
 	g_test_add_func ("/AppStream/store{merge-replace}", as_test_store_merge_replace_func);
+	g_test_add_func ("/AppStream/store{merge-then-replace}", as_test_store_merge_then_replace_func);
 	g_test_add_func ("/AppStream/store{empty}", as_test_store_empty_func);
 	if (g_test_slow ()) {
 		g_test_add_func ("/AppStream/store{auto-reload-dir}", as_test_store_auto_reload_dir_func);
@@ -5331,11 +5706,13 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/store{embedded}", as_test_store_embedded_func);
 	g_test_add_func ("/AppStream/store{provides}", as_test_store_provides_func);
 	g_test_add_func ("/AppStream/store{local-appdata}", as_test_store_local_appdata_func);
-	g_test_add_func ("/AppStream/store{speed-appstream}", as_test_store_speed_appstream_func);
-	g_test_add_func ("/AppStream/store{speed-search}", as_test_store_speed_search_func);
-	g_test_add_func ("/AppStream/store{speed-appdata}", as_test_store_speed_appdata_func);
-	g_test_add_func ("/AppStream/store{speed-desktop}", as_test_store_speed_desktop_func);
-	g_test_add_func ("/AppStream/store{speed-yaml}", as_test_store_speed_yaml_func);
+	if (g_test_slow ()) {
+		g_test_add_func ("/AppStream/store{speed-appstream}", as_test_store_speed_appstream_func);
+		g_test_add_func ("/AppStream/store{speed-search}", as_test_store_speed_search_func);
+		g_test_add_func ("/AppStream/store{speed-appdata}", as_test_store_speed_appdata_func);
+		g_test_add_func ("/AppStream/store{speed-desktop}", as_test_store_speed_desktop_func);
+		g_test_add_func ("/AppStream/store{speed-yaml}", as_test_store_speed_yaml_func);
+	}
 
 	return g_test_run ();
 }

@@ -1,6 +1,7 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2018 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2018 Matthias Klumpp <matthias@tenstral.net>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -50,6 +51,7 @@
 typedef struct
 {
 	AsUrgencyKind		 urgency;
+	AsReleaseKind		 kind;
 	AsReleaseState		 state;
 	guint64			*sizes;
 	AsRefString		*version;
@@ -90,6 +92,7 @@ as_release_init (AsRelease *release)
 {
 	AsReleasePrivate *priv = GET_PRIVATE (release);
 	priv->urgency = AS_URGENCY_KIND_UNKNOWN;
+	priv->kind = AS_RELEASE_KIND_UNKNOWN;
 	priv->state = AS_RELEASE_STATE_UNKNOWN;
 }
 
@@ -136,6 +139,45 @@ as_release_class_init (AsReleaseClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	object_class->finalize = as_release_finalize;
+}
+/**
+ * as_release_kind_to_string:
+ * @kind: the #AsReleaseKind.
+ *
+ * Converts the enumerated value to an text representation.
+ *
+ * Returns: string version of @kind
+ *
+ * Since: 0.7.6
+ **/
+const gchar*
+as_release_kind_to_string (AsReleaseKind kind)
+{
+	if (kind == AS_RELEASE_KIND_STABLE)
+		return "stable";
+	if (kind == AS_RELEASE_KIND_DEVELOPMENT)
+		return "development";
+	return "unknown";
+}
+
+/**
+ * as_release_kind_from_string:
+ * @kind_str: the string.
+ *
+ * Converts the text representation to an enumerated value.
+ *
+ * Returns: an #AsReleaseKind or %AS_RELEASE_KIND_UNKNOWN for unknown
+ *
+ * Since: 0.7.6
+ **/
+AsReleaseKind
+as_release_kind_from_string (const gchar *kind_str)
+{
+	if (g_strcmp0 (kind_str, "stable") == 0)
+		return AS_RELEASE_KIND_STABLE;
+	if (g_strcmp0 (kind_str, "development") == 0)
+		return AS_RELEASE_KIND_DEVELOPMENT;
+	return AS_RELEASE_KIND_UNKNOWN;
 }
 
 /**
@@ -196,16 +238,17 @@ as_release_vercmp (AsRelease *rel1, AsRelease *rel2)
 	AsReleasePrivate *priv2 = GET_PRIVATE (rel2);
 	gint val;
 
-	/* prefer the version strings */
-	val = as_utils_vercmp (priv2->version, priv1->version);
-	if (val != G_MAXINT)
-		return val;
-
-	/* fall back to the timestamp */
+	/* prefer the timestamp */
 	if (priv1->timestamp > priv2->timestamp)
 		return -1;
 	if (priv1->timestamp < priv2->timestamp)
 		return 1;
+
+	/* fall back to the version strings */
+	val = as_utils_vercmp (priv2->version, priv1->version);
+	if (val != G_MAXINT)
+		return val;
+
 	return 0;
 }
 
@@ -283,6 +326,23 @@ as_release_get_state (AsRelease *release)
 {
 	AsReleasePrivate *priv = GET_PRIVATE (release);
 	return priv->state;
+}
+
+/**
+ * as_release_get_kind:
+ * @release: a #AsRelease instance.
+ *
+ * Gets the type of the release.
+ *
+ * Returns: enumerated value, e.g. %AS_RELEASE_KIND_STABLE
+ *
+ * Since: 0.7.6
+ **/
+AsReleaseKind
+as_release_get_kind (AsRelease *release)
+{
+	AsReleasePrivate *priv = GET_PRIVATE (release);
+	return priv->kind;
 }
 
 /**
@@ -454,7 +514,7 @@ as_release_get_timestamp (AsRelease *release)
 /**
  * as_release_get_description:
  * @release: a #AsRelease instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  *
  * Gets the release description markup for a given locale.
  *
@@ -529,6 +589,22 @@ as_release_set_urgency (AsRelease *release, AsUrgencyKind urgency)
 }
 
 /**
+ * as_release_set_kind:
+ * @release: a #AsRelease instance.
+ * @kind: the #AsReleaseKind
+ *
+ * Sets the release kind.
+ *
+ * Since: 0.7.6
+ **/
+void
+as_release_set_kind (AsRelease *release, AsReleaseKind kind)
+{
+	AsReleasePrivate *priv = GET_PRIVATE (release);
+	priv->kind = kind;
+}
+
+/**
  * as_release_set_state:
  * @release: a #AsRelease instance.
  * @state: the release state, e.g. %AS_RELEASE_STATE_INSTALLED
@@ -559,6 +635,7 @@ as_release_add_location (AsRelease *release, const gchar *location)
 	AsReleasePrivate *priv = GET_PRIVATE (release);
 
 	/* deduplicate */
+	as_release_ensure_locations (release);
 	if (as_ptr_array_find_string (priv->locations, location))
 		return;
 
@@ -601,7 +678,7 @@ as_release_set_timestamp (AsRelease *release, guint64 timestamp)
 /**
  * as_release_set_description:
  * @release: a #AsRelease instance.
- * @locale: the locale, or %NULL. e.g. "en_GB"
+ * @locale: (nullable): the locale. e.g. "en_GB"
  * @description: the description markup.
  *
  * Sets the description release markup.
@@ -645,7 +722,6 @@ as_release_node_insert (AsRelease *release, GNode *parent, AsNodeContext *ctx)
 	AsReleasePrivate *priv = GET_PRIVATE (release);
 	AsChecksum *checksum;
 	GNode *n;
-	guint i;
 
 	n = as_node_insert (parent, "release", NULL,
 			    AS_NODE_INSERT_FLAG_NONE,
@@ -660,6 +736,10 @@ as_release_node_insert (AsRelease *release, GNode *parent, AsNodeContext *ctx)
 		as_node_add_attribute (n, "urgency",
 				       as_urgency_kind_to_string (priv->urgency));
 	}
+	if (priv->kind != AS_RELEASE_KIND_UNKNOWN) {
+		as_node_add_attribute (n, "type",
+				       as_release_kind_to_string (priv->kind));
+	}
 	if (as_node_context_get_output_trusted (ctx) &&
 	    priv->state != AS_RELEASE_STATE_UNKNOWN) {
 		as_node_add_attribute (n, "state",
@@ -667,19 +747,16 @@ as_release_node_insert (AsRelease *release, GNode *parent, AsNodeContext *ctx)
 	}
 	if (priv->version != NULL)
 		as_node_add_attribute (n, "version", priv->version);
-	if (as_node_context_get_version (ctx) >= 0.9) {
-		const gchar *tmp;
-		for (i = 0; priv->locations != NULL && i < priv->locations->len; i++) {
-			tmp = g_ptr_array_index (priv->locations, i);
-			as_node_insert (n, "location", tmp,
-					AS_NODE_INSERT_FLAG_NONE, NULL);
-		}
-		for (i = 0; priv->checksums != NULL && i < priv->checksums->len; i++) {
-			checksum = g_ptr_array_index (priv->checksums, i);
-			as_checksum_node_insert (checksum, n, ctx);
-		}
+	for (guint i = 0; priv->locations != NULL && i < priv->locations->len; i++) {
+		const gchar *tmp = g_ptr_array_index (priv->locations, i);
+		as_node_insert (n, "location", tmp,
+				AS_NODE_INSERT_FLAG_NONE, NULL);
 	}
-	if (priv->descriptions != NULL && as_node_context_get_version (ctx) >= 0.6) {
+	for (guint i = 0; priv->checksums != NULL && i < priv->checksums->len; i++) {
+		checksum = g_ptr_array_index (priv->checksums, i);
+		as_checksum_node_insert (checksum, n, ctx);
+	}
+	if (priv->descriptions != NULL) {
 		as_node_insert_localized (n, "description", priv->descriptions,
 					  AS_NODE_INSERT_FLAG_PRE_ESCAPED |
 					  AS_NODE_INSERT_FLAG_DEDUPE_LANG);
@@ -687,7 +764,7 @@ as_release_node_insert (AsRelease *release, GNode *parent, AsNodeContext *ctx)
 
 	/* add sizes */
 	if (priv->sizes != NULL) {
-		for (i = 0; i < AS_SIZE_KIND_LAST; i++) {
+		for (guint i = 0; i < AS_SIZE_KIND_LAST; i++) {
 			g_autofree gchar *size_str = NULL;
 			if (priv->sizes[i] == 0)
 				continue;
@@ -735,6 +812,9 @@ as_release_node_parse (AsRelease *release, GNode *node,
 	tmp = as_node_get_attribute (node, "urgency");
 	if (tmp != NULL)
 		as_release_set_urgency (release, as_urgency_kind_from_string (tmp));
+	tmp = as_node_get_attribute (node, "type");
+	if (tmp != NULL)
+		as_release_set_kind (release, as_release_kind_from_string (tmp));
 	tmp = as_node_get_attribute (node, "version");
 	if (tmp != NULL)
 		as_release_set_version (release, tmp);
@@ -743,13 +823,14 @@ as_release_node_parse (AsRelease *release, GNode *node,
 	if (priv->locations != NULL)
 		g_ptr_array_set_size (priv->locations, 0);
 	for (n = node->children; n != NULL; n = n->next) {
+		AsRefString *str;
 		if (as_node_get_tag (n) != AS_TAG_LOCATION)
 			continue;
-		tmp = as_node_get_data (n);
-		if (tmp == NULL)
+		str = as_node_get_data_as_refstr (n);
+		if (str == NULL)
 			continue;
 		as_release_ensure_locations (release);
-		g_ptr_array_add (priv->locations, as_ref_string_ref (tmp));
+		g_ptr_array_add (priv->locations, as_ref_string_ref (str));
 	}
 
 	/* get optional checksums */
@@ -844,6 +925,10 @@ as_release_node_parse_dep11 (AsRelease *release, GNode *node,
 		}
 		if (g_strcmp0 (tmp, "version") == 0) {
 			as_release_set_version (release, as_yaml_node_get_value (n));
+			continue;
+		}
+		if (g_strcmp0 (tmp, "type") == 0) {
+			as_release_set_kind (release, as_release_kind_from_string (as_yaml_node_get_value (n)));
 			continue;
 		}
 		if (g_strcmp0 (tmp, "description") == 0) {

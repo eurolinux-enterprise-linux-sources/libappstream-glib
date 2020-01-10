@@ -56,7 +56,7 @@ asb_app_load_icon (AsbPlugin *plugin,
 {
 	g_autoptr(AsImage) im = NULL;
 	g_autoptr(GError) error_local = NULL;
-	AsImageLoadFlags load_flags = AS_IMAGE_LOAD_FLAG_NONE;
+	AsImageLoadFlags load_flags = AS_IMAGE_LOAD_FLAG_ALWAYS_RESIZE;
 
 	/* is icon in a unsupported format */
 	if (!asb_context_get_flag (plugin->ctx, ASB_CONTEXT_FLAG_IGNORE_LEGACY_ICONS))
@@ -246,6 +246,7 @@ asb_plugin_process_app (AsbPlugin *plugin,
 			const gchar *tmpdir,
 			GError **error)
 {
+	gboolean found = FALSE;
 	guint i;
 	const gchar *app_dirs[] = {
 		"/usr/share/applications",
@@ -263,7 +264,18 @@ asb_plugin_process_app (AsbPlugin *plugin,
 			if (!asb_plugin_desktop_refine (plugin, pkg, fn,
 							app, tmpdir, error))
 				return FALSE;
+			found = TRUE;
 		}
+	}
+
+	/* required */
+	if (!found && as_app_get_kind (AS_APP (app)) == AS_APP_KIND_DESKTOP) {
+		g_set_error (error,
+			     ASB_PLUGIN_ERROR,
+			     ASB_PLUGIN_ERROR_FAILED,
+			     "a desktop file is required for %s",
+			     as_app_get_id (AS_APP (app)));
+		return FALSE;
 	}
 
 	return TRUE;
