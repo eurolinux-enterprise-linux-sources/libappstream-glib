@@ -98,29 +98,25 @@ host_triplet = @host@
 @HAVE_ALPM_TRUE@	asb-package-alpm.c					\
 @HAVE_ALPM_TRUE@	asb-package-alpm.h
 
-@HAVE_OSTREE_TRUE@am__append_3 = \
-@HAVE_OSTREE_TRUE@	asb-package-ostree.c					\
-@HAVE_OSTREE_TRUE@	asb-package-ostree.h
-
 check_PROGRAMS = asb-self-test$(EXEEXT)
 TESTS = asb-self-test$(EXEEXT)
-@HAVE_INTROSPECTION_TRUE@@HAVE_RPM_TRUE@am__append_4 = \
+@HAVE_INTROSPECTION_TRUE@@HAVE_RPM_TRUE@am__append_3 = \
 @HAVE_INTROSPECTION_TRUE@@HAVE_RPM_TRUE@	rpmio 							\
 @HAVE_INTROSPECTION_TRUE@@HAVE_RPM_TRUE@	rpm
 
 subdir = libappstream-builder
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/as-linguas.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_link_flag.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/gtk-doc.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_check_xml_catalog.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_path_xml_catalog.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
-	$(top_srcdir)/m4/intltool.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -166,33 +162,29 @@ am__DEPENDENCIES_1 =
 libappstream_builder_la_DEPENDENCIES = $(AS_GLIB_LIBS) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 am__libappstream_builder_la_SOURCES_DIST = asb-app.c asb-app.h \
 	asb-context.c asb-context.h asb-context-private.h \
 	asb-package.c asb-package-cab.c asb-package-cab.h \
-	asb-package-deb.c asb-package-deb.h asb-package.h asb-panel.c \
-	asb-panel.h asb-task.c asb-task.h asb-utils.c asb-utils.h \
-	asb-plugin.c asb-plugin.h asb-plugin-loader.c \
-	asb-plugin-loader.h asb-package-rpm.c asb-package-rpm.h \
-	asb-package-alpm.c asb-package-alpm.h asb-package-ostree.c \
-	asb-package-ostree.h
+	asb-package-deb.c asb-package-deb.h asb-package.h asb-task.c \
+	asb-task.h asb-utils.c asb-utils.h asb-plugin.c asb-plugin.h \
+	asb-plugin-loader.c asb-plugin-loader.h asb-package-rpm.c \
+	asb-package-rpm.h asb-package-alpm.c asb-package-alpm.h
 @HAVE_RPM_TRUE@am__objects_1 =  \
 @HAVE_RPM_TRUE@	libappstream_builder_la-asb-package-rpm.lo
 @HAVE_ALPM_TRUE@am__objects_2 =  \
 @HAVE_ALPM_TRUE@	libappstream_builder_la-asb-package-alpm.lo
-@HAVE_OSTREE_TRUE@am__objects_3 = libappstream_builder_la-asb-package-ostree.lo
 am_libappstream_builder_la_OBJECTS =  \
 	libappstream_builder_la-asb-app.lo \
 	libappstream_builder_la-asb-context.lo \
 	libappstream_builder_la-asb-package.lo \
 	libappstream_builder_la-asb-package-cab.lo \
 	libappstream_builder_la-asb-package-deb.lo \
-	libappstream_builder_la-asb-panel.lo \
 	libappstream_builder_la-asb-task.lo \
 	libappstream_builder_la-asb-utils.lo \
 	libappstream_builder_la-asb-plugin.lo \
 	libappstream_builder_la-asb-plugin-loader.lo $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3)
+	$(am__objects_2)
 libappstream_builder_la_OBJECTS =  \
 	$(am_libappstream_builder_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -206,7 +198,7 @@ libappstream_builder_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 am_asb_self_test_OBJECTS = asb_self_test-asb-self-test.$(OBJEXT)
 asb_self_test_OBJECTS = $(am_asb_self_test_OBJECTS)
 asb_self_test_DEPENDENCIES = $(AS_GLIB_LIBS) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) $(lib_LTLIBRARIES)
+	$(am__DEPENDENCIES_1) $(lib_LTLIBRARIES)
 asb_self_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(asb_self_test_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -505,6 +497,7 @@ AR = @AR@
 AS_MAJOR_VERSION = @AS_MAJOR_VERSION@
 AS_MICRO_VERSION = @AS_MICRO_VERSION@
 AS_MINOR_VERSION = @AS_MINOR_VERSION@
+AS_PLUGIN_VERSION = @AS_PLUGIN_VERSION@
 AS_VERSION = @AS_VERSION@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -534,6 +527,9 @@ FGREP = @FGREP@
 FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
 FREETYPE_LIBS = @FREETYPE_LIBS@
 GCAB = @GCAB@
+GCAB_CFLAGS = @GCAB_CFLAGS@
+GCAB_DEPENDENCY = @GCAB_DEPENDENCY@
+GCAB_LIBS = @GCAB_LIBS@
 GDKPIXBUF_CFLAGS = @GDKPIXBUF_CFLAGS@
 GDKPIXBUF_LIBS = @GDKPIXBUF_LIBS@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
@@ -559,14 +555,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTLLIBS = @INTLLIBS@
-INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-INTLTOOL_MERGE = @INTLTOOL_MERGE@
-INTLTOOL_PERL = @INTLTOOL_PERL@
-INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-INTLTOOL_V_MERGE = @INTLTOOL_V_MERGE@
-INTLTOOL_V_MERGE_OPTIONS = @INTLTOOL_V_MERGE_OPTIONS@
-INTLTOOL__v_MERGE_ = @INTLTOOL__v_MERGE_@
-INTLTOOL__v_MERGE_0 = @INTLTOOL__v_MERGE_0@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 INTROSPECTION_CFLAGS = @INTROSPECTION_CFLAGS@
 INTROSPECTION_COMPILER = @INTROSPECTION_COMPILER@
@@ -576,6 +564,8 @@ INTROSPECTION_LIBS = @INTROSPECTION_LIBS@
 INTROSPECTION_MAKEFILE = @INTROSPECTION_MAKEFILE@
 INTROSPECTION_SCANNER = @INTROSPECTION_SCANNER@
 INTROSPECTION_TYPELIBDIR = @INTROSPECTION_TYPELIBDIR@
+JSON_GLIB_CFLAGS = @JSON_GLIB_CFLAGS@
+JSON_GLIB_LIBS = @JSON_GLIB_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBARCHIVE_CFLAGS = @LIBARCHIVE_CFLAGS@
@@ -593,6 +583,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_REVISION = @LT_REVISION@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -603,8 +594,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSTREE_CFLAGS = @OSTREE_CFLAGS@
-OSTREE_LIBS = @OSTREE_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -622,6 +611,7 @@ PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+RELRO_LDFLAGS = @RELRO_LDFLAGS@
 RPM_CFLAGS = @RPM_CFLAGS@
 RPM_LIBS = @RPM_LIBS@
 SED = @SED@
@@ -629,12 +619,13 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SOUP_CFLAGS = @SOUP_CFLAGS@
 SOUP_LIBS = @SOUP_LIBS@
-SQLITE_CFLAGS = @SQLITE_CFLAGS@
-SQLITE_LIBS = @SQLITE_LIBS@
+STEMMER_LIBS = @STEMMER_LIBS@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
+UUID_CFLAGS = @UUID_CFLAGS@
+UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
-WARNINGFLAGS_C = @WARNINGFLAGS_C@
+WARN_CFLAGS = @WARN_CFLAGS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -677,8 +668,6 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-intltool__v_merge_options_ = @intltool__v_merge_options_@
-intltool__v_merge_options_0 = @intltool__v_merge_options_0@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -713,7 +702,6 @@ AM_CPPFLAGS = \
 	$(GLIB_CFLAGS)						\
 	$(GDKPIXBUF_CFLAGS)					\
 	$(GTK_CFLAGS)						\
-	$(OSTREE_CFLAGS)					\
 	$(SOUP_CFLAGS)						\
 	-I$(top_srcdir)/libappstream-glib			\
 	-I$(top_builddir)/libappstream-glib			\
@@ -721,7 +709,8 @@ AM_CPPFLAGS = \
 	-DAS_COMPILATION					\
 	-DTESTDIRSRC=\""$(top_srcdir)/data/tests"\"		\
 	-DTESTDIRBUILD=\""$(top_builddir)/data/tests"\"		\
-	-DASB_PLUGIN_DIR=\"$(libdir)/asb-plugins\"		\
+	-DASB_PLUGIN_DIR=\"$(libdir)/asb-plugins-$(AS_PLUGIN_VERSION)\" \
+	-DTESTPLUGINDIR=\"./plugins/.libs\" \
 	-DG_LOG_DOMAIN=\"Asb\"
 
 AS_GLIB_LIBS = \
@@ -742,15 +731,14 @@ libappstream_builder_include_HEADERS = \
 libappstream_builder_la_SOURCES = asb-app.c asb-app.h asb-context.c \
 	asb-context.h asb-context-private.h asb-package.c \
 	asb-package-cab.c asb-package-cab.h asb-package-deb.c \
-	asb-package-deb.h asb-package.h asb-panel.c asb-panel.h \
-	asb-task.c asb-task.h asb-utils.c asb-utils.h asb-plugin.c \
-	asb-plugin.h asb-plugin-loader.c asb-plugin-loader.h \
-	$(am__append_1) $(am__append_2) $(am__append_3)
+	asb-package-deb.h asb-package.h asb-task.c asb-task.h \
+	asb-utils.c asb-utils.h asb-plugin.c asb-plugin.h \
+	asb-plugin-loader.c asb-plugin-loader.h $(am__append_1) \
+	$(am__append_2)
 libappstream_builder_la_LIBADD = \
 	$(AS_GLIB_LIBS)						\
 	$(RPM_LIBS)						\
 	$(ALPM_LIBS)						\
-	$(OSTREE_LIBS)						\
 	$(GLIB_LIBS)						\
 	$(GTK_LIBS)						\
 	$(LIBARCHIVE_LIBS)
@@ -762,7 +750,7 @@ libappstream_builder_la_LDFLAGS = \
 	-export-symbols-regex '^asb_.*'
 
 libappstream_builder_la_CFLAGS = \
-	$(WARNINGFLAGS_C)
+	$(WARN_CFLAGS)
 
 asb_self_test_SOURCES = \
 	asb-self-test.c
@@ -771,10 +759,9 @@ asb_self_test_LDADD = \
 	$(AS_GLIB_LIBS)						\
 	$(GLIB_LIBS)						\
 	$(GDKPIXBUF_LIBS)					\
-	$(SOUP_LIBS)						\
 	$(lib_LTLIBRARIES)
 
-asb_self_test_CFLAGS = $(WARNINGFLAGS_C)
+asb_self_test_CFLAGS = $(WARN_CFLAGS)
 @HAVE_INTROSPECTION_TRUE@introspection_sources = \
 @HAVE_INTROSPECTION_TRUE@	asb-app.c						\
 @HAVE_INTROSPECTION_TRUE@	asb-app.h						\
@@ -802,7 +789,7 @@ asb_self_test_CFLAGS = $(WARNINGFLAGS_C)
 @HAVE_INTROSPECTION_TRUE@AppStreamBuilder_1_0_gir_LIBS =  \
 @HAVE_INTROSPECTION_TRUE@	$(AS_GLIB_LIBS) \
 @HAVE_INTROSPECTION_TRUE@	libappstream-builder.la archive \
-@HAVE_INTROSPECTION_TRUE@	$(am__append_4)
+@HAVE_INTROSPECTION_TRUE@	$(am__append_3)
 @HAVE_INTROSPECTION_TRUE@AppStreamBuilder_1_0_gir_FILES = $(introspection_sources)
 @HAVE_INTROSPECTION_TRUE@girdir = $(datadir)/gir-1.0
 @HAVE_INTROSPECTION_TRUE@gir_DATA = $(INTROSPECTION_GIRS)
@@ -915,10 +902,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-package-alpm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-package-cab.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-package-deb.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-package-ostree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-package-rpm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-package.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-panel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-plugin-loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-plugin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_builder_la-asb-task.Plo@am__quote@
@@ -980,13 +965,6 @@ libappstream_builder_la-asb-package-deb.lo: asb-package-deb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -c -o libappstream_builder_la-asb-package-deb.lo `test -f 'asb-package-deb.c' || echo '$(srcdir)/'`asb-package-deb.c
 
-libappstream_builder_la-asb-panel.lo: asb-panel.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -MT libappstream_builder_la-asb-panel.lo -MD -MP -MF $(DEPDIR)/libappstream_builder_la-asb-panel.Tpo -c -o libappstream_builder_la-asb-panel.lo `test -f 'asb-panel.c' || echo '$(srcdir)/'`asb-panel.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_builder_la-asb-panel.Tpo $(DEPDIR)/libappstream_builder_la-asb-panel.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-panel.c' object='libappstream_builder_la-asb-panel.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -c -o libappstream_builder_la-asb-panel.lo `test -f 'asb-panel.c' || echo '$(srcdir)/'`asb-panel.c
-
 libappstream_builder_la-asb-task.lo: asb-task.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -MT libappstream_builder_la-asb-task.lo -MD -MP -MF $(DEPDIR)/libappstream_builder_la-asb-task.Tpo -c -o libappstream_builder_la-asb-task.lo `test -f 'asb-task.c' || echo '$(srcdir)/'`asb-task.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_builder_la-asb-task.Tpo $(DEPDIR)/libappstream_builder_la-asb-task.Plo
@@ -1028,13 +1006,6 @@ libappstream_builder_la-asb-package-alpm.lo: asb-package-alpm.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-package-alpm.c' object='libappstream_builder_la-asb-package-alpm.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -c -o libappstream_builder_la-asb-package-alpm.lo `test -f 'asb-package-alpm.c' || echo '$(srcdir)/'`asb-package-alpm.c
-
-libappstream_builder_la-asb-package-ostree.lo: asb-package-ostree.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -MT libappstream_builder_la-asb-package-ostree.lo -MD -MP -MF $(DEPDIR)/libappstream_builder_la-asb-package-ostree.Tpo -c -o libappstream_builder_la-asb-package-ostree.lo `test -f 'asb-package-ostree.c' || echo '$(srcdir)/'`asb-package-ostree.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_builder_la-asb-package-ostree.Tpo $(DEPDIR)/libappstream_builder_la-asb-package-ostree.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-package-ostree.c' object='libappstream_builder_la-asb-package-ostree.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_builder_la_CFLAGS) $(CFLAGS) -c -o libappstream_builder_la-asb-package-ostree.lo `test -f 'asb-package-ostree.c' || echo '$(srcdir)/'`asb-package-ostree.c
 
 asb_self_test-asb-self-test.o: asb-self-test.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(asb_self_test_CFLAGS) $(CFLAGS) -MT asb_self_test-asb-self-test.o -MD -MP -MF $(DEPDIR)/asb_self_test-asb-self-test.Tpo -c -o asb_self_test-asb-self-test.o `test -f 'asb-self-test.c' || echo '$(srcdir)/'`asb-self-test.c

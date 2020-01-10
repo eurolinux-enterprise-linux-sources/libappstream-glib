@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>AppStream-glib Reference Manual: AsProvide</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>AsProvide: AppStream-glib Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="AppStream-glib Reference Manual">
 <link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
 <link rel="prev" href="AsRelease.html" title="AsRelease">
 <link rel="next" href="AsScreenshot.html" title="AsScreenshot">
-<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -44,7 +44,7 @@ justifications.
 </div>
 <div class="refsect1">
 <a name="AsProvide.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -67,14 +67,14 @@ justifications.
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsProvide.html#as-provide-kind-to-string" title="as_provide_kind_to_string ()">as_provide_kind_to_string</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsProvide.html#as-provide-get-value" title="as_provide_get_value ()">as_provide_get_value</a> <span class="c_punctuation">()</span>
@@ -109,20 +109,34 @@ justifications.
 </div>
 <div class="refsect1">
 <a name="AsProvide.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsProvide.html#AS-TYPE-PROVIDE:CAPS" title="AS_TYPE_PROVIDE">AS_TYPE_PROVIDE</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">struct</td>
+<td class="function_name"><a class="link" href="AsProvide.html#AsProvideClass" title="struct AsProvideClass">AsProvideClass</a></td>
+</tr>
+<tr>
 <td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="AsProvide.html#AsProvideKind" title="enum AsProvideKind">AsProvideKind</a></td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="AsProvide.html#AsProvide-struct" title="AsProvide">AsProvide</a></td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect1">
 <a name="AsProvide.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    GObject
+<pre class="screen">    <a href="/usr/share/gtk-doc/html/gobjectgobject-The-Base-Object-Type.html#GObject-struct">GObject</a>
     <span class="lineart">╰──</span> AsProvide
 </pre>
 </div>
@@ -145,21 +159,21 @@ kind of thing. This is the place to express those extra items.</p>
 as_provide_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Creates a new <a class="link" href="AsProvide.html" title="AsProvide"><span class="type">AsProvide</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.2.5"></a><h4>Returns</h4>
+<a name="as-provide-new.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsProvide.html" title="AsProvide"><span class="type">AsProvide</span></a>. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-provide-kind-from-string"></a><h3>as_provide_kind_from_string ()</h3>
 <pre class="programlisting"><a class="link" href="AsProvide.html#AsProvideKind" title="enum AsProvideKind"><span class="returnvalue">AsProvideKind</span></a>
-as_provide_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *kind</code></em>);</pre>
+as_provide_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *kind</code></em>);</pre>
 <p>Converts the text representation to an enumerated value.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-provide-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -173,21 +187,21 @@ as_provide_kind_from_string (<em class="parameter"><code>const <span class="type
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.7.9.3.6"></a><h4>Returns</h4>
+<a name="as-provide-kind-from-string.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsProvide.html#AsProvideKind" title="enum AsProvideKind"><span class="type">AsProvideKind</span></a>, or <a class="link" href="AsProvide.html#AS-PROVIDE-KIND-UNKNOWN:CAPS"><code class="literal">AS_PROVIDE_KIND_UNKNOWN</code></a> for unknown. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-provide-kind-to-string"></a><h3>as_provide_kind_to_string ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_provide_kind_to_string (<em class="parameter"><code><a class="link" href="AsProvide.html#AsProvideKind" title="enum AsProvideKind"><span class="type">AsProvideKind</span></a> kind</code></em>);</pre>
 <p>Converts the enumerated value to an text representation.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-provide-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -201,22 +215,21 @@ as_provide_kind_to_string (<em class="parameter"><code><a class="link" href="AsP
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.7.9.4.6"></a><h4>Returns</h4>
+<a name="as-provide-kind-to-string.returns"></a><h4>Returns</h4>
 <p> string version of <em class="parameter"><code>kind</code></em>
 </p>
-<p></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-provide-get-value"></a><h3>as_provide_get_value ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_provide_get_value (<em class="parameter"><code><a class="link" href="AsProvide.html" title="AsProvide"><span class="type">AsProvide</span></a> *provide</code></em>);</pre>
 <p>Gets the full qualified URL for the provide, usually pointing at some mirror.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-provide-get-value.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -230,11 +243,10 @@ as_provide_get_value (<em class="parameter"><code><a class="link" href="AsProvid
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.7.9.5.6"></a><h4>Returns</h4>
+<a name="as-provide-get-value.returns"></a><h4>Returns</h4>
 <p> URL</p>
-<p></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -243,8 +255,8 @@ as_provide_get_value (<em class="parameter"><code><a class="link" href="AsProvid
 as_provide_get_kind (<em class="parameter"><code><a class="link" href="AsProvide.html" title="AsProvide"><span class="type">AsProvide</span></a> *provide</code></em>);</pre>
 <p>Gets the provide kind.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.6.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-provide-get-kind.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -258,23 +270,21 @@ as_provide_get_kind (<em class="parameter"><code><a class="link" href="AsProvide
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.7.9.6.6"></a><h4>Returns</h4>
+<a name="as-provide-get-kind.returns"></a><h4>Returns</h4>
 <p> the <a class="link" href="AsProvide.html#AsProvideKind" title="enum AsProvideKind"><span class="type">AsProvideKind</span></a></p>
-<p></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-provide-set-value"></a><h3>as_provide_set_value ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_provide_set_value (<em class="parameter"><code><a class="link" href="AsProvide.html" title="AsProvide"><span class="type">AsProvide</span></a> *provide</code></em>,
-                      <em class="parameter"><code>const <span class="type">gchar</span> *value</code></em>,
-                      <em class="parameter"><code><span class="type">gssize</span> value_len</code></em>);</pre>
+                      <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *value</code></em>);</pre>
 <p>Sets the fully-qualified mirror URL to use for the provide.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.7.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-provide-set-value.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -291,16 +301,10 @@ as_provide_set_value (<em class="parameter"><code><a class="link" href="AsProvid
 <td class="parameter_description"><p>the URL.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
-<tr>
-<td class="parameter_name"><p>value_len</p></td>
-<td class="parameter_description"><p>the size of <em class="parameter"><code>value</code></em>
-, or -1 if <code class="literal">NULL</code>-terminated.</p></td>
-<td class="parameter_annotations"> </td>
-</tr>
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -310,8 +314,8 @@ as_provide_set_kind (<em class="parameter"><code><a class="link" href="AsProvide
                      <em class="parameter"><code><a class="link" href="AsProvide.html#AsProvideKind" title="enum AsProvideKind"><span class="type">AsProvideKind</span></a> kind</code></em>);</pre>
 <p>Sets the provide kind.</p>
 <div class="refsect3">
-<a name="id-1.2.7.9.8.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-provide-set-kind.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -331,17 +335,31 @@ as_provide_set_kind (<em class="parameter"><code><a class="link" href="AsProvide
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 </div>
 <div class="refsect1">
 <a name="AsProvide.other_details"></a><h2>Types and Values</h2>
 <div class="refsect2">
+<a name="AS-TYPE-PROVIDE:CAPS"></a><h3>AS_TYPE_PROVIDE</h3>
+<pre class="programlisting">#define AS_TYPE_PROVIDE (as_provide_get_type ())
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsProvideClass"></a><h3>struct AsProvideClass</h3>
+<pre class="programlisting">struct AsProvideClass {
+	GObjectClass		parent_class;
+};
+</pre>
+</div>
+<hr>
+<div class="refsect2">
 <a name="AsProvideKind"></a><h3>enum AsProvideKind</h3>
 <p>The provide type.</p>
 <div class="refsect3">
-<a name="id-1.2.7.10.2.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsProvideKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -384,9 +402,9 @@ as_provide_set_kind (<em class="parameter"><code><a class="link" href="AsProvide
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-PROVIDE-KIND-FIRMWARE:CAPS"></a>AS_PROVIDE_KIND_FIRMWARE</p></td>
+<td class="enum_member_name"><p><a name="AS-PROVIDE-KIND-FIRMWARE-RUNTIME:CAPS"></a>AS_PROVIDE_KIND_FIRMWARE_RUNTIME</p></td>
 <td class="enum_member_description">
-<p>A firmware file</p>
+<p>A runtime-loadable firmware file</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
@@ -405,9 +423,9 @@ as_provide_set_kind (<em class="parameter"><code><a class="link" href="AsProvide
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-PROVIDE-KIND-DBUS:CAPS"></a>AS_PROVIDE_KIND_DBUS</p></td>
+<td class="enum_member_name"><p><a name="AS-PROVIDE-KIND-DBUS-SESSION:CAPS"></a>AS_PROVIDE_KIND_DBUS_SESSION</p></td>
 <td class="enum_member_description">
-<p>A D-Bus service</p>
+<p>A D-Bus session service</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
@@ -418,14 +436,25 @@ as_provide_set_kind (<em class="parameter"><code><a class="link" href="AsProvide
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROVIDE-KIND-FIRMWARE-FLASHED:CAPS"></a>AS_PROVIDE_KIND_FIRMWARE_FLASHED</p></td>
+<td class="enum_member_description">
+<p>A flashed firmware GUID</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
 </tbody>
 </table></div>
 </div>
 </div>
+<hr>
+<div class="refsect2">
+<a name="AsProvide-struct"></a><h3>AsProvide</h3>
+<pre class="programlisting">typedef struct _AsProvide AsProvide;</pre>
+</div>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>

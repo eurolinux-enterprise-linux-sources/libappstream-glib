@@ -35,45 +35,37 @@
 
 #include "as-node-private.h"
 #include "as-provide-private.h"
+#include "as-ref-string.h"
 #include "as-utils-private.h"
 #include "as-yaml.h"
 
-typedef struct _AsProvidePrivate	AsProvidePrivate;
-struct _AsProvidePrivate
+typedef struct
 {
 	AsProvideKind		 kind;
-	gchar			*value;
-};
+	AsRefString		*value;
+} AsProvidePrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsProvide, as_provide, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) (as_provide_get_instance_private (o))
 
-/**
- * as_provide_finalize:
- **/
 static void
 as_provide_finalize (GObject *object)
 {
 	AsProvide *provide = AS_PROVIDE (object);
 	AsProvidePrivate *priv = GET_PRIVATE (provide);
 
-	g_free (priv->value);
+	if (priv->value != NULL)
+		as_ref_string_unref (priv->value);
 
 	G_OBJECT_CLASS (as_provide_parent_class)->finalize (object);
 }
 
-/**
- * as_provide_init:
- **/
 static void
 as_provide_init (AsProvide *provide)
 {
 }
 
-/**
- * as_provide_class_init:
- **/
 static void
 as_provide_class_init (AsProvideClass *klass)
 {
@@ -103,14 +95,16 @@ as_provide_kind_from_string (const gchar *kind)
 		return AS_PROVIDE_KIND_FONT;
 	if (g_strcmp0 (kind, "modalias") == 0)
 		return AS_PROVIDE_KIND_MODALIAS;
-	if (g_strcmp0 (kind, "firmware") == 0)
-		return AS_PROVIDE_KIND_FIRMWARE;
+	if (g_strcmp0 (kind, "firmware-runtime") == 0)
+		return AS_PROVIDE_KIND_FIRMWARE_RUNTIME;
+	if (g_strcmp0 (kind, "firmware-flashed") == 0)
+		return AS_PROVIDE_KIND_FIRMWARE_FLASHED;
 	if (g_strcmp0 (kind, "python2") == 0)
 		return AS_PROVIDE_KIND_PYTHON2;
 	if (g_strcmp0 (kind, "python3") == 0)
 		return AS_PROVIDE_KIND_PYTHON3;
-	if (g_strcmp0 (kind, "dbus") == 0)
-		return AS_PROVIDE_KIND_DBUS;
+	if (g_strcmp0 (kind, "dbus-session") == 0)
+		return AS_PROVIDE_KIND_DBUS_SESSION;
 	if (g_strcmp0 (kind, "dbus-system") == 0)
 		return AS_PROVIDE_KIND_DBUS_SYSTEM;
 	return AS_PROVIDE_KIND_UNKNOWN;
@@ -137,13 +131,15 @@ as_provide_kind_to_string (AsProvideKind kind)
 		return "font";
 	if (kind == AS_PROVIDE_KIND_MODALIAS)
 		return "modalias";
-	if (kind == AS_PROVIDE_KIND_FIRMWARE)
-		return "firmware";
+	if (kind == AS_PROVIDE_KIND_FIRMWARE_RUNTIME)
+		return "firmware-runtime";
+	if (kind == AS_PROVIDE_KIND_FIRMWARE_FLASHED)
+		return "firmware-flashed";
 	if (kind == AS_PROVIDE_KIND_PYTHON2)
 		return "python2";
 	if (kind == AS_PROVIDE_KIND_PYTHON3)
 		return "python3";
-	if (kind == AS_PROVIDE_KIND_DBUS)
+	if (kind == AS_PROVIDE_KIND_DBUS_SESSION)
 		return "dbus";
 	if (kind == AS_PROVIDE_KIND_DBUS_SYSTEM)
 		return "dbus-system";
@@ -188,18 +184,16 @@ as_provide_get_kind (AsProvide *provide)
  * as_provide_set_value:
  * @provide: a #AsProvide instance.
  * @value: the URL.
- * @value_len: the size of @value, or -1 if %NULL-terminated.
  *
  * Sets the fully-qualified mirror URL to use for the provide.
  *
  * Since: 0.1.6
  **/
 void
-as_provide_set_value (AsProvide *provide, const gchar *value, gssize value_len)
+as_provide_set_value (AsProvide *provide, const gchar *value)
 {
 	AsProvidePrivate *priv = GET_PRIVATE (provide);
-	g_free (priv->value);
-	priv->value = as_strndup (value, value_len);
+	as_ref_string_assign_safe (&priv->value, value);
 }
 
 /**
@@ -239,7 +233,7 @@ as_provide_node_insert (AsProvide *provide, GNode *parent, AsNodeContext *ctx)
 	switch (priv->kind) {
 	case AS_PROVIDE_KIND_UNKNOWN:
 		break;
-	case AS_PROVIDE_KIND_DBUS:
+	case AS_PROVIDE_KIND_DBUS_SESSION:
 		n = as_node_insert (parent, "dbus",
 				    priv->value,
 				    AS_NODE_INSERT_FLAG_NONE,
@@ -251,6 +245,20 @@ as_provide_node_insert (AsProvide *provide, GNode *parent, AsNodeContext *ctx)
 				    priv->value,
 				    AS_NODE_INSERT_FLAG_NONE,
 				    "type", "system",
+				    NULL);
+		break;
+	case AS_PROVIDE_KIND_FIRMWARE_FLASHED:
+		n = as_node_insert (parent, "firmware",
+				    priv->value,
+				    AS_NODE_INSERT_FLAG_NONE,
+				    "type", "flashed",
+				    NULL);
+		break;
+	case AS_PROVIDE_KIND_FIRMWARE_RUNTIME:
+		n = as_node_insert (parent, "firmware",
+				    priv->value,
+				    AS_NODE_INSERT_FLAG_NONE,
+				    "type", "runtime",
 				    NULL);
 		break;
 	default:
@@ -301,12 +309,24 @@ as_provide_node_parse (AsProvide *provide, GNode *node,
 		       AsNodeContext *ctx, GError **error)
 {
 	AsProvidePrivate *priv = GET_PRIVATE (provide);
-	priv->kind = as_provide_kind_from_string (as_node_get_name (node));
-	if (priv->kind == AS_PROVIDE_KIND_DBUS &&
-	    g_strcmp0 (as_node_get_attribute (node, "type"), "system") == 0)
-		priv->kind = AS_PROVIDE_KIND_DBUS_SYSTEM;
-	g_free (priv->value);
-	priv->value = as_node_take_data (node);
+	const gchar *tmp;
+
+	if (g_strcmp0 (as_node_get_name (node), "dbus") == 0) {
+		tmp = as_node_get_attribute (node, "type");
+		if (g_strcmp0 (tmp, "system") == 0)
+			priv->kind = AS_PROVIDE_KIND_DBUS_SYSTEM;
+		else
+			priv->kind = AS_PROVIDE_KIND_DBUS_SESSION;
+	} else if (g_strcmp0 (as_node_get_name (node), "firmware") == 0) {
+		tmp = as_node_get_attribute (node, "type");
+		if (g_strcmp0 (tmp, "flashed") == 0)
+			priv->kind = AS_PROVIDE_KIND_FIRMWARE_FLASHED;
+		else
+			priv->kind = AS_PROVIDE_KIND_FIRMWARE_RUNTIME;
+	} else {
+		priv->kind = as_provide_kind_from_string (as_node_get_name (node));
+	}
+	as_ref_string_assign (&priv->value, as_node_get_data (node));
 	return TRUE;
 }
 

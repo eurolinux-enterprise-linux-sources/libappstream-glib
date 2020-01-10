@@ -29,34 +29,26 @@
 
 #include "config.h"
 
-#include "as-cleanup.h"
 #include "asb-package-deb.h"
 #include "asb-plugin.h"
 
 
 G_DEFINE_TYPE (AsbPackageDeb, asb_package_deb, ASB_TYPE_PACKAGE)
 
-/**
- * asb_package_deb_init:
- **/
 static void
 asb_package_deb_init (AsbPackageDeb *pkg)
 {
 }
 
-/**
- * asb_package_deb_ensure_simple:
- **/
 static gboolean
 asb_package_deb_ensure_simple (AsbPackage *pkg, GError **error)
 {
 	const gchar *argv[4] = { "dpkg", "--field", "fn", NULL };
 	gchar *tmp;
-	gchar **vr;
 	guint i;
 	guint j;
-	_cleanup_free_ gchar *output = NULL;
-	_cleanup_strv_free_ gchar **lines = NULL;
+	g_autofree gchar *output = NULL;
+	g_auto(GStrv) lines = NULL;
 
 	/* spawn sync */
 	argv[2] = asb_package_get_filename (pkg);
@@ -78,21 +70,29 @@ asb_package_deb_ensure_simple (AsbPackage *pkg, GError **error)
 			continue;
 		}
 		if (g_str_has_prefix (lines[i], "Version: ")) {
+			g_auto(GStrv) vr = NULL;
 			vr = g_strsplit (lines[i] + 9, "-", 2);
 			tmp = g_strstr_len (vr[0], -1, ":");
 			if (tmp == NULL) {
 				asb_package_set_version (pkg, vr[0]);
 			} else {
 				*tmp = '\0';
-				j = g_ascii_strtoll (vr[0], NULL, 10);
+				j = (guint) g_ascii_strtoull (vr[0], NULL, 10);
 				asb_package_set_epoch (pkg, j);
 				asb_package_set_version (pkg, tmp + 1);
 			}
-			asb_package_set_release (pkg, vr[1]);
-			g_strfreev (vr);
+			if (vr[1] != NULL) {
+				asb_package_set_release (pkg, vr[1]);
+			} else {
+				/* packages don't actually have to have a
+				 * release value like rpm; in this case fake
+				 * something plausible */
+				asb_package_set_release (pkg, "0");
+			}
 			continue;
 		}
 		if (g_str_has_prefix (lines[i], "Depends: ")) {
+			g_auto(GStrv) vr = NULL;
 			vr = g_strsplit (lines[i] + 9, ", ", -1);
 			for (j = 0; vr[j] != NULL; j++) {
 				tmp = g_strstr_len (vr[j], -1, " ");
@@ -106,18 +106,15 @@ asb_package_deb_ensure_simple (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_deb_ensure_filelists:
- **/
 static gboolean
 asb_package_deb_ensure_filelists (AsbPackage *pkg, GError **error)
 {
 	const gchar *argv[4] = { "dpkg", "--contents", "fn", NULL };
 	const gchar *fn;
 	guint i;
-	_cleanup_free_ gchar *output = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *files = NULL;
-	_cleanup_strv_free_ gchar **lines = NULL;
+	g_autofree gchar *output = NULL;
+	g_autoptr(GPtrArray) files = NULL;
+	g_auto(GStrv) lines = NULL;
 
 	/* spawn sync */
 	argv[2] = asb_package_get_filename (pkg);
@@ -146,9 +143,6 @@ asb_package_deb_ensure_filelists (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_deb_open:
- **/
 static gboolean
 asb_package_deb_open (AsbPackage *pkg, const gchar *filename, GError **error)
 {
@@ -160,9 +154,6 @@ asb_package_deb_open (AsbPackage *pkg, const gchar *filename, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_deb_explode:
- **/
 static gboolean
 asb_package_deb_explode (AsbPackage *pkg,
 			 const gchar *dir,
@@ -184,7 +175,7 @@ asb_package_deb_explode (AsbPackage *pkg,
 
 	/* then decompress the data file */
 	for (i = 0; data_names[i] != NULL; i++) {
-		_cleanup_free_ gchar *data_fn = NULL;
+		g_autofree gchar *data_fn = NULL;
 		data_fn = g_build_filename (dir, data_names[i], NULL);
 		if (g_file_test (data_fn, G_FILE_TEST_EXISTS)) {
 			if (!asb_utils_explode (data_fn, dir, glob, error))
@@ -194,9 +185,6 @@ asb_package_deb_explode (AsbPackage *pkg,
 	return TRUE;
 }
 
-/**
- * asb_package_deb_class_init:
- **/
 static void
 asb_package_deb_class_init (AsbPackageDebClass *klass)
 {

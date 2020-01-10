@@ -88,22 +88,22 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_OSTREE_TRUE@am__append_1 = \
-@HAVE_OSTREE_TRUE@	libasb_plugin_ostree.la
+@HAVE_FONTS_TRUE@am__append_1 = \
+@HAVE_FONTS_TRUE@	libasb_plugin_font.la
 
 subdir = libappstream-builder/plugins
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/as-linguas.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_link_flag.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/gtk-doc.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_check_xml_catalog.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_path_xml_catalog.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
-	$(top_srcdir)/m4/intltool.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -143,46 +143,20 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(plugindir)"
 LTLIBRARIES = $(plugin_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-libasb_plugin_absorb_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_absorb_la_OBJECTS =  \
-	libasb_plugin_absorb_la-asb-plugin-absorb.lo
-libasb_plugin_absorb_la_OBJECTS =  \
-	$(am_libasb_plugin_absorb_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-libasb_plugin_absorb_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_absorb_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_absorb_la_LDFLAGS) $(LDFLAGS) -o $@
 libasb_plugin_appdata_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_libasb_plugin_appdata_la_OBJECTS =  \
 	libasb_plugin_appdata_la-asb-plugin-appdata.lo
 libasb_plugin_appdata_la_OBJECTS =  \
 	$(am_libasb_plugin_appdata_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 libasb_plugin_appdata_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libasb_plugin_appdata_la_CFLAGS) $(CFLAGS) \
 	$(libasb_plugin_appdata_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_blacklist_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_blacklist_la_OBJECTS =  \
-	libasb_plugin_blacklist_la-asb-plugin-blacklist.lo
-libasb_plugin_blacklist_la_OBJECTS =  \
-	$(am_libasb_plugin_blacklist_la_OBJECTS)
-libasb_plugin_blacklist_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_blacklist_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_blacklist_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_dbus_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_dbus_la_OBJECTS =  \
-	libasb_plugin_dbus_la-asb-plugin-dbus.lo
-libasb_plugin_dbus_la_OBJECTS = $(am_libasb_plugin_dbus_la_OBJECTS)
-libasb_plugin_dbus_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_dbus_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_dbus_la_LDFLAGS) $(LDFLAGS) -o $@
 libasb_plugin_desktop_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_libasb_plugin_desktop_la_OBJECTS =  \
@@ -193,24 +167,18 @@ libasb_plugin_desktop_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libasb_plugin_desktop_la_CFLAGS) $(CFLAGS) \
 	$(libasb_plugin_desktop_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_firmware_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_firmware_la_OBJECTS =  \
-	libasb_plugin_firmware_la-asb-plugin-firmware.lo
-libasb_plugin_firmware_la_OBJECTS =  \
-	$(am_libasb_plugin_firmware_la_OBJECTS)
-libasb_plugin_firmware_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_firmware_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_firmware_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_font_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_libasb_plugin_font_la_OBJECTS =  \
-	libasb_plugin_font_la-asb-plugin-font.lo
+@HAVE_FONTS_TRUE@libasb_plugin_font_la_DEPENDENCIES =  \
+@HAVE_FONTS_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+@HAVE_FONTS_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am__libasb_plugin_font_la_SOURCES_DIST = asb-plugin-font.c
+@HAVE_FONTS_TRUE@am_libasb_plugin_font_la_OBJECTS =  \
+@HAVE_FONTS_TRUE@	libasb_plugin_font_la-asb-plugin-font.lo
 libasb_plugin_font_la_OBJECTS = $(am_libasb_plugin_font_la_OBJECTS)
 libasb_plugin_font_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libasb_plugin_font_la_CFLAGS) $(CFLAGS) \
 	$(libasb_plugin_font_la_LDFLAGS) $(LDFLAGS) -o $@
+@HAVE_FONTS_TRUE@am_libasb_plugin_font_la_rpath = -rpath $(plugindir)
 libasb_plugin_gettext_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_libasb_plugin_gettext_la_OBJECTS =  \
 	libasb_plugin_gettext_la-asb-plugin-gettext.lo
@@ -220,34 +188,6 @@ libasb_plugin_gettext_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libasb_plugin_gettext_la_CFLAGS) $(CFLAGS) \
 	$(libasb_plugin_gettext_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_gir_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_libasb_plugin_gir_la_OBJECTS =  \
-	libasb_plugin_gir_la-asb-plugin-gir.lo
-libasb_plugin_gir_la_OBJECTS = $(am_libasb_plugin_gir_la_OBJECTS)
-libasb_plugin_gir_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_gir_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_gir_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_gresource_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_libasb_plugin_gresource_la_OBJECTS =  \
-	libasb_plugin_gresource_la-asb-plugin-gresource.lo
-libasb_plugin_gresource_la_OBJECTS =  \
-	$(am_libasb_plugin_gresource_la_OBJECTS)
-libasb_plugin_gresource_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_gresource_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_gresource_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_gstreamer_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_gstreamer_la_OBJECTS =  \
-	libasb_plugin_gstreamer_la-asb-plugin-gstreamer.lo
-libasb_plugin_gstreamer_la_OBJECTS =  \
-	$(am_libasb_plugin_gstreamer_la_OBJECTS)
-libasb_plugin_gstreamer_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_gstreamer_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_gstreamer_la_LDFLAGS) $(LDFLAGS) -o $@
 libasb_plugin_hardcoded_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_libasb_plugin_hardcoded_la_OBJECTS =  \
 	libasb_plugin_hardcoded_la-asb-plugin-hardcoded.lo
@@ -257,73 +197,15 @@ libasb_plugin_hardcoded_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libasb_plugin_hardcoded_la_CFLAGS) $(CFLAGS) \
 	$(libasb_plugin_hardcoded_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_ibus_sql_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libasb_plugin_shell_extension_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-am_libasb_plugin_ibus_sql_la_OBJECTS =  \
-	libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.lo
-libasb_plugin_ibus_sql_la_OBJECTS =  \
-	$(am_libasb_plugin_ibus_sql_la_OBJECTS)
-libasb_plugin_ibus_sql_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+am_libasb_plugin_shell_extension_la_OBJECTS = libasb_plugin_shell_extension_la-asb-plugin-shell-extension.lo
+libasb_plugin_shell_extension_la_OBJECTS =  \
+	$(am_libasb_plugin_shell_extension_la_OBJECTS)
+libasb_plugin_shell_extension_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_ibus_sql_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_ibus_sql_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_ibus_xml_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_libasb_plugin_ibus_xml_la_OBJECTS =  \
-	libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.lo
-libasb_plugin_ibus_xml_la_OBJECTS =  \
-	$(am_libasb_plugin_ibus_xml_la_OBJECTS)
-libasb_plugin_ibus_xml_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_ibus_xml_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_ibus_xml_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_kde_notifyrc_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_kde_notifyrc_la_OBJECTS =  \
-	libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.lo
-libasb_plugin_kde_notifyrc_la_OBJECTS =  \
-	$(am_libasb_plugin_kde_notifyrc_la_OBJECTS)
-libasb_plugin_kde_notifyrc_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_kde_notifyrc_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_kde_notifyrc_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_kde_services_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_kde_services_la_OBJECTS =  \
-	libasb_plugin_kde_services_la-asb-plugin-kde-services.lo
-libasb_plugin_kde_services_la_OBJECTS =  \
-	$(am_libasb_plugin_kde_services_la_OBJECTS)
-libasb_plugin_kde_services_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_kde_services_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_kde_services_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_metainfo_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_metainfo_la_OBJECTS =  \
-	libasb_plugin_metainfo_la-asb-plugin-metainfo.lo
-libasb_plugin_metainfo_la_OBJECTS =  \
-	$(am_libasb_plugin_metainfo_la_OBJECTS)
-libasb_plugin_metainfo_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_metainfo_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_metainfo_la_LDFLAGS) $(LDFLAGS) -o $@
-libasb_plugin_nm_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libasb_plugin_nm_la_OBJECTS = libasb_plugin_nm_la-asb-plugin-nm.lo
-libasb_plugin_nm_la_OBJECTS = $(am_libasb_plugin_nm_la_OBJECTS)
-libasb_plugin_nm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_nm_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_nm_la_LDFLAGS) $(LDFLAGS) -o $@
-@HAVE_OSTREE_TRUE@libasb_plugin_ostree_la_DEPENDENCIES =  \
-@HAVE_OSTREE_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@HAVE_OSTREE_TRUE@	$(am__DEPENDENCIES_1)
-am__libasb_plugin_ostree_la_SOURCES_DIST = asb-plugin-ostree.c
-@HAVE_OSTREE_TRUE@am_libasb_plugin_ostree_la_OBJECTS = libasb_plugin_ostree_la-asb-plugin-ostree.lo
-libasb_plugin_ostree_la_OBJECTS =  \
-	$(am_libasb_plugin_ostree_la_OBJECTS)
-libasb_plugin_ostree_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libasb_plugin_ostree_la_CFLAGS) $(CFLAGS) \
-	$(libasb_plugin_ostree_la_LDFLAGS) $(LDFLAGS) -o $@
-@HAVE_OSTREE_TRUE@am_libasb_plugin_ostree_la_rpath = -rpath \
-@HAVE_OSTREE_TRUE@	$(plugindir)
+	$(libasb_plugin_shell_extension_la_CFLAGS) $(CFLAGS) \
+	$(libasb_plugin_shell_extension_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -358,44 +240,18 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libasb_plugin_absorb_la_SOURCES) \
-	$(libasb_plugin_appdata_la_SOURCES) \
-	$(libasb_plugin_blacklist_la_SOURCES) \
-	$(libasb_plugin_dbus_la_SOURCES) \
+SOURCES = $(libasb_plugin_appdata_la_SOURCES) \
 	$(libasb_plugin_desktop_la_SOURCES) \
-	$(libasb_plugin_firmware_la_SOURCES) \
 	$(libasb_plugin_font_la_SOURCES) \
 	$(libasb_plugin_gettext_la_SOURCES) \
-	$(libasb_plugin_gir_la_SOURCES) \
-	$(libasb_plugin_gresource_la_SOURCES) \
-	$(libasb_plugin_gstreamer_la_SOURCES) \
 	$(libasb_plugin_hardcoded_la_SOURCES) \
-	$(libasb_plugin_ibus_sql_la_SOURCES) \
-	$(libasb_plugin_ibus_xml_la_SOURCES) \
-	$(libasb_plugin_kde_notifyrc_la_SOURCES) \
-	$(libasb_plugin_kde_services_la_SOURCES) \
-	$(libasb_plugin_metainfo_la_SOURCES) \
-	$(libasb_plugin_nm_la_SOURCES) \
-	$(libasb_plugin_ostree_la_SOURCES)
-DIST_SOURCES = $(libasb_plugin_absorb_la_SOURCES) \
-	$(libasb_plugin_appdata_la_SOURCES) \
-	$(libasb_plugin_blacklist_la_SOURCES) \
-	$(libasb_plugin_dbus_la_SOURCES) \
+	$(libasb_plugin_shell_extension_la_SOURCES)
+DIST_SOURCES = $(libasb_plugin_appdata_la_SOURCES) \
 	$(libasb_plugin_desktop_la_SOURCES) \
-	$(libasb_plugin_firmware_la_SOURCES) \
-	$(libasb_plugin_font_la_SOURCES) \
+	$(am__libasb_plugin_font_la_SOURCES_DIST) \
 	$(libasb_plugin_gettext_la_SOURCES) \
-	$(libasb_plugin_gir_la_SOURCES) \
-	$(libasb_plugin_gresource_la_SOURCES) \
-	$(libasb_plugin_gstreamer_la_SOURCES) \
 	$(libasb_plugin_hardcoded_la_SOURCES) \
-	$(libasb_plugin_ibus_sql_la_SOURCES) \
-	$(libasb_plugin_ibus_xml_la_SOURCES) \
-	$(libasb_plugin_kde_notifyrc_la_SOURCES) \
-	$(libasb_plugin_kde_services_la_SOURCES) \
-	$(libasb_plugin_metainfo_la_SOURCES) \
-	$(libasb_plugin_nm_la_SOURCES) \
-	$(am__libasb_plugin_ostree_la_SOURCES_DIST)
+	$(libasb_plugin_shell_extension_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -432,6 +288,7 @@ AR = @AR@
 AS_MAJOR_VERSION = @AS_MAJOR_VERSION@
 AS_MICRO_VERSION = @AS_MICRO_VERSION@
 AS_MINOR_VERSION = @AS_MINOR_VERSION@
+AS_PLUGIN_VERSION = @AS_PLUGIN_VERSION@
 AS_VERSION = @AS_VERSION@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -461,6 +318,9 @@ FGREP = @FGREP@
 FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
 FREETYPE_LIBS = @FREETYPE_LIBS@
 GCAB = @GCAB@
+GCAB_CFLAGS = @GCAB_CFLAGS@
+GCAB_DEPENDENCY = @GCAB_DEPENDENCY@
+GCAB_LIBS = @GCAB_LIBS@
 GDKPIXBUF_CFLAGS = @GDKPIXBUF_CFLAGS@
 GDKPIXBUF_LIBS = @GDKPIXBUF_LIBS@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
@@ -486,14 +346,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTLLIBS = @INTLLIBS@
-INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-INTLTOOL_MERGE = @INTLTOOL_MERGE@
-INTLTOOL_PERL = @INTLTOOL_PERL@
-INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-INTLTOOL_V_MERGE = @INTLTOOL_V_MERGE@
-INTLTOOL_V_MERGE_OPTIONS = @INTLTOOL_V_MERGE_OPTIONS@
-INTLTOOL__v_MERGE_ = @INTLTOOL__v_MERGE_@
-INTLTOOL__v_MERGE_0 = @INTLTOOL__v_MERGE_0@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 INTROSPECTION_CFLAGS = @INTROSPECTION_CFLAGS@
 INTROSPECTION_COMPILER = @INTROSPECTION_COMPILER@
@@ -503,6 +355,8 @@ INTROSPECTION_LIBS = @INTROSPECTION_LIBS@
 INTROSPECTION_MAKEFILE = @INTROSPECTION_MAKEFILE@
 INTROSPECTION_SCANNER = @INTROSPECTION_SCANNER@
 INTROSPECTION_TYPELIBDIR = @INTROSPECTION_TYPELIBDIR@
+JSON_GLIB_CFLAGS = @JSON_GLIB_CFLAGS@
+JSON_GLIB_LIBS = @JSON_GLIB_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBARCHIVE_CFLAGS = @LIBARCHIVE_CFLAGS@
@@ -520,6 +374,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_REVISION = @LT_REVISION@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -530,8 +385,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSTREE_CFLAGS = @OSTREE_CFLAGS@
-OSTREE_LIBS = @OSTREE_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -549,6 +402,7 @@ PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+RELRO_LDFLAGS = @RELRO_LDFLAGS@
 RPM_CFLAGS = @RPM_CFLAGS@
 RPM_LIBS = @RPM_LIBS@
 SED = @SED@
@@ -556,12 +410,13 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SOUP_CFLAGS = @SOUP_CFLAGS@
 SOUP_LIBS = @SOUP_LIBS@
-SQLITE_CFLAGS = @SQLITE_CFLAGS@
-SQLITE_LIBS = @SQLITE_LIBS@
+STEMMER_LIBS = @STEMMER_LIBS@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
+UUID_CFLAGS = @UUID_CFLAGS@
+UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
-WARNINGFLAGS_C = @WARNINGFLAGS_C@
+WARN_CFLAGS = @WARN_CFLAGS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -604,8 +459,6 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-intltool__v_merge_options_ = @intltool__v_merge_options_@
-intltool__v_merge_options_0 = @intltool__v_merge_options_0@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -632,7 +485,7 @@ AM_CPPFLAGS = \
 	$(LIBARCHIVE_CFLAGS)				\
 	$(SOUP_CFLAGS)					\
 	$(RPM_CFLAGS)					\
-	$(SQLITE_CFLAGS)				\
+	$(JSON_GLIB_CFLAGS)				\
 	$(FREETYPE_CFLAGS)				\
 	-I$(top_srcdir)/libappstream-glib		\
 	-I$(top_builddir)/libappstream-glib		\
@@ -640,93 +493,35 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/libappstream-builder		\
 	-DG_LOG_DOMAIN=\"Asb\"
 
-plugindir = $(libdir)/asb-plugins
-plugin_LTLIBRARIES = libasb_plugin_absorb.la libasb_plugin_appdata.la \
-	libasb_plugin_blacklist.la libasb_plugin_dbus.la \
-	libasb_plugin_firmware.la libasb_plugin_desktop.la \
-	libasb_plugin_gir.la libasb_plugin_gresource.la \
-	libasb_plugin_font.la libasb_plugin_gettext.la \
-	libasb_plugin_gstreamer.la libasb_plugin_hardcoded.la \
-	libasb_plugin_ibus_sql.la libasb_plugin_ibus_xml.la \
-	libasb_plugin_metainfo.la libasb_plugin_kde_services.la \
-	libasb_plugin_kde_notifyrc.la libasb_plugin_nm.la \
+plugindir = $(libdir)/asb-plugins-$(AS_PLUGIN_VERSION)
+plugin_LTLIBRARIES = libasb_plugin_appdata.la \
+	libasb_plugin_shell_extension.la libasb_plugin_desktop.la \
+	libasb_plugin_gettext.la libasb_plugin_hardcoded.la \
 	$(am__append_1)
-libasb_plugin_dbus_la_SOURCES = asb-plugin-dbus.c
-libasb_plugin_dbus_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_dbus_la_LDFLAGS = -module -avoid-version
-libasb_plugin_dbus_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_firmware_la_SOURCES = asb-plugin-firmware.c
-libasb_plugin_firmware_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_firmware_la_LDFLAGS = -module -avoid-version
-libasb_plugin_firmware_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_absorb_la_SOURCES = asb-plugin-absorb.c
-libasb_plugin_absorb_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_absorb_la_LDFLAGS = -module -avoid-version
-libasb_plugin_absorb_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_kde_services_la_SOURCES = asb-plugin-kde-services.c
-libasb_plugin_kde_services_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_kde_services_la_LDFLAGS = -module -avoid-version
-libasb_plugin_kde_services_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_kde_notifyrc_la_SOURCES = asb-plugin-kde-notifyrc.c
-libasb_plugin_kde_notifyrc_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_kde_notifyrc_la_LDFLAGS = -module -avoid-version
-libasb_plugin_kde_notifyrc_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_gstreamer_la_SOURCES = asb-plugin-gstreamer.c
-libasb_plugin_gstreamer_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_gstreamer_la_LDFLAGS = -module -avoid-version
-libasb_plugin_gstreamer_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_metainfo_la_SOURCES = asb-plugin-metainfo.c
-libasb_plugin_metainfo_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_metainfo_la_LDFLAGS = -module -avoid-version
-libasb_plugin_metainfo_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
 libasb_plugin_gettext_la_SOURCES = asb-plugin-gettext.c
 libasb_plugin_gettext_la_LIBADD = $(GLIB_LIBS)
 libasb_plugin_gettext_la_LDFLAGS = -module -avoid-version
-libasb_plugin_gettext_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_blacklist_la_SOURCES = asb-plugin-blacklist.c
-libasb_plugin_blacklist_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_blacklist_la_LDFLAGS = -module -avoid-version
-libasb_plugin_blacklist_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
+libasb_plugin_gettext_la_CFLAGS = $(GLIB_CFLAGS) $(WARN_CFLAGS)
 libasb_plugin_hardcoded_la_SOURCES = asb-plugin-hardcoded.c
 libasb_plugin_hardcoded_la_LIBADD = $(GLIB_LIBS)
 libasb_plugin_hardcoded_la_LDFLAGS = -module -avoid-version
-libasb_plugin_hardcoded_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
+libasb_plugin_hardcoded_la_CFLAGS = $(GLIB_CFLAGS) $(WARN_CFLAGS)
 libasb_plugin_desktop_la_SOURCES = asb-plugin-desktop.c
 libasb_plugin_desktop_la_LIBADD = $(GLIB_LIBS) $(GDKPIXBUF_LIBS)
 libasb_plugin_desktop_la_LDFLAGS = -module -avoid-version
-libasb_plugin_desktop_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_gir_la_SOURCES = asb-plugin-gir.c
-libasb_plugin_gir_la_LIBADD = $(GLIB_LIBS) $(GDKPIXBUF_LIBS)
-libasb_plugin_gir_la_LDFLAGS = -module -avoid-version
-libasb_plugin_gir_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_gresource_la_SOURCES = asb-plugin-gresource.c
-libasb_plugin_gresource_la_LIBADD = $(GLIB_LIBS) $(GDKPIXBUF_LIBS)
-libasb_plugin_gresource_la_LDFLAGS = -module -avoid-version
-libasb_plugin_gresource_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
+libasb_plugin_desktop_la_CFLAGS = $(GLIB_CFLAGS) $(WARN_CFLAGS)
 libasb_plugin_appdata_la_SOURCES = asb-plugin-appdata.c
 libasb_plugin_appdata_la_LIBADD = $(GLIB_LIBS) $(GDKPIXBUF_LIBS)
 libasb_plugin_appdata_la_LDFLAGS = -module -avoid-version
-libasb_plugin_appdata_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_nm_la_SOURCES = asb-plugin-nm.c
-libasb_plugin_nm_la_LIBADD = $(GLIB_LIBS)
-libasb_plugin_nm_la_LDFLAGS = -module -avoid-version
-libasb_plugin_nm_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_ibus_sql_la_SOURCES = asb-plugin-ibus-sql.c
-libasb_plugin_ibus_sql_la_LIBADD = $(GLIB_LIBS) $(SQLITE_LIBS)
-libasb_plugin_ibus_sql_la_LDFLAGS = -module -avoid-version
-libasb_plugin_ibus_sql_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_ibus_xml_la_SOURCES = asb-plugin-ibus-xml.c
-libasb_plugin_ibus_xml_la_LIBADD = $(GLIB_LIBS) $(SQLITE_LIBS)
-libasb_plugin_ibus_xml_la_LDFLAGS = -module -avoid-version
-libasb_plugin_ibus_xml_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
-libasb_plugin_font_la_SOURCES = asb-plugin-font.c
-libasb_plugin_font_la_LIBADD = $(GLIB_LIBS) $(FREETYPE_LIBS) $(GDKPIXBUF_LIBS)
-libasb_plugin_font_la_LDFLAGS = -module -avoid-version
-libasb_plugin_font_la_CFLAGS = $(GLIB_CFLAGS) $(GTK_CFLAGS) $(WARNINGFLAGS_C)
-@HAVE_OSTREE_TRUE@libasb_plugin_ostree_la_SOURCES = asb-plugin-ostree.c
-@HAVE_OSTREE_TRUE@libasb_plugin_ostree_la_LIBADD = $(GLIB_LIBS) $(FREETYPE_LIBS) $(GDKPIXBUF_LIBS)
-@HAVE_OSTREE_TRUE@libasb_plugin_ostree_la_LDFLAGS = -module -avoid-version
-@HAVE_OSTREE_TRUE@libasb_plugin_ostree_la_CFLAGS = $(GLIB_CFLAGS) $(WARNINGFLAGS_C)
+libasb_plugin_appdata_la_CFLAGS = $(GLIB_CFLAGS) $(WARN_CFLAGS)
+libasb_plugin_shell_extension_la_SOURCES = asb-plugin-shell-extension.c
+libasb_plugin_shell_extension_la_LIBADD = $(GLIB_LIBS) $(JSON_GLIB_LIBS)
+libasb_plugin_shell_extension_la_LDFLAGS = -module -avoid-version
+libasb_plugin_shell_extension_la_CFLAGS = $(GLIB_CFLAGS) $(WARN_CFLAGS)
+@HAVE_FONTS_TRUE@libasb_plugin_font_la_SOURCES = asb-plugin-font.c
+@HAVE_FONTS_TRUE@libasb_plugin_font_la_LIBADD = $(GLIB_LIBS) $(FREETYPE_LIBS) $(GDKPIXBUF_LIBS) $(GTK_LIBS)
+@HAVE_FONTS_TRUE@libasb_plugin_font_la_LDFLAGS = -module -avoid-version
+@HAVE_FONTS_TRUE@libasb_plugin_font_la_CFLAGS = $(GLIB_CFLAGS) $(GTK_CFLAGS) $(WARN_CFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -796,62 +591,23 @@ clean-pluginLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libasb_plugin_absorb.la: $(libasb_plugin_absorb_la_OBJECTS) $(libasb_plugin_absorb_la_DEPENDENCIES) $(EXTRA_libasb_plugin_absorb_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_absorb_la_LINK) -rpath $(plugindir) $(libasb_plugin_absorb_la_OBJECTS) $(libasb_plugin_absorb_la_LIBADD) $(LIBS)
-
 libasb_plugin_appdata.la: $(libasb_plugin_appdata_la_OBJECTS) $(libasb_plugin_appdata_la_DEPENDENCIES) $(EXTRA_libasb_plugin_appdata_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libasb_plugin_appdata_la_LINK) -rpath $(plugindir) $(libasb_plugin_appdata_la_OBJECTS) $(libasb_plugin_appdata_la_LIBADD) $(LIBS)
-
-libasb_plugin_blacklist.la: $(libasb_plugin_blacklist_la_OBJECTS) $(libasb_plugin_blacklist_la_DEPENDENCIES) $(EXTRA_libasb_plugin_blacklist_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_blacklist_la_LINK) -rpath $(plugindir) $(libasb_plugin_blacklist_la_OBJECTS) $(libasb_plugin_blacklist_la_LIBADD) $(LIBS)
-
-libasb_plugin_dbus.la: $(libasb_plugin_dbus_la_OBJECTS) $(libasb_plugin_dbus_la_DEPENDENCIES) $(EXTRA_libasb_plugin_dbus_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_dbus_la_LINK) -rpath $(plugindir) $(libasb_plugin_dbus_la_OBJECTS) $(libasb_plugin_dbus_la_LIBADD) $(LIBS)
 
 libasb_plugin_desktop.la: $(libasb_plugin_desktop_la_OBJECTS) $(libasb_plugin_desktop_la_DEPENDENCIES) $(EXTRA_libasb_plugin_desktop_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libasb_plugin_desktop_la_LINK) -rpath $(plugindir) $(libasb_plugin_desktop_la_OBJECTS) $(libasb_plugin_desktop_la_LIBADD) $(LIBS)
 
-libasb_plugin_firmware.la: $(libasb_plugin_firmware_la_OBJECTS) $(libasb_plugin_firmware_la_DEPENDENCIES) $(EXTRA_libasb_plugin_firmware_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_firmware_la_LINK) -rpath $(plugindir) $(libasb_plugin_firmware_la_OBJECTS) $(libasb_plugin_firmware_la_LIBADD) $(LIBS)
-
 libasb_plugin_font.la: $(libasb_plugin_font_la_OBJECTS) $(libasb_plugin_font_la_DEPENDENCIES) $(EXTRA_libasb_plugin_font_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_font_la_LINK) -rpath $(plugindir) $(libasb_plugin_font_la_OBJECTS) $(libasb_plugin_font_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(libasb_plugin_font_la_LINK) $(am_libasb_plugin_font_la_rpath) $(libasb_plugin_font_la_OBJECTS) $(libasb_plugin_font_la_LIBADD) $(LIBS)
 
 libasb_plugin_gettext.la: $(libasb_plugin_gettext_la_OBJECTS) $(libasb_plugin_gettext_la_DEPENDENCIES) $(EXTRA_libasb_plugin_gettext_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libasb_plugin_gettext_la_LINK) -rpath $(plugindir) $(libasb_plugin_gettext_la_OBJECTS) $(libasb_plugin_gettext_la_LIBADD) $(LIBS)
 
-libasb_plugin_gir.la: $(libasb_plugin_gir_la_OBJECTS) $(libasb_plugin_gir_la_DEPENDENCIES) $(EXTRA_libasb_plugin_gir_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_gir_la_LINK) -rpath $(plugindir) $(libasb_plugin_gir_la_OBJECTS) $(libasb_plugin_gir_la_LIBADD) $(LIBS)
-
-libasb_plugin_gresource.la: $(libasb_plugin_gresource_la_OBJECTS) $(libasb_plugin_gresource_la_DEPENDENCIES) $(EXTRA_libasb_plugin_gresource_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_gresource_la_LINK) -rpath $(plugindir) $(libasb_plugin_gresource_la_OBJECTS) $(libasb_plugin_gresource_la_LIBADD) $(LIBS)
-
-libasb_plugin_gstreamer.la: $(libasb_plugin_gstreamer_la_OBJECTS) $(libasb_plugin_gstreamer_la_DEPENDENCIES) $(EXTRA_libasb_plugin_gstreamer_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_gstreamer_la_LINK) -rpath $(plugindir) $(libasb_plugin_gstreamer_la_OBJECTS) $(libasb_plugin_gstreamer_la_LIBADD) $(LIBS)
-
 libasb_plugin_hardcoded.la: $(libasb_plugin_hardcoded_la_OBJECTS) $(libasb_plugin_hardcoded_la_DEPENDENCIES) $(EXTRA_libasb_plugin_hardcoded_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libasb_plugin_hardcoded_la_LINK) -rpath $(plugindir) $(libasb_plugin_hardcoded_la_OBJECTS) $(libasb_plugin_hardcoded_la_LIBADD) $(LIBS)
 
-libasb_plugin_ibus_sql.la: $(libasb_plugin_ibus_sql_la_OBJECTS) $(libasb_plugin_ibus_sql_la_DEPENDENCIES) $(EXTRA_libasb_plugin_ibus_sql_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_ibus_sql_la_LINK) -rpath $(plugindir) $(libasb_plugin_ibus_sql_la_OBJECTS) $(libasb_plugin_ibus_sql_la_LIBADD) $(LIBS)
-
-libasb_plugin_ibus_xml.la: $(libasb_plugin_ibus_xml_la_OBJECTS) $(libasb_plugin_ibus_xml_la_DEPENDENCIES) $(EXTRA_libasb_plugin_ibus_xml_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_ibus_xml_la_LINK) -rpath $(plugindir) $(libasb_plugin_ibus_xml_la_OBJECTS) $(libasb_plugin_ibus_xml_la_LIBADD) $(LIBS)
-
-libasb_plugin_kde_notifyrc.la: $(libasb_plugin_kde_notifyrc_la_OBJECTS) $(libasb_plugin_kde_notifyrc_la_DEPENDENCIES) $(EXTRA_libasb_plugin_kde_notifyrc_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_kde_notifyrc_la_LINK) -rpath $(plugindir) $(libasb_plugin_kde_notifyrc_la_OBJECTS) $(libasb_plugin_kde_notifyrc_la_LIBADD) $(LIBS)
-
-libasb_plugin_kde_services.la: $(libasb_plugin_kde_services_la_OBJECTS) $(libasb_plugin_kde_services_la_DEPENDENCIES) $(EXTRA_libasb_plugin_kde_services_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_kde_services_la_LINK) -rpath $(plugindir) $(libasb_plugin_kde_services_la_OBJECTS) $(libasb_plugin_kde_services_la_LIBADD) $(LIBS)
-
-libasb_plugin_metainfo.la: $(libasb_plugin_metainfo_la_OBJECTS) $(libasb_plugin_metainfo_la_DEPENDENCIES) $(EXTRA_libasb_plugin_metainfo_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_metainfo_la_LINK) -rpath $(plugindir) $(libasb_plugin_metainfo_la_OBJECTS) $(libasb_plugin_metainfo_la_LIBADD) $(LIBS)
-
-libasb_plugin_nm.la: $(libasb_plugin_nm_la_OBJECTS) $(libasb_plugin_nm_la_DEPENDENCIES) $(EXTRA_libasb_plugin_nm_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_nm_la_LINK) -rpath $(plugindir) $(libasb_plugin_nm_la_OBJECTS) $(libasb_plugin_nm_la_LIBADD) $(LIBS)
-
-libasb_plugin_ostree.la: $(libasb_plugin_ostree_la_OBJECTS) $(libasb_plugin_ostree_la_DEPENDENCIES) $(EXTRA_libasb_plugin_ostree_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libasb_plugin_ostree_la_LINK) $(am_libasb_plugin_ostree_la_rpath) $(libasb_plugin_ostree_la_OBJECTS) $(libasb_plugin_ostree_la_LIBADD) $(LIBS)
+libasb_plugin_shell_extension.la: $(libasb_plugin_shell_extension_la_OBJECTS) $(libasb_plugin_shell_extension_la_DEPENDENCIES) $(EXTRA_libasb_plugin_shell_extension_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libasb_plugin_shell_extension_la_LINK) -rpath $(plugindir) $(libasb_plugin_shell_extension_la_OBJECTS) $(libasb_plugin_shell_extension_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -859,25 +615,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_absorb_la-asb-plugin-absorb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_appdata_la-asb-plugin-appdata.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_blacklist_la-asb-plugin-blacklist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_dbus_la-asb-plugin-dbus.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_desktop_la-asb-plugin-desktop.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_firmware_la-asb-plugin-firmware.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_font_la-asb-plugin-font.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_gettext_la-asb-plugin-gettext.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_gir_la-asb-plugin-gir.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_gresource_la-asb-plugin-gresource.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_gstreamer_la-asb-plugin-gstreamer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_hardcoded_la-asb-plugin-hardcoded.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_kde_services_la-asb-plugin-kde-services.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_metainfo_la-asb-plugin-metainfo.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_nm_la-asb-plugin-nm.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_ostree_la-asb-plugin-ostree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libasb_plugin_shell_extension_la-asb-plugin-shell-extension.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -900,13 +643,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-libasb_plugin_absorb_la-asb-plugin-absorb.lo: asb-plugin-absorb.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_absorb_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_absorb_la-asb-plugin-absorb.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_absorb_la-asb-plugin-absorb.Tpo -c -o libasb_plugin_absorb_la-asb-plugin-absorb.lo `test -f 'asb-plugin-absorb.c' || echo '$(srcdir)/'`asb-plugin-absorb.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_absorb_la-asb-plugin-absorb.Tpo $(DEPDIR)/libasb_plugin_absorb_la-asb-plugin-absorb.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-absorb.c' object='libasb_plugin_absorb_la-asb-plugin-absorb.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_absorb_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_absorb_la-asb-plugin-absorb.lo `test -f 'asb-plugin-absorb.c' || echo '$(srcdir)/'`asb-plugin-absorb.c
-
 libasb_plugin_appdata_la-asb-plugin-appdata.lo: asb-plugin-appdata.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_appdata_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_appdata_la-asb-plugin-appdata.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_appdata_la-asb-plugin-appdata.Tpo -c -o libasb_plugin_appdata_la-asb-plugin-appdata.lo `test -f 'asb-plugin-appdata.c' || echo '$(srcdir)/'`asb-plugin-appdata.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_appdata_la-asb-plugin-appdata.Tpo $(DEPDIR)/libasb_plugin_appdata_la-asb-plugin-appdata.Plo
@@ -914,33 +650,12 @@ libasb_plugin_appdata_la-asb-plugin-appdata.lo: asb-plugin-appdata.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_appdata_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_appdata_la-asb-plugin-appdata.lo `test -f 'asb-plugin-appdata.c' || echo '$(srcdir)/'`asb-plugin-appdata.c
 
-libasb_plugin_blacklist_la-asb-plugin-blacklist.lo: asb-plugin-blacklist.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_blacklist_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_blacklist_la-asb-plugin-blacklist.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_blacklist_la-asb-plugin-blacklist.Tpo -c -o libasb_plugin_blacklist_la-asb-plugin-blacklist.lo `test -f 'asb-plugin-blacklist.c' || echo '$(srcdir)/'`asb-plugin-blacklist.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_blacklist_la-asb-plugin-blacklist.Tpo $(DEPDIR)/libasb_plugin_blacklist_la-asb-plugin-blacklist.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-blacklist.c' object='libasb_plugin_blacklist_la-asb-plugin-blacklist.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_blacklist_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_blacklist_la-asb-plugin-blacklist.lo `test -f 'asb-plugin-blacklist.c' || echo '$(srcdir)/'`asb-plugin-blacklist.c
-
-libasb_plugin_dbus_la-asb-plugin-dbus.lo: asb-plugin-dbus.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_dbus_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_dbus_la-asb-plugin-dbus.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_dbus_la-asb-plugin-dbus.Tpo -c -o libasb_plugin_dbus_la-asb-plugin-dbus.lo `test -f 'asb-plugin-dbus.c' || echo '$(srcdir)/'`asb-plugin-dbus.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_dbus_la-asb-plugin-dbus.Tpo $(DEPDIR)/libasb_plugin_dbus_la-asb-plugin-dbus.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-dbus.c' object='libasb_plugin_dbus_la-asb-plugin-dbus.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_dbus_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_dbus_la-asb-plugin-dbus.lo `test -f 'asb-plugin-dbus.c' || echo '$(srcdir)/'`asb-plugin-dbus.c
-
 libasb_plugin_desktop_la-asb-plugin-desktop.lo: asb-plugin-desktop.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_desktop_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_desktop_la-asb-plugin-desktop.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_desktop_la-asb-plugin-desktop.Tpo -c -o libasb_plugin_desktop_la-asb-plugin-desktop.lo `test -f 'asb-plugin-desktop.c' || echo '$(srcdir)/'`asb-plugin-desktop.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_desktop_la-asb-plugin-desktop.Tpo $(DEPDIR)/libasb_plugin_desktop_la-asb-plugin-desktop.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-desktop.c' object='libasb_plugin_desktop_la-asb-plugin-desktop.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_desktop_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_desktop_la-asb-plugin-desktop.lo `test -f 'asb-plugin-desktop.c' || echo '$(srcdir)/'`asb-plugin-desktop.c
-
-libasb_plugin_firmware_la-asb-plugin-firmware.lo: asb-plugin-firmware.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_firmware_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_firmware_la-asb-plugin-firmware.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_firmware_la-asb-plugin-firmware.Tpo -c -o libasb_plugin_firmware_la-asb-plugin-firmware.lo `test -f 'asb-plugin-firmware.c' || echo '$(srcdir)/'`asb-plugin-firmware.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_firmware_la-asb-plugin-firmware.Tpo $(DEPDIR)/libasb_plugin_firmware_la-asb-plugin-firmware.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-firmware.c' object='libasb_plugin_firmware_la-asb-plugin-firmware.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_firmware_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_firmware_la-asb-plugin-firmware.lo `test -f 'asb-plugin-firmware.c' || echo '$(srcdir)/'`asb-plugin-firmware.c
 
 libasb_plugin_font_la-asb-plugin-font.lo: asb-plugin-font.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_font_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_font_la-asb-plugin-font.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_font_la-asb-plugin-font.Tpo -c -o libasb_plugin_font_la-asb-plugin-font.lo `test -f 'asb-plugin-font.c' || echo '$(srcdir)/'`asb-plugin-font.c
@@ -956,27 +671,6 @@ libasb_plugin_gettext_la-asb-plugin-gettext.lo: asb-plugin-gettext.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gettext_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_gettext_la-asb-plugin-gettext.lo `test -f 'asb-plugin-gettext.c' || echo '$(srcdir)/'`asb-plugin-gettext.c
 
-libasb_plugin_gir_la-asb-plugin-gir.lo: asb-plugin-gir.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gir_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_gir_la-asb-plugin-gir.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_gir_la-asb-plugin-gir.Tpo -c -o libasb_plugin_gir_la-asb-plugin-gir.lo `test -f 'asb-plugin-gir.c' || echo '$(srcdir)/'`asb-plugin-gir.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_gir_la-asb-plugin-gir.Tpo $(DEPDIR)/libasb_plugin_gir_la-asb-plugin-gir.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-gir.c' object='libasb_plugin_gir_la-asb-plugin-gir.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gir_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_gir_la-asb-plugin-gir.lo `test -f 'asb-plugin-gir.c' || echo '$(srcdir)/'`asb-plugin-gir.c
-
-libasb_plugin_gresource_la-asb-plugin-gresource.lo: asb-plugin-gresource.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gresource_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_gresource_la-asb-plugin-gresource.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_gresource_la-asb-plugin-gresource.Tpo -c -o libasb_plugin_gresource_la-asb-plugin-gresource.lo `test -f 'asb-plugin-gresource.c' || echo '$(srcdir)/'`asb-plugin-gresource.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_gresource_la-asb-plugin-gresource.Tpo $(DEPDIR)/libasb_plugin_gresource_la-asb-plugin-gresource.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-gresource.c' object='libasb_plugin_gresource_la-asb-plugin-gresource.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gresource_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_gresource_la-asb-plugin-gresource.lo `test -f 'asb-plugin-gresource.c' || echo '$(srcdir)/'`asb-plugin-gresource.c
-
-libasb_plugin_gstreamer_la-asb-plugin-gstreamer.lo: asb-plugin-gstreamer.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gstreamer_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_gstreamer_la-asb-plugin-gstreamer.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_gstreamer_la-asb-plugin-gstreamer.Tpo -c -o libasb_plugin_gstreamer_la-asb-plugin-gstreamer.lo `test -f 'asb-plugin-gstreamer.c' || echo '$(srcdir)/'`asb-plugin-gstreamer.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_gstreamer_la-asb-plugin-gstreamer.Tpo $(DEPDIR)/libasb_plugin_gstreamer_la-asb-plugin-gstreamer.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-gstreamer.c' object='libasb_plugin_gstreamer_la-asb-plugin-gstreamer.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_gstreamer_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_gstreamer_la-asb-plugin-gstreamer.lo `test -f 'asb-plugin-gstreamer.c' || echo '$(srcdir)/'`asb-plugin-gstreamer.c
-
 libasb_plugin_hardcoded_la-asb-plugin-hardcoded.lo: asb-plugin-hardcoded.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_hardcoded_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_hardcoded_la-asb-plugin-hardcoded.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_hardcoded_la-asb-plugin-hardcoded.Tpo -c -o libasb_plugin_hardcoded_la-asb-plugin-hardcoded.lo `test -f 'asb-plugin-hardcoded.c' || echo '$(srcdir)/'`asb-plugin-hardcoded.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_hardcoded_la-asb-plugin-hardcoded.Tpo $(DEPDIR)/libasb_plugin_hardcoded_la-asb-plugin-hardcoded.Plo
@@ -984,54 +678,12 @@ libasb_plugin_hardcoded_la-asb-plugin-hardcoded.lo: asb-plugin-hardcoded.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_hardcoded_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_hardcoded_la-asb-plugin-hardcoded.lo `test -f 'asb-plugin-hardcoded.c' || echo '$(srcdir)/'`asb-plugin-hardcoded.c
 
-libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.lo: asb-plugin-ibus-sql.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_ibus_sql_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.Tpo -c -o libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.lo `test -f 'asb-plugin-ibus-sql.c' || echo '$(srcdir)/'`asb-plugin-ibus-sql.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.Tpo $(DEPDIR)/libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-ibus-sql.c' object='libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.lo' libtool=yes @AMDEPBACKSLASH@
+libasb_plugin_shell_extension_la-asb-plugin-shell-extension.lo: asb-plugin-shell-extension.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_shell_extension_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_shell_extension_la-asb-plugin-shell-extension.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_shell_extension_la-asb-plugin-shell-extension.Tpo -c -o libasb_plugin_shell_extension_la-asb-plugin-shell-extension.lo `test -f 'asb-plugin-shell-extension.c' || echo '$(srcdir)/'`asb-plugin-shell-extension.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_shell_extension_la-asb-plugin-shell-extension.Tpo $(DEPDIR)/libasb_plugin_shell_extension_la-asb-plugin-shell-extension.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-shell-extension.c' object='libasb_plugin_shell_extension_la-asb-plugin-shell-extension.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_ibus_sql_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_ibus_sql_la-asb-plugin-ibus-sql.lo `test -f 'asb-plugin-ibus-sql.c' || echo '$(srcdir)/'`asb-plugin-ibus-sql.c
-
-libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.lo: asb-plugin-ibus-xml.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_ibus_xml_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.Tpo -c -o libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.lo `test -f 'asb-plugin-ibus-xml.c' || echo '$(srcdir)/'`asb-plugin-ibus-xml.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.Tpo $(DEPDIR)/libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-ibus-xml.c' object='libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_ibus_xml_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_ibus_xml_la-asb-plugin-ibus-xml.lo `test -f 'asb-plugin-ibus-xml.c' || echo '$(srcdir)/'`asb-plugin-ibus-xml.c
-
-libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.lo: asb-plugin-kde-notifyrc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_kde_notifyrc_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.Tpo -c -o libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.lo `test -f 'asb-plugin-kde-notifyrc.c' || echo '$(srcdir)/'`asb-plugin-kde-notifyrc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.Tpo $(DEPDIR)/libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-kde-notifyrc.c' object='libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_kde_notifyrc_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_kde_notifyrc_la-asb-plugin-kde-notifyrc.lo `test -f 'asb-plugin-kde-notifyrc.c' || echo '$(srcdir)/'`asb-plugin-kde-notifyrc.c
-
-libasb_plugin_kde_services_la-asb-plugin-kde-services.lo: asb-plugin-kde-services.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_kde_services_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_kde_services_la-asb-plugin-kde-services.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_kde_services_la-asb-plugin-kde-services.Tpo -c -o libasb_plugin_kde_services_la-asb-plugin-kde-services.lo `test -f 'asb-plugin-kde-services.c' || echo '$(srcdir)/'`asb-plugin-kde-services.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_kde_services_la-asb-plugin-kde-services.Tpo $(DEPDIR)/libasb_plugin_kde_services_la-asb-plugin-kde-services.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-kde-services.c' object='libasb_plugin_kde_services_la-asb-plugin-kde-services.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_kde_services_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_kde_services_la-asb-plugin-kde-services.lo `test -f 'asb-plugin-kde-services.c' || echo '$(srcdir)/'`asb-plugin-kde-services.c
-
-libasb_plugin_metainfo_la-asb-plugin-metainfo.lo: asb-plugin-metainfo.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_metainfo_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_metainfo_la-asb-plugin-metainfo.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_metainfo_la-asb-plugin-metainfo.Tpo -c -o libasb_plugin_metainfo_la-asb-plugin-metainfo.lo `test -f 'asb-plugin-metainfo.c' || echo '$(srcdir)/'`asb-plugin-metainfo.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_metainfo_la-asb-plugin-metainfo.Tpo $(DEPDIR)/libasb_plugin_metainfo_la-asb-plugin-metainfo.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-metainfo.c' object='libasb_plugin_metainfo_la-asb-plugin-metainfo.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_metainfo_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_metainfo_la-asb-plugin-metainfo.lo `test -f 'asb-plugin-metainfo.c' || echo '$(srcdir)/'`asb-plugin-metainfo.c
-
-libasb_plugin_nm_la-asb-plugin-nm.lo: asb-plugin-nm.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_nm_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_nm_la-asb-plugin-nm.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_nm_la-asb-plugin-nm.Tpo -c -o libasb_plugin_nm_la-asb-plugin-nm.lo `test -f 'asb-plugin-nm.c' || echo '$(srcdir)/'`asb-plugin-nm.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_nm_la-asb-plugin-nm.Tpo $(DEPDIR)/libasb_plugin_nm_la-asb-plugin-nm.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-nm.c' object='libasb_plugin_nm_la-asb-plugin-nm.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_nm_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_nm_la-asb-plugin-nm.lo `test -f 'asb-plugin-nm.c' || echo '$(srcdir)/'`asb-plugin-nm.c
-
-libasb_plugin_ostree_la-asb-plugin-ostree.lo: asb-plugin-ostree.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_ostree_la_CFLAGS) $(CFLAGS) -MT libasb_plugin_ostree_la-asb-plugin-ostree.lo -MD -MP -MF $(DEPDIR)/libasb_plugin_ostree_la-asb-plugin-ostree.Tpo -c -o libasb_plugin_ostree_la-asb-plugin-ostree.lo `test -f 'asb-plugin-ostree.c' || echo '$(srcdir)/'`asb-plugin-ostree.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libasb_plugin_ostree_la-asb-plugin-ostree.Tpo $(DEPDIR)/libasb_plugin_ostree_la-asb-plugin-ostree.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='asb-plugin-ostree.c' object='libasb_plugin_ostree_la-asb-plugin-ostree.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_ostree_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_ostree_la-asb-plugin-ostree.lo `test -f 'asb-plugin-ostree.c' || echo '$(srcdir)/'`asb-plugin-ostree.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libasb_plugin_shell_extension_la_CFLAGS) $(CFLAGS) -c -o libasb_plugin_shell_extension_la-asb-plugin-shell-extension.lo `test -f 'asb-plugin-shell-extension.c' || echo '$(srcdir)/'`asb-plugin-shell-extension.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

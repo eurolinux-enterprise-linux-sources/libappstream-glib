@@ -24,8 +24,7 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <locale.h>
-
-#include "as-cleanup.h"
+#include <fnmatch.h>
 
 #include "asb-context-private.h"
 #include "asb-plugin.h"
@@ -37,15 +36,10 @@
 #include "asb-package-rpm.h"
 #endif
 
-/**
- * asb_test_get_filename:
- **/
 static gchar *
 asb_test_get_filename (const gchar *filename)
 {
-	char full_tmp[PATH_MAX];
-	gchar *tmp;
-	_cleanup_free_ gchar *path = NULL;
+	g_autofree gchar *path = NULL;
 
 	/* try the source then the destdir */
 	path = g_build_filename (TESTDIRSRC, filename, NULL);
@@ -53,22 +47,23 @@ asb_test_get_filename (const gchar *filename)
 		g_free (path);
 		path = g_build_filename (TESTDIRBUILD, filename, NULL);
 	}
-	tmp = realpath (path, full_tmp);
-	if (tmp == NULL)
-		return NULL;
-	return g_strdup (full_tmp);
+	return realpath (path, NULL);
 }
 
-/**
- * asb_test_compare_lines:
- **/
+#define AS_TEST_WILDCARD_SHA1	"\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?"
+#define AS_TEST_WILDCARD_MD5	"\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?"
+
 static gboolean
 asb_test_compare_lines (const gchar *txt1, const gchar *txt2, GError **error)
 {
-	_cleanup_free_ gchar *output = NULL;
+	g_autofree gchar *output = NULL;
 
 	/* exactly the same */
 	if (g_strcmp0 (txt1, txt2) == 0)
+		return TRUE;
+
+	/* matches a pattern */
+	if (fnmatch (txt2, txt1, FNM_NOESCAPE) == 0)
 		return TRUE;
 
 	/* save temp files and diff them */
@@ -95,9 +90,9 @@ asb_test_package_rpm_func (void)
 	GPtrArray *releases;
 	gboolean ret;
 	gchar *tmp;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsbPackage *pkg = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *glob = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsbPackage) pkg = NULL;
+	g_autoptr(GPtrArray) glob = NULL;
 
 	/* open file */
 	filename = asb_test_get_filename ("test-0.1-1.fc21.noarch.rpm");
@@ -136,10 +131,11 @@ asb_test_package_rpm_func (void)
 
 	/* deps */
 	deps = asb_package_get_deps (pkg);
-	g_assert_cmpint (deps->len, ==, 3);
+	g_assert_cmpint (deps->len, ==, 4);
 	g_assert_cmpstr (g_ptr_array_index (deps, 0), ==, "bar");
 	g_assert_cmpstr (g_ptr_array_index (deps, 1), ==, "baz");
 	g_assert_cmpstr (g_ptr_array_index (deps, 2), ==, "foo");
+	g_assert_cmpstr (g_ptr_array_index (deps, 3), ==, "test-lang");
 
 	/* releases */
 	releases = asb_package_get_releases (pkg);
@@ -147,11 +143,11 @@ asb_test_package_rpm_func (void)
 	rel = g_ptr_array_index (releases, 0);
 	g_assert (rel != NULL);
 	g_assert_cmpstr (as_release_get_version (rel), ==, "0.1");
-	g_assert_cmpint (as_release_get_timestamp (rel), ==, 1274097600);
+	g_assert_cmpint ((gint64) as_release_get_timestamp (rel), ==, 1274097600);
 	g_assert_cmpstr (as_release_get_description (rel, NULL), ==, NULL);
 	rel = asb_package_get_release (pkg, "0.1");
 	g_assert (rel != NULL);
-	g_assert_cmpint (as_release_get_timestamp (rel), ==, 1274097600);
+	g_assert_cmpint ((gint64) as_release_get_timestamp (rel), ==, 1274097600);
 
 	/* check config */
 	g_assert_cmpstr (asb_package_get_config (pkg, "test"), ==, NULL);
@@ -173,13 +169,13 @@ asb_test_package_rpm_func (void)
 	ret = asb_package_ensure (pkg, ASB_PACKAGE_ENSURE_DEPS, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
-	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 3);
+	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 4);
 	ret = asb_package_ensure (pkg, ASB_PACKAGE_ENSURE_DEPS, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
-	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 3);
+	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 4);
 	asb_package_clear (pkg, ASB_PACKAGE_ENSURE_DEPS);
-	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 3);
+	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 4);
 	asb_package_clear (pkg, ASB_PACKAGE_ENSURE_DEPS);
 	g_assert_cmpint (asb_package_get_deps(pkg)->len, ==, 0);
 
@@ -211,19 +207,43 @@ asb_test_package_rpm_func (void)
 static void
 asb_test_package_func (void)
 {
-	_cleanup_object_unref_ AsbPackage *pkg = NULL;
+	g_autoptr(AsbPackage) pkg = NULL;
+	g_autoptr(AsbPackage) pkg2 = NULL;
+
+	/* set package values from filename */
 	pkg = asb_package_new ();
 	asb_package_set_filename (pkg, "/tmp/gambit-c-doc-4.7.3-2.fc22.noarch.rpm");
 	g_assert_cmpstr (asb_package_get_nevra (pkg), ==, "gambit-c-doc-4.7.3-2.fc22.noarch");
 	g_assert_cmpstr (asb_package_get_name (pkg), ==, "gambit-c-doc");
 	g_assert_cmpstr (asb_package_get_version (pkg), ==, "4.7.3");
+	g_assert_cmpstr (asb_package_get_release_str (pkg), ==, "2.fc22");
 	g_assert_cmpstr (asb_package_get_arch (pkg), ==, "noarch");
+	g_assert_cmpint (asb_package_get_epoch (pkg), ==, 0);
+
+	/* set package values again */
+	pkg2 = asb_package_new ();
+	asb_package_set_filename (pkg2, "/tmp/gambit-c-doc-4.7.3-2.fc22.noarch.rpm");
+
+	/* check same */
+	g_assert_cmpint (asb_package_compare (pkg, pkg2), ==, 0);
+
+	/* fix version */
+	asb_package_set_version (pkg2, "4.7.4");
+	g_assert_cmpint (asb_package_compare (pkg, pkg2), <, 0);
+	g_assert_cmpint (asb_package_compare (pkg2, pkg), >, 0);
+	asb_package_set_version (pkg2, "4.7.3");
+
+	/* fix release */
+	asb_package_set_release (pkg2, "3.fc22");
+	g_assert_cmpint (asb_package_compare (pkg, pkg2), <, 0);
+	g_assert_cmpint (asb_package_compare (pkg2, pkg), >, 0);
+	asb_package_set_release (pkg2, "2.fc22");
 }
 
 static void
 asb_test_utils_glob_func (void)
 {
-	_cleanup_ptrarray_unref_ GPtrArray *array = NULL;
+	g_autoptr(GPtrArray) array = NULL;
 
 	array = asb_glob_value_array_new ();
 	g_ptr_array_add (array, asb_glob_value_new ("*.desktop", "DESKTOP"));
@@ -235,18 +255,6 @@ asb_test_utils_glob_func (void)
 }
 
 static void
-asb_test_utils_replace_func (void)
-{
-	guint n;
-	_cleanup_string_free_ GString *str = NULL;
-
-	str = g_string_new ("I want to have searched for search");
-	n = asb_string_replace (str, "search", "replace");
-	g_assert_cmpstr (str->str, ==, "I want to have replaceed for replace");
-	g_assert_cmpint (n, ==, 2);
-}
-
-static void
 asb_test_plugin_loader_func (void)
 {
 	AsbPluginLoader *loader = NULL;
@@ -254,26 +262,26 @@ asb_test_plugin_loader_func (void)
 	GError *error = NULL;
 	GPtrArray *plugins;
 	gboolean ret;
-	_cleanup_object_unref_ AsbContext *ctx = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *globs = NULL;
+	g_autoptr(AsbContext) ctx = NULL;
+	g_autoptr(GPtrArray) globs = NULL;
 
 	/* set up loader */
 	ctx = asb_context_new ();
 	loader = asb_context_get_plugin_loader (ctx);
+	asb_plugin_loader_set_dir (loader, TESTPLUGINDIR);
 	ret = asb_plugin_loader_setup (loader, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
 	/* get the list of globs */
 	globs = asb_plugin_loader_get_globs (loader);\
-	g_assert_cmpint (globs->len, >=, 44);
+	g_assert_cmpint (globs->len, >=, 10);
 	g_assert_cmpstr (asb_glob_value_search (globs, "/usr/share/applications/gimp.desktop"), ==, "");
-	g_assert_cmpstr (asb_glob_value_search (globs, "/files/share/applications/gimp.desktop"), ==, "");
 	g_assert_cmpstr (asb_glob_value_search (globs, "/srv/dave.txt"), ==, NULL);
 
 	/* get the list of plugins */
 	plugins = asb_plugin_loader_get_plugins (loader);
-	g_assert_cmpint (plugins->len, >=, 17);
+	g_assert_cmpint (plugins->len, >=, 5);
 	plugin = g_ptr_array_index (plugins, 0);
 	g_assert (plugin != NULL);
 	g_assert (plugin->module != NULL);
@@ -281,9 +289,9 @@ asb_test_plugin_loader_func (void)
 	g_assert (plugin->ctx == ctx);
 
 	/* match the correct one */
-	plugin = asb_plugin_loader_match_fn (loader, "/usr/share/applications/gimp.desktop");
+	plugin = asb_plugin_loader_match_fn (loader, "/usr/share/appdata/gimp.appdata.xml");
 	g_assert (plugin != NULL);
-	g_assert_cmpstr (plugin->name, ==, "desktop");
+	g_assert_cmpstr (plugin->name, ==, "appdata");
 }
 
 #ifdef HAVE_RPM
@@ -299,26 +307,27 @@ static void
 asb_test_context_test_func (AsbTestContextMode mode)
 {
 	AsApp *app;
+	AsbPluginLoader *loader;
 	GError *error = NULL;
 	const gchar *expected_xml;
 	gboolean ret;
 	guint i;
-	_cleanup_object_unref_ AsbContext *ctx = NULL;
-	_cleanup_object_unref_ AsStore *store_failed = NULL;
-	_cleanup_object_unref_ AsStore *store_ignore = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file_failed = NULL;
-	_cleanup_object_unref_ GFile *file_ignore = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_string_free_ GString *xml = NULL;
-	_cleanup_string_free_ GString *xml_failed = NULL;
-	_cleanup_string_free_ GString *xml_ignore = NULL;
+	g_autoptr(AsbContext) ctx = NULL;
+	g_autoptr(AsStore) store_failed = NULL;
+	g_autoptr(AsStore) store_ignore = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file_failed = NULL;
+	g_autoptr(GFile) file_ignore = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GString) xml = NULL;
+	g_autoptr(GString) xml_failed = NULL;
+	g_autoptr(GString) xml_ignore = NULL;
 	const gchar *filenames[] = {
 		"test-0.1-1.fc21.noarch.rpm",		/* a console app */
-		"app-1-1.fc21.x86_64.rpm",		/* a GUI app */
-		"app-extra-1-1.fc21.noarch.rpm",	/* addons for a GUI app */
-		"app-console-1-1.fc21.noarch.rpm",	/* app with no icon */
-		"app-1-1.fc21.i686.rpm",		/* GUI multiarch app */
+		"app-1-1.fc25.x86_64.rpm",		/* a GUI app */
+		"app-extra-1-1.fc25.noarch.rpm",	/* addons for a GUI app */
+		"app-console-1-1.fc25.noarch.rpm",	/* app with no icon */
+		"app-1-1.fc25.i686.rpm",		/* GUI multiarch app */
 		"composite-1-1.fc21.x86_64.rpm",	/* multiple GUI apps */
 		"font-1-1.fc21.noarch.rpm",		/* font */
 		"font-serif-1-1.fc21.noarch.rpm",	/* font that extends */
@@ -333,7 +342,6 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	asb_context_set_flags (ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID |
 				    ASB_CONTEXT_FLAG_NO_NETWORK |
 				    ASB_CONTEXT_FLAG_INCLUDE_FAILED |
-				    ASB_CONTEXT_FLAG_BATCH_OUTPUT |
 				    ASB_CONTEXT_FLAG_HIDPI_ICONS);
 	asb_context_set_basename (ctx, "appstream");
 	asb_context_set_origin (ctx, "asb-self-test");
@@ -341,14 +349,13 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	asb_context_set_output_dir (ctx, "/tmp/asbuilder/output");
 	asb_context_set_temp_dir (ctx, "/tmp/asbuilder/temp");
 	asb_context_set_icons_dir (ctx, "/tmp/asbuilder/temp/icons");
-	asb_context_set_screenshot_dir (ctx, "/tmp/asbuilder/temp/screenshots");
 	switch (mode) {
 	case ASB_TEST_CONTEXT_MODE_WITH_CACHE:
 		asb_context_set_old_metadata (ctx, "/tmp/asbuilder/output");
 		break;
 	case ASB_TEST_CONTEXT_MODE_WITH_OLD_CACHE:
 		{
-			_cleanup_free_ gchar *old_cache_dir = NULL;
+			g_autofree gchar *old_cache_dir = NULL;
 			old_cache_dir = asb_test_get_filename (".");
 			asb_context_set_old_metadata (ctx, old_cache_dir);
 		}
@@ -358,13 +365,15 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	}
 	g_assert (asb_context_get_flag (ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID));
 	g_assert_cmpstr (asb_context_get_temp_dir (ctx), ==, "/tmp/asbuilder/temp");
+	loader = asb_context_get_plugin_loader (ctx);
+	asb_plugin_loader_set_dir (loader, TESTPLUGINDIR);
 	ret = asb_context_setup (ctx, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
 	/* add packages */
 	for (i = 0; filenames[i] != NULL; i++) {
-		_cleanup_free_ gchar *filename = NULL;
+		g_autofree gchar *filename = NULL;
 		filename = asb_test_get_filename (filenames[i]);
 		if (filename == NULL)
 			g_warning ("%s not found", filenames[i]);
@@ -404,7 +413,11 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	ret = as_store_from_file (store, file, NULL, NULL, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
-	g_assert_cmpint (as_store_get_size (store), ==, 6);
+#ifdef HAVE_FONTS
+	g_assert_cmpint (as_store_get_size (store), ==, 5);
+#else
+	g_assert_cmpint (as_store_get_size (store), ==, 4);
+#endif
 	app = as_store_get_app_by_pkgname (store, "app");
 	g_assert (app != NULL);
 	app = as_store_get_app_by_id (store, "app.desktop");
@@ -413,55 +426,35 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	/* check it matches what we expect */
 	xml = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
 	expected_xml =
-		"<components version=\"0.9\" builder_id=\"appstream-glib:4\" origin=\"asb-self-test\">\n"
-		"<component type=\"firmware\">\n"
-		"<id>84f40464-9272-4ef7-9399-cd95f12da696</id>\n"
-		"<name>ColorHug Firmware</name>\n"
-		"<summary>Firmware for the ColorHug Colorimeter</summary>\n"
-		"<developer_name>Hughski</developer_name>\n"
-		"<description><p>Updating the firmware on your ColorHug device "
-		"improves performance and adds new features.</p></description>\n"
-		"<icon type=\"stock\">application-x-executable</icon>\n"
-		"<kudos>\n"
-		"<kudo>HiDpiIcon</kudo>\n"
-		"</kudos>\n"
-		"<url type=\"homepage\">http://www.hughski.com/</url>\n"
-		"<releases>\n"
-		"<release version=\"2.0.2\" timestamp=\"1424116753\">\n"
-		"<location>http://www.hughski.com/downloads/colorhug2/firmware/colorhug-2.0.2.cab</location>\n"
-		"<checksum type=\"sha1\">ab2d0294e0d23c1718af79c6a17216c8322ae6da</checksum>\n"
-		"<description><p>This unstable release adds the following features:</p>"
-		"<ul><li>Add TakeReadingArray to enable panel latency measurements</li>"
-		"<li>Speed up the auto-scaled measurements considerably, using 256ms "
-		"as the smallest sample duration</li></ul></description>\n"
-		"</release>\n"
-		"</releases>\n"
-		"<metadata>\n"
-		"<value key=\"X-CacheID\">colorhug-als-2.0.2.cab</value>\n"
-		"</metadata>\n"
-		"</component>\n"
+		"<components builder_id=\"appstream-glib:4\" origin=\"asb-self-test\" version=\"0.9\">\n"
+#ifdef HAVE_FONTS
 		"<component type=\"font\">\n"
 		"<id>Liberation</id>\n"
 		"<pkgname>font</pkgname>\n"
 		"<pkgname>font-serif</pkgname>\n"
+		"<source_pkgname>font</source_pkgname>\n"
 		"<name>Liberation</name>\n"
 		"<summary>Open source versions of several commecial fonts</summary>\n"
 		"<description><p>The Liberation Fonts are intended to be replacements for Times New Roman, Arial, and Courier New.</p></description>\n"
-		"<icon height=\"64\" width=\"64\" type=\"cached\">LiberationSerif.png</icon>\n"
+		"<icon type=\"cached\" height=\"64\" width=\"64\">LiberationSerif.png</icon>\n"
+		"<categories>\n"
+		"<category>Addons</category>\n"
+		"<category>Fonts</category>\n"
+		"</categories>\n"
 		"<project_license>GPL-2.0+</project_license>\n"
-		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
+		"<url type=\"homepage\">http://fedorahosted.org/liberation-fonts/</url>\n"
 		"<screenshots>\n"
 		"<screenshot type=\"default\">\n"
 		"<caption>Liberation Serif – Regular</caption>\n"
-		"<image type=\"source\" height=\"48\" width=\"640\"/>\n"
+		"<image type=\"source\" height=\"48\" width=\"640\">file:/LiberationSerif-" AS_TEST_WILDCARD_MD5 ".png</image>\n"
 		"</screenshot>\n"
 		"<screenshot priority=\"-32\">\n"
 		"<caption>Liberation Serif – Bold</caption>\n"
-		"<image type=\"source\" height=\"48\" width=\"640\"/>\n"
+		"<image type=\"source\" height=\"48\" width=\"640\">file:/LiberationSerif-" AS_TEST_WILDCARD_MD5 ".png</image>\n"
 		"</screenshot>\n"
 		"</screenshots>\n"
 		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
+		"<release timestamp=\"1407844800\" version=\"1\"/>\n"
 		"</releases>\n"
 		"<languages>\n"
 		"<lang>en</lang>\n"
@@ -470,27 +463,30 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"<value key=\"X-CacheID\">font-1-1.fc21.noarch.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
+#endif
+		"<component type=\"addon\">\n"
+		"<id>app-core</id>\n"
+		"<pkgname>app</pkgname>\n"
+		"<name>Core</name>\n"
+		"<summary>Addons for core functionality</summary>\n"
+		"<project_license>GPL-2.0+</project_license>\n"
+		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
+		"<extends>app.desktop</extends>\n"
+		"<metadata>\n"
+		"<value key=\"X-CacheID\">app-1-1.fc25.x86_64.rpm</value>\n"
+		"</metadata>\n"
+		"</component>\n"
 		"<component type=\"addon\">\n"
 		"<id>app-extra</id>\n"
 		"<pkgname>app-extra</pkgname>\n"
 		"<source_pkgname>app</source_pkgname>\n"
 		"<name>Extra</name>\n"
 		"<summary>Addons for extra functionality</summary>\n"
-		"<kudos>\n"
-		"<kudo>ModernToolkit</kudo>\n"
-		"</kudos>\n"
 		"<project_license>GPL-2.0+</project_license>\n"
 		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
 		"<extends>app.desktop</extends>\n"
-		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
-		"</releases>\n"
-		"<languages>\n"
-		"<lang percentage=\"100\">en_GB</lang>\n"
-		"<lang percentage=\"33\">ru</lang>\n"
-		"</languages>\n"
 		"<metadata>\n"
-		"<value key=\"X-CacheID\">app-extra-1-1.fc21.noarch.rpm</value>\n"
+		"<value key=\"X-CacheID\">app-extra-1-1.fc25.noarch.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
 		"<component type=\"desktop\">\n"
@@ -499,7 +495,8 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"<name>App</name>\n"
 		"<summary>A test application</summary>\n"
 		"<description><p>Long description goes here.</p></description>\n"
-		"<icon height=\"64\" width=\"64\" type=\"cached\">app.png</icon>\n"
+		"<icon type=\"cached\" height=\"128\" width=\"128\">app.png</icon>\n"
+		"<icon type=\"cached\" height=\"64\" width=\"64\">app.png</icon>\n"
 		"<categories>\n"
 		"<category>Profiling</category>\n"
 		"<category>System</category>\n"
@@ -509,13 +506,12 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"<keyword>Remote</keyword>\n"
 		"</keywords>\n"
 		"<kudos>\n"
-		"<kudo>AppMenu</kudo>\n"
+		"<kudo>HiDpiIcon</kudo>\n"
 		"<kudo>ModernToolkit</kudo>\n"
-		"<kudo>Notifications</kudo>\n"
 		"<kudo>SearchProvider</kudo>\n"
 		"<kudo>UserDocs</kudo>\n"
 		"</kudos>\n"
-		"<project_license>GPL-2.0+</project_license>\n"
+		"<project_license>LGPL-2.0+</project_license>\n"
 		"<url type=\"homepage\">http://people.freedesktop.org/~hughsient/appdata/</url>\n"
 		"<screenshots>\n"
 		"<screenshot type=\"default\">\n"
@@ -523,7 +519,7 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"</screenshot>\n"
 		"</screenshots>\n"
 		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
+		"<release timestamp=\"1407844800\" version=\"1\"/>\n"
 		"</releases>\n"
 		"<provides>\n"
 		"<dbus type=\"session\">org.freedesktop.AppStream</dbus>\n"
@@ -533,52 +529,40 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"<lang percentage=\"33\">ru</lang>\n"
 		"</languages>\n"
 		"<metadata>\n"
-		"<value key=\"PaddedIcon\">48x48</value>\n"
-		"<value key=\"X-CacheID\">app-1-1.fc21.x86_64.rpm</value>\n"
+		"<value key=\"X-CacheID\">app-1-1.fc25.x86_64.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
-		"<component type=\"desktop\">\n"
-		"<id>valid1.desktop</id>\n"
-		"<pkgname>composite</pkgname>\n"
-		"<name>Frobnicator</name>\n"
-		"<summary>Frobnicator</summary>\n"
-		"<icon type=\"stock\">computer</icon>\n"
-		"<categories>\n"
-		"<category>Profiling</category>\n"
-		"</categories>\n"
-		"<kudos>\n"
-		"<kudo>HiDpiIcon</kudo>\n"
-		"</kudos>\n"
+#ifdef HAVE_GCAB
+		"<component type=\"firmware\">\n"
+		"<id>com.hughski.ColorHug2.firmware</id>\n"
+		"<name>ColorHug Firmware</name>\n"
+		"<summary>Firmware for the ColorHug Colorimeter</summary>\n"
+		"<developer_name>Hughski Limited</developer_name>\n"
+		"<description><p>Updating the firmware on your ColorHug device "
+		"improves performance and adds new features.</p></description>\n"
 		"<project_license>GPL-2.0+</project_license>\n"
-		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
+		"<url type=\"homepage\">http://www.hughski.com/</url>\n"
 		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
+		"<release timestamp=\"1424116753\" version=\"2.0.2\">\n"
+		"<location>http://www.hughski.com/downloads/colorhug2/firmware/colorhug-2.0.2.cab</location>\n"
+		"<checksum type=\"sha1\" filename=\"colorhug-als-2.0.2.cab\" target=\"container\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
+		"<checksum type=\"sha1\" filename=\"firmware.bin\" target=\"content\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
+		"<description><p>This unstable release adds the following features:</p>"
+		"<ul><li>Add TakeReadingArray to enable panel latency measurements</li>"
+		"<li>Speed up the auto-scaled measurements considerably, using 256ms "
+		"as the smallest sample duration</li></ul></description>\n"
+		"<size type=\"installed\">14</size>\n"
+		"<size type=\"download\">2015</size>\n"
+		"</release>\n"
 		"</releases>\n"
+		"<provides>\n"
+		"<firmware type=\"flashed\">84f40464-9272-4ef7-9399-cd95f12da696</firmware>\n"
+		"</provides>\n"
 		"<metadata>\n"
-		"<value key=\"X-CacheID\">composite-1-1.fc21.x86_64.rpm</value>\n"
+		"<value key=\"X-CacheID\">colorhug-als-2.0.2.cab</value>\n"
 		"</metadata>\n"
 		"</component>\n"
-		"<component type=\"desktop\">\n"
-		"<id>valid2.desktop</id>\n"
-		"<pkgname>composite</pkgname>\n"
-		"<name>Frobnicator Example</name>\n"
-		"<summary>Frobnicator Example Program</summary>\n"
-		"<icon type=\"stock\">computer</icon>\n"
-		"<categories>\n"
-		"<category>Profiling</category>\n"
-		"</categories>\n"
-		"<kudos>\n"
-		"<kudo>HiDpiIcon</kudo>\n"
-		"</kudos>\n"
-		"<project_license>GPL-2.0+</project_license>\n"
-		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
-		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
-		"</releases>\n"
-		"<metadata>\n"
-		"<value key=\"X-CacheID\">composite-1-1.fc21.x86_64.rpm</value>\n"
-		"</metadata>\n"
-		"</component>\n"
+#endif
 		"</components>\n";
 	ret = asb_test_compare_lines (xml->str, expected_xml, &error);
 	g_assert_no_error (error);
@@ -590,23 +574,24 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	ret = as_store_from_file (store_failed, file_failed, NULL, NULL, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
-	g_assert_cmpint (as_store_get_size (store_failed), ==, 4);
-	app = as_store_get_app_by_id (store_failed, "console1.desktop");
-	g_assert (app != NULL);
-	app = as_store_get_app_by_id (store_failed, "console2.desktop");
-	g_assert (app != NULL);
+	g_assert_cmpint (as_store_get_size (store_failed), ==, 1);
+//	app = as_store_get_app_by_id (store_failed, "console1.desktop");
+//	g_assert (app != NULL);
+//	app = as_store_get_app_by_id (store_failed, "console2.desktop");
+//	g_assert (app != NULL);
 
 	/* check output */
 	xml_failed = as_store_to_xml (store_failed, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
 	expected_xml =
-		"<components version=\"0.9\" builder_id=\"appstream-glib:4\" origin=\"asb-self-test-failed\">\n"
+		"<components builder_id=\"appstream-glib:4\" origin=\"asb-self-test-failed\" version=\"0.9\">\n"
+#ifdef HAVE_FONTS
 		"<component type=\"font\">\n"
 		"<id>LiberationSerif</id>\n"
 		"<pkgname>font-serif</pkgname>\n"
 		"<source_pkgname>font</source_pkgname>\n"
 		"<name>Liberation Serif</name>\n"
 		"<summary>A Bold font from Liberation Serif</summary>\n"
-		"<icon height=\"64\" width=\"64\" type=\"cached\">LiberationSerif.png</icon>\n"
+		"<icon type=\"cached\" height=\"64\" width=\"64\">LiberationSerif.png</icon>\n"
 		"<categories>\n"
 		"<category>Addons</category>\n"
 		"<category>Fonts</category>\n"
@@ -620,15 +605,15 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"<screenshots>\n"
 		"<screenshot type=\"default\">\n"
 		"<caption>Liberation Serif – Regular</caption>\n"
-		"<image type=\"source\" height=\"48\" width=\"640\"/>\n"
+		"<image type=\"source\" height=\"48\" width=\"640\">file:/LiberationSerif-" AS_TEST_WILDCARD_MD5 ".png</image>\n"
 		"</screenshot>\n"
 		"<screenshot priority=\"-32\">\n"
 		"<caption>Liberation Serif – Bold</caption>\n"
-		"<image type=\"source\" height=\"48\" width=\"640\"/>\n"
+		"<image type=\"source\" height=\"48\" width=\"640\">file:/LiberationSerif-" AS_TEST_WILDCARD_MD5 ".png</image>\n"
 		"</screenshot>\n"
 		"</screenshots>\n"
 		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
+		"<release timestamp=\"1407844800\" version=\"1\"/>\n"
 		"</releases>\n"
 		"<languages>\n"
 		"<lang>en</lang>\n"
@@ -637,99 +622,7 @@ asb_test_context_test_func (AsbTestContextMode mode)
 		"<value key=\"X-CacheID\">font-serif-1-1.fc21.noarch.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
-		"<component type=\"addon\">\n"
-		"<id>app-core</id>\n"
-		"<pkgname>app</pkgname>\n"
-		"<name>Core</name>\n"
-		"<summary>Addons for core functionality</summary>\n"
-		"<kudos>\n"
-		"<kudo>AppMenu</kudo>\n"
-		"<kudo>ModernToolkit</kudo>\n"
-		"<kudo>Notifications</kudo>\n"
-		"<kudo>SearchProvider</kudo>\n"
-		"<kudo>UserDocs</kudo>\n"
-		"</kudos>\n"
-		"<vetos>\n"
-		"<veto>partially absorbing app-core into app.desktop</veto>\n"
-		"</vetos>\n"
-		"<project_license>GPL-2.0+</project_license>\n"
-		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
-		"<extends>app.desktop</extends>\n"
-		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
-		"</releases>\n"
-		"<provides>\n"
-		"<dbus type=\"session\">org.freedesktop.AppStream</dbus>\n"
-		"</provides>\n"
-		"<languages>\n"
-		"<lang percentage=\"100\">en_GB</lang>\n"
-		"<lang percentage=\"33\">ru</lang>\n"
-		"</languages>\n"
-		"<metadata>\n"
-		"<value key=\"X-CacheID\">app-1-1.fc21.x86_64.rpm</value>\n"
-		"<value key=\"X-Merge-With-Parent\">app.desktop</value>\n"
-		"</metadata>\n"
-		"</component>\n"
-		"<component type=\"desktop\">\n"
-		"<id>console1.desktop</id>\n"
-		"<pkgname>app-console</pkgname>\n"
-		"<source_pkgname>app</source_pkgname>\n"
-		"<name>Console1</name>\n"
-		"<summary>A console1 test application</summary>\n"
-		"<icon height=\"64\" width=\"64\" type=\"cached\">console1.png</icon>\n"
-		"<categories>\n"
-		"<category>ConsoleOnly</category>\n"
-		"</categories>\n"
-		"<kudos>\n"
-		"<kudo>ModernToolkit</kudo>\n"
-		"</kudos>\n"
-		"<vetos>\n"
-		"<veto>Required AppData: ConsoleOnly</veto>\n"
-		"</vetos>\n"
-		"<project_license>GPL-2.0+</project_license>\n"
-		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
-		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
-		"</releases>\n"
-		"<languages>\n"
-		"<lang percentage=\"100\">en_GB</lang>\n"
-		"<lang percentage=\"33\">ru</lang>\n"
-		"</languages>\n"
-		"<metadata>\n"
-		"<value key=\"PaddedIcon\">48x48</value>\n"
-		"<value key=\"X-CacheID\">app-console-1-1.fc21.noarch.rpm</value>\n"
-		"</metadata>\n"
-		"</component>\n"
-		"<component type=\"desktop\">\n"
-		"<id>console2.desktop</id>\n"
-		"<pkgname>app-console</pkgname>\n"
-		"<source_pkgname>app</source_pkgname>\n"
-		"<name>Console2</name>\n"
-		"<summary>A console2 test application</summary>\n"
-		"<icon height=\"64\" width=\"64\" type=\"cached\">console2.png</icon>\n"
-		"<categories>\n"
-		"<category>ConsoleOnly</category>\n"
-		"</categories>\n"
-		"<kudos>\n"
-		"<kudo>ModernToolkit</kudo>\n"
-		"</kudos>\n"
-		"<vetos>\n"
-		"<veto>Required AppData: ConsoleOnly</veto>\n"
-		"</vetos>\n"
-		"<project_license>GPL-2.0+</project_license>\n"
-		"<url type=\"homepage\">http://people.freedesktop.org/</url>\n"
-		"<releases>\n"
-		"<release version=\"1\" timestamp=\"1407844800\"/>\n"
-		"</releases>\n"
-		"<languages>\n"
-		"<lang percentage=\"100\">en_GB</lang>\n"
-		"<lang percentage=\"33\">ru</lang>\n"
-		"</languages>\n"
-		"<metadata>\n"
-		"<value key=\"PaddedIcon\">48x48</value>\n"
-		"<value key=\"X-CacheID\">app-console-1-1.fc21.noarch.rpm</value>\n"
-		"</metadata>\n"
-		"</component>\n"
+#endif
 		"</components>\n";
 	ret = asb_test_compare_lines (xml_failed->str, expected_xml, &error);
 	g_assert_no_error (error);
@@ -745,27 +638,38 @@ asb_test_context_test_func (AsbTestContextMode mode)
 	/* check output */
 	xml_ignore = as_store_to_xml (store_ignore, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
 	expected_xml =
-		"<components version=\"0.9\" builder_id=\"appstream-glib:4\" origin=\"asb-self-test-ignore\">\n"
-		"<component>\n"
+		"<components builder_id=\"appstream-glib:4\" origin=\"asb-self-test-ignore\" version=\"0.9\">\n"
+		"<component type=\"generic\">\n"
 		"<id>app-console.noarch</id>\n"
+		"<pkgname>app-console</pkgname>\n"
 		"<metadata>\n"
-		"<value key=\"X-CacheID\">app-console-1-1.fc21.noarch.rpm</value>\n"
+		"<value key=\"X-CacheID\">app-console-1-1.fc25.noarch.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
-		"<component>\n"
+		"<component type=\"generic\">\n"
 		"<id>app.i686</id>\n"
+		"<pkgname>app</pkgname>\n"
 		"<metadata>\n"
-		"<value key=\"X-CacheID\">app-1-1.fc21.i686.rpm</value>\n"
+		"<value key=\"X-CacheID\">app-1-1.fc25.i686.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
-		"<component>\n"
+		"<component type=\"generic\">\n"
+		"<id>composite.x86_64</id>\n"
+		"<pkgname>composite</pkgname>\n"
+		"<metadata>\n"
+		"<value key=\"X-CacheID\">composite-1-1.fc21.x86_64.rpm</value>\n"
+		"</metadata>\n"
+		"</component>\n"
+		"<component type=\"generic\">\n"
 		"<id>font-serif.noarch</id>\n"
+		"<pkgname>font-serif</pkgname>\n"
 		"<metadata>\n"
 		"<value key=\"X-CacheID\">font-serif-1-1.fc21.noarch.rpm</value>\n"
 		"</metadata>\n"
 		"</component>\n"
-		"<component>\n"
+		"<component type=\"generic\">\n"
 		"<id>test.noarch</id>\n"
+		"<pkgname>test</pkgname>\n"
 		"<metadata>\n"
 		"<value key=\"X-CacheID\">test-0.1-1.fc21.noarch.rpm</value>\n"
 		"</metadata>\n"
@@ -777,8 +681,8 @@ asb_test_context_test_func (AsbTestContextMode mode)
 
 	/* check icon dir */
 	g_assert (g_file_test ("/tmp/asbuilder/temp/icons/64x64/app.png", G_FILE_TEST_EXISTS));
+	g_assert (g_file_test ("/tmp/asbuilder/temp/icons/128x128/app.png", G_FILE_TEST_EXISTS));
 	g_assert (!g_file_test ("/tmp/asbuilder/temp/icons/app.png", G_FILE_TEST_EXISTS));
-	g_assert (!g_file_test ("/tmp/asbuilder/temp/icons/128x128/app.png", G_FILE_TEST_EXISTS));
 }
 #endif
 
@@ -841,101 +745,19 @@ asb_test_context_oldcache_func (void)
 }
 
 static void
-asb_test_context_extra_appstream_func (void)
-{
-	GError *error = NULL;
-	gboolean ret;
-	AsApp *app;
-	const gchar *expected_xml;
-	_cleanup_free_ gchar *extra_appdata = NULL;
-	_cleanup_object_unref_ AsbContext *ctx = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_string_free_ GString *xml = NULL;
-
-	ctx = asb_context_new ();
-	extra_appdata = asb_test_get_filename ("extra-appdata");
-	g_assert (extra_appdata != NULL);
-	asb_context_set_extra_appstream (ctx, extra_appdata);
-	asb_context_set_max_threads (ctx, 1);
-	asb_context_set_api_version (ctx, 0.8);
-	asb_context_set_flags (ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID |
-				    ASB_CONTEXT_FLAG_NO_NETWORK |
-				    ASB_CONTEXT_FLAG_BATCH_OUTPUT |
-				    ASB_CONTEXT_FLAG_HIDPI_ICONS);
-	asb_context_set_basename (ctx, "appstream");
-	asb_context_set_origin (ctx, "asb-self-test");
-	asb_context_set_cache_dir (ctx, "/tmp/asbuilder/cache");
-	asb_context_set_output_dir (ctx, "/tmp/asbuilder/output");
-	asb_context_set_temp_dir (ctx, "/tmp/asbuilder/temp");
-	asb_context_set_icons_dir (ctx, "/tmp/asbuilder/temp/icons");
-	ret = asb_context_setup (ctx, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-
-	/* run the plugins */
-	ret = asb_context_process (ctx, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-
-	/* check files created */
-	g_assert (g_file_test ("/tmp/asbuilder/output/appstream.xml.gz", G_FILE_TEST_EXISTS));
-
-	/* load AppStream metadata */
-	file = g_file_new_for_path ("/tmp/asbuilder/output/appstream.xml.gz");
-	store = as_store_new ();
-	ret = as_store_from_file (store, file, NULL, NULL, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	g_assert_cmpint (as_store_get_size (store), ==, 2);
-	app = as_store_get_app_by_id (store, "epiphany-test.desktop");
-	g_assert (app != NULL);
-	app = as_store_get_app_by_id (store, "epiphany-local.desktop");
-	g_assert (app != NULL);
-
-	/* check it matches what we expect */
-	xml = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
-	expected_xml =
-		"<components version=\"0.8\" builder_id=\"appstream-glib:4\" origin=\"asb-self-test\">\n"
-		"<component type=\"webapp\">\n"
-		"<id>epiphany-local.desktop</id>\n"
-		"<name>Local</name>\n"
-		"<summary>My local webapp</summary>\n"
-		"<description><p>This is awesome</p></description>\n"
-		"<icon type=\"local\">/usr/share/icons/hicolor/256x256/apps/fedora-logo-icon.png</icon>\n"
-		"<url type=\"homepage\">http://www.hughski.com/</url>\n"
-		"</component>\n"
-		"<component type=\"webapp\">\n"
-		"<id>epiphany-test.desktop</id>\n"
-		"<name>Test</name>\n"
-		"<summary>Please use my awesome webapp</summary>\n"
-		"<description><p>This could be awesome</p></description>\n"
-		"<icon type=\"remote\">http://www.hughski.com/img/logo.png</icon>\n"
-		"<url type=\"homepage\">http://www.hughski.com/</url>\n"
-		"</component>\n"
-		"</components>\n";
-	ret = asb_test_compare_lines (xml->str, expected_xml, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-
-	/* remove temp space */
-	ret = asb_utils_rmtree ("/tmp/asbuilder", &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-}
-
-static void
 asb_test_firmware_func (void)
 {
+#ifdef HAVE_GCAB
 	AsApp *app;
+	AsbPluginLoader *loader;
 	const gchar *expected_xml;
 	gboolean ret;
 	guint i;
-	_cleanup_error_free_ GError *error = NULL;
-	_cleanup_object_unref_ AsbContext *ctx = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_string_free_ GString *xml = NULL;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsbContext) ctx = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GString) xml = NULL;
 	const gchar *filenames[] = {
 		"colorhug-als-2.0.1.cab",
 		"colorhug-als-2.0.0.cab",
@@ -953,13 +775,15 @@ asb_test_firmware_func (void)
 	asb_context_set_output_dir (ctx, "/tmp/asbuilder/output");
 	asb_context_set_temp_dir (ctx, "/tmp/asbuilder/temp");
 	asb_context_set_icons_dir (ctx, "/tmp/asbuilder/temp/icons");
+	loader = asb_context_get_plugin_loader (ctx);
+	asb_plugin_loader_set_dir (loader, TESTPLUGINDIR);
 	ret = asb_context_setup (ctx, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
 	/* add packages */
 	for (i = 0; filenames[i] != NULL; i++) {
-		_cleanup_free_ gchar *filename = NULL;
+		g_autofree gchar *filename = NULL;
 		filename = asb_test_get_filename (filenames[i]);
 		if (filename == NULL)
 			g_warning ("%s not found", filenames[i]);
@@ -987,47 +811,49 @@ asb_test_firmware_func (void)
 	g_assert_no_error (error);
 	g_assert (ret);
 	g_assert_cmpint (as_store_get_size (store), ==, 1);
-	app = as_store_get_app_by_id (store, "84f40464-9272-4ef7-9399-cd95f12da696");
+	app = as_store_get_app_by_id (store, "com.hughski.ColorHug2.firmware");
 	g_assert (app != NULL);
 
 	/* check it matches what we expect */
 	xml = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
 	expected_xml =
-		"<components version=\"0.9\" origin=\"asb-self-test\">\n"
+		"<components origin=\"asb-self-test\" version=\"0.9\">\n"
 		"<component type=\"firmware\">\n"
-		"<id>84f40464-9272-4ef7-9399-cd95f12da696</id>\n"
+		"<id>com.hughski.ColorHug2.firmware</id>\n"
 		"<name>ColorHug Firmware</name>\n"
 		"<summary>Firmware for the ColorHug Colorimeter</summary>\n"
-		"<developer_name>Hughski</developer_name>\n"
+		"<developer_name>Hughski Limited</developer_name>\n"
 		"<description><p>Updating the firmware on your ColorHug device "
 		"improves performance and adds new features.</p></description>\n"
-		"<icon type=\"stock\">application-x-executable</icon>\n"
-		"<kudos>\n"
-		"<kudo>HiDpiIcon</kudo>\n"
-		"</kudos>\n"
+		"<project_license>GPL-2.0+</project_license>\n"
 		"<url type=\"homepage\">http://www.hughski.com/</url>\n"
 		"<releases>\n"
-		"<release version=\"2.0.2\" timestamp=\"1424116753\">\n"
+		"<release timestamp=\"1424116753\" version=\"2.0.2\">\n"
 		"<location>http://www.hughski.com/downloads/colorhug2/firmware/colorhug-2.0.2.cab</location>\n"
-		"<checksum type=\"sha1\">ab2d0294e0d23c1718af79c6a17216c8322ae6da</checksum>\n"
+		"<checksum type=\"sha1\" filename=\"colorhug-als-2.0.2.cab\" target=\"container\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
+		"<checksum type=\"sha1\" filename=\"firmware.bin\" target=\"content\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
 		"<description><p>This unstable release adds the following features:</p>"
 		"<ul><li>Add TakeReadingArray to enable panel latency measurements</li>"
 		"<li>Speed up the auto-scaled measurements considerably, using 256ms "
 		"as the smallest sample duration</li></ul></description>\n"
+		"<size type=\"installed\">14</size>\n"
+		"<size type=\"download\">2015</size>\n"
 		"</release>\n"
-		"<release version=\"2.0.1\" timestamp=\"1424116753\">\n"
+		"<release timestamp=\"1424116753\" version=\"2.0.1\">\n"
 		"<location>http://www.hughski.com/downloads/colorhug2/firmware/colorhug-2.0.1.cab</location>\n"
-		"<checksum type=\"sha1\">cc07f12dfea7103774decbcf48c47cc0604fbc4e</checksum>\n"
+		"<checksum type=\"sha1\" filename=\"colorhug-als-2.0.1.cab\" target=\"container\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
+		"<checksum type=\"sha1\" filename=\"firmware.bin\" target=\"content\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
 		"<description><p>This unstable release adds the following features:</p>"
 		"<ul><li>Use TakeReadings() to do a quick non-adaptive measurement</li>"
 		"<li>Scale XYZ measurement with a constant factor to make the CCMX more "
 		"sane</li></ul></description>\n"
-		"</release>\n"
-		"<release version=\"2.0.0\" timestamp=\"1425168000\">\n"
-		"<location>http://www.hughski.com/downloads/colorhug2/firmware/colorhug-2.0.0.cab</location>\n"
-		"<checksum type=\"sha1\">81431b6d3c9f90c3137a8a132d4fb5e3681e6791</checksum>\n"
+		"<size type=\"installed\">14</size>\n"
+		"<size type=\"download\">1951</size>\n"
 		"</release>\n"
 		"</releases>\n"
+		"<provides>\n"
+		"<firmware type=\"flashed\">84f40464-9272-4ef7-9399-cd95f12da696</firmware>\n"
+		"</provides>\n"
 		"</component>\n"
 		"</components>\n";
 	ret = asb_test_compare_lines (xml->str, expected_xml, &error);
@@ -1037,6 +863,7 @@ asb_test_firmware_func (void)
 	ret = asb_utils_rmtree ("/tmp/asbuilder", &error);
 	g_assert_no_error (error);
 	g_assert (ret);
+#endif
 }
 
 int
@@ -1051,14 +878,12 @@ main (int argc, char **argv)
 
 	/* tests go here */
 	g_test_add_func ("/AppStreamBuilder/package", asb_test_package_func);
-	g_test_add_func ("/AppStreamBuilder/utils{replace}", asb_test_utils_replace_func);
 	g_test_add_func ("/AppStreamBuilder/utils{glob}", asb_test_utils_glob_func);
 	g_test_add_func ("/AppStreamBuilder/plugin-loader", asb_test_plugin_loader_func);
 	g_test_add_func ("/AppStreamBuilder/firmware", asb_test_firmware_func);
 	g_test_add_func ("/AppStreamBuilder/context{no-cache}", asb_test_context_nocache_func);
 	g_test_add_func ("/AppStreamBuilder/context{cache}", asb_test_context_cache_func);
 	g_test_add_func ("/AppStreamBuilder/context{old-cache}", asb_test_context_oldcache_func);
-	g_test_add_func ("/AppStreamBuilder/context{extra-appstream}", asb_test_context_extra_appstream_func);
 #ifdef HAVE_RPM
 	g_test_add_func ("/AppStreamBuilder/package{rpm}", asb_test_package_rpm_func);
 #endif

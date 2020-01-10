@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2015 Richard Hughes <richard@hughsie.com`
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com`
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -28,11 +28,13 @@
 
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 /**
  * AsTag:
  * @AS_TAG_UNKNOWN:			Type invalid or not known
- * @AS_TAG_APPLICATIONS:		`applications`
- * @AS_TAG_APPLICATION:			`application`
+ * @AS_TAG_COMPONENTS:			`components`
+ * @AS_TAG_COMPONENT:			`component`
  * @AS_TAG_ID:				`id`
  * @AS_TAG_PKGNAME:			`pkgname`
  * @AS_TAG_NAME:			`name`
@@ -40,14 +42,14 @@
  * @AS_TAG_DESCRIPTION:			`description`
  * @AS_TAG_URL:				`url`
  * @AS_TAG_ICON:			`icon`
- * @AS_TAG_CATEGORIES:			`categories` (or `appcategories`)
- * @AS_TAG_CATEGORY:			`category` (or `appcategory`)
+ * @AS_TAG_CATEGORIES:			`categories`
+ * @AS_TAG_CATEGORY:			`category`
  * @AS_TAG_KEYWORDS:			`keywords`
  * @AS_TAG_KEYWORD:			`keyword`
  * @AS_TAG_MIMETYPES:			`mimetypes`
  * @AS_TAG_MIMETYPE:			`mimetype`
  * @AS_TAG_PROJECT_GROUP:		`project_group`
- * @AS_TAG_PROJECT_LICENSE:		`project_license` (or `licence`)
+ * @AS_TAG_PROJECT_LICENSE:		`project_license`
  * @AS_TAG_SCREENSHOT:			`screenshot`
  * @AS_TAG_SCREENSHOTS:			`screenshots`
  * @AS_TAG_UPDATE_CONTACT:		`update_contact`
@@ -77,13 +79,25 @@
  * @AS_TAG_PERMISSION:			`permission`
  * @AS_TAG_LOCATION:			`location`
  * @AS_TAG_CHECKSUM:			`checksum`
+ * @AS_TAG_SIZE:			`size`
+ * @AS_TAG_TRANSLATION:			`translation`
+ * @AS_TAG_CONTENT_RATING:		`content_rating`
+ * @AS_TAG_CONTENT_ATTRIBUTE:		`content_attribute`
+ * @AS_TAG_VERSION:			`version`
+ * @AS_TAG_REVIEWS:			`reviews`
+ * @AS_TAG_REVIEW:			`review`
+ * @AS_TAG_REVIEWER_NAME:		`reviewer_name`
+ * @AS_TAG_REVIEWER_ID:			`reviewer_id`
+ * @AS_TAG_SUGGESTS:			`suggests`
+ * @AS_TAG_REQUIRES:			`requires`
+ * @AS_TAG_CUSTOM:			`custom`
  *
  * The tag type.
  **/
 typedef enum {
 	AS_TAG_UNKNOWN,			/* Since: 0.1.0 */
-	AS_TAG_APPLICATIONS,		/* Since: 0.1.0 */
-	AS_TAG_APPLICATION,		/* Since: 0.1.0 */
+	AS_TAG_COMPONENTS,		/* Since: 0.5.0 */
+	AS_TAG_COMPONENT,		/* Since: 0.5.0 */
 	AS_TAG_ID,			/* Since: 0.1.0 */
 	AS_TAG_PKGNAME,			/* Since: 0.1.0 */
 	AS_TAG_NAME,			/* Since: 0.1.0 */
@@ -128,6 +142,18 @@ typedef enum {
 	AS_TAG_PERMISSION,		/* Since: 0.3.5 */
 	AS_TAG_LOCATION,		/* Since: 0.3.5 */
 	AS_TAG_CHECKSUM,		/* Since: 0.3.5 */
+	AS_TAG_SIZE,			/* Since: 0.5.2 */
+	AS_TAG_TRANSLATION,		/* Since: 0.5.8 */
+	AS_TAG_CONTENT_RATING,		/* Since: 0.5.12 */
+	AS_TAG_CONTENT_ATTRIBUTE,	/* Since: 0.5.12 */
+	AS_TAG_VERSION,			/* Since: 0.6.1 */
+	AS_TAG_REVIEWS,			/* Since: 0.6.1 */
+	AS_TAG_REVIEW,			/* Since: 0.6.1 */
+	AS_TAG_REVIEWER_NAME,		/* Since: 0.6.1 */
+	AS_TAG_REVIEWER_ID,		/* Since: 0.6.1 */
+	AS_TAG_SUGGESTS,		/* Since: 0.6.1 */
+	AS_TAG_REQUIRES,		/* Since: 0.6.7 */
+	AS_TAG_CUSTOM,			/* Since: 0.6.8 */
 	/*< private >*/
 	AS_TAG_LAST
 } AsTag;

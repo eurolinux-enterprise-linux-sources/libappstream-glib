@@ -28,22 +28,10 @@
 
 #include <glib-object.h>
 
-#define AS_TYPE_PROVIDE			(as_provide_get_type())
-#define AS_PROVIDE(obj)			(G_TYPE_CHECK_INSTANCE_CAST((obj), AS_TYPE_PROVIDE, AsProvide))
-#define AS_PROVIDE_CLASS(cls)		(G_TYPE_CHECK_CLASS_CAST((cls), AS_TYPE_PROVIDE, AsProvideClass))
-#define AS_IS_PROVIDE(obj)		(G_TYPE_CHECK_INSTANCE_TYPE((obj), AS_TYPE_PROVIDE))
-#define AS_IS_PROVIDE_CLASS(cls)	(G_TYPE_CHECK_CLASS_TYPE((cls), AS_TYPE_PROVIDE))
-#define AS_PROVIDE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), AS_TYPE_PROVIDE, AsProvideClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsProvide		AsProvide;
-typedef struct _AsProvideClass		AsProvideClass;
-
-struct _AsProvide
-{
-	GObject			parent;
-};
+#define AS_TYPE_PROVIDE (as_provide_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsProvide, as_provide, AS, PROVIDE, GObject)
 
 struct _AsProvideClass
 {
@@ -66,11 +54,12 @@ struct _AsProvideClass
  * @AS_PROVIDE_KIND_BINARY:		A binary file
  * @AS_PROVIDE_KIND_FONT:		A font file
  * @AS_PROVIDE_KIND_MODALIAS:		A hardware modalias
- * @AS_PROVIDE_KIND_FIRMWARE:		A firmware file
+ * @AS_PROVIDE_KIND_FIRMWARE_RUNTIME:	A runtime-loadable firmware file
  * @AS_PROVIDE_KIND_PYTHON2:		A Python 2 module
  * @AS_PROVIDE_KIND_PYTHON3:		A Python 3 module
- * @AS_PROVIDE_KIND_DBUS:		A D-Bus service
+ * @AS_PROVIDE_KIND_DBUS_SESSION:	A D-Bus session service
  * @AS_PROVIDE_KIND_DBUS_SYSTEM:	A D-Bus system service
+ * @AS_PROVIDE_KIND_FIRMWARE_FLASHED:	A flashed firmware GUID
  *
  * The provide type.
  **/
@@ -80,16 +69,16 @@ typedef enum {
 	AS_PROVIDE_KIND_BINARY,
 	AS_PROVIDE_KIND_FONT,
 	AS_PROVIDE_KIND_MODALIAS,
-	AS_PROVIDE_KIND_FIRMWARE,
+	AS_PROVIDE_KIND_FIRMWARE_RUNTIME,
 	AS_PROVIDE_KIND_PYTHON2,
 	AS_PROVIDE_KIND_PYTHON3,
-	AS_PROVIDE_KIND_DBUS,		/* Since: 0.1.7 */
-	AS_PROVIDE_KIND_DBUS_SYSTEM,	/* Since: 0.2.4 */
+	AS_PROVIDE_KIND_DBUS_SESSION,		/* Since: 0.1.7 */
+	AS_PROVIDE_KIND_DBUS_SYSTEM,		/* Since: 0.2.4 */
+	AS_PROVIDE_KIND_FIRMWARE_FLASHED,	/* Since: 0.5.0 */
 	/*< private >*/
 	AS_PROVIDE_KIND_LAST
 } AsProvideKind;
 
-GType		 as_provide_get_type		(void);
 AsProvide	*as_provide_new			(void);
 
 /* helpers */
@@ -102,8 +91,7 @@ AsProvideKind	 as_provide_get_kind		(AsProvide	*provide);
 
 /* setters */
 void		 as_provide_set_value		(AsProvide	*provide,
-						 const gchar	*value,
-						 gssize		 value_len);
+						 const gchar	*value);
 void		 as_provide_set_kind		(AsProvide	*provide,
 						 AsProvideKind	 kind);
 

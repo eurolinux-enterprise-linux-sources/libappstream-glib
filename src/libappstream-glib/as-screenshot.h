@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -30,22 +30,10 @@
 
 #include "as-image.h"
 
-#define AS_TYPE_SCREENSHOT		(as_screenshot_get_type())
-#define AS_SCREENSHOT(obj)		(G_TYPE_CHECK_INSTANCE_CAST((obj), AS_TYPE_SCREENSHOT, AsScreenshot))
-#define AS_SCREENSHOT_CLASS(cls)	(G_TYPE_CHECK_CLASS_CAST((cls), AS_TYPE_SCREENSHOT, AsScreenshotClass))
-#define AS_IS_SCREENSHOT(obj)	(G_TYPE_CHECK_INSTANCE_TYPE((obj), AS_TYPE_SCREENSHOT))
-#define AS_IS_SCREENSHOT_CLASS(cls)	(G_TYPE_CHECK_CLASS_TYPE((cls), AS_TYPE_SCREENSHOT))
-#define AS_SCREENSHOT_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), AS_TYPE_SCREENSHOT, AsScreenshotClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsScreenshot		AsScreenshot;
-typedef struct _AsScreenshotClass	AsScreenshotClass;
-
-struct _AsScreenshot
-{
-	GObject			parent;
-};
+#define AS_TYPE_SCREENSHOT (as_screenshot_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsScreenshot, as_screenshot, AS, SCREENSHOT, GObject)
 
 struct _AsScreenshotClass
 {
@@ -77,7 +65,6 @@ typedef enum {
 	AS_SCREENSHOT_KIND_LAST
 } AsScreenshotKind;
 
-GType		 as_screenshot_get_type		(void);
 AsScreenshot	*as_screenshot_new		(void);
 
 /* helpers */
@@ -90,7 +77,13 @@ gint		 as_screenshot_get_priority	(AsScreenshot	*screenshot);
 const gchar	*as_screenshot_get_caption	(AsScreenshot	*screenshot,
 						 const gchar	*locale);
 GPtrArray	*as_screenshot_get_images	(AsScreenshot	*screenshot);
+GPtrArray	*as_screenshot_get_images_for_locale (AsScreenshot	*screenshot,
+						 const gchar	*locale);
 AsImage		*as_screenshot_get_image	(AsScreenshot	*screenshot,
+						 guint		 width,
+						 guint		 height);
+AsImage		*as_screenshot_get_image_for_locale (AsScreenshot	*screenshot,
+						 const gchar	*locale,
 						 guint		 width,
 						 guint		 height);
 AsImage		*as_screenshot_get_source	(AsScreenshot	*screenshot);
@@ -102,10 +95,11 @@ void		 as_screenshot_set_priority	(AsScreenshot	*screenshot,
 						 gint		 priority);
 void		 as_screenshot_set_caption	(AsScreenshot	*screenshot,
 						 const gchar	*locale,
-						 const gchar	*caption,
-						 gsize		 caption_len);
+						 const gchar	*caption);
 void		 as_screenshot_add_image	(AsScreenshot	*screenshot,
 						 AsImage	*image);
+gboolean	 as_screenshot_equal		(AsScreenshot	*screenshot1,
+						 AsScreenshot	*screenshot2);
 
 G_END_DECLS
 

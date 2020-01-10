@@ -27,35 +27,21 @@
 #include <stdarg.h>
 #include <appstream-glib.h>
 
-#define ASB_TYPE_PACKAGE		(asb_package_get_type())
-#define ASB_PACKAGE(obj)		(G_TYPE_CHECK_INSTANCE_CAST((obj), ASB_TYPE_PACKAGE, AsbPackage))
-#define ASB_PACKAGE_CLASS(cls)		(G_TYPE_CHECK_CLASS_CAST((cls), ASB_TYPE_PACKAGE, AsbPackageClass))
-#define ASB_IS_PACKAGE(obj)		(G_TYPE_CHECK_INSTANCE_TYPE((obj), ASB_TYPE_PACKAGE))
-#define ASB_IS_PACKAGE_CLASS(cls)	(G_TYPE_CHECK_CLASS_TYPE((cls), ASB_TYPE_PACKAGE))
-#define ASB_PACKAGE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), ASB_TYPE_PACKAGE, AsbPackageClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsbPackage		AsbPackage;
-typedef struct _AsbPackageClass		AsbPackageClass;
+#define ASB_TYPE_PACKAGE (asb_package_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsbPackage, asb_package, ASB, PACKAGE, GObject)
 
-struct _AsbPackage
-{
-	GObject			parent;
-};
-
-typedef enum {
-	ASB_PACKAGE_ENSURE_NONE		= 0,
-	ASB_PACKAGE_ENSURE_NEVRA	= 1,
-	ASB_PACKAGE_ENSURE_FILES	= 2,
-	ASB_PACKAGE_ENSURE_RELEASES	= 4,
-	ASB_PACKAGE_ENSURE_DEPS		= 8,
-	ASB_PACKAGE_ENSURE_LICENSE	= 16,
-	ASB_PACKAGE_ENSURE_URL		= 32,
-	ASB_PACKAGE_ENSURE_SOURCE	= 64,
-	ASB_PACKAGE_ENSURE_VCS		= 128,
-	ASB_PACKAGE_ENSURE_LAST
-} AsbPackageEnsureFlags;
+#define ASB_PACKAGE_ENSURE_NONE		(0u)
+#define ASB_PACKAGE_ENSURE_NEVRA	(1u << 0)
+#define ASB_PACKAGE_ENSURE_FILES	(1u << 1)
+#define ASB_PACKAGE_ENSURE_RELEASES	(1u << 2)
+#define ASB_PACKAGE_ENSURE_DEPS		(1u << 3)
+#define ASB_PACKAGE_ENSURE_LICENSE	(1u << 4)
+#define ASB_PACKAGE_ENSURE_URL		(1u << 5)
+#define ASB_PACKAGE_ENSURE_SOURCE	(1u << 6)
+#define ASB_PACKAGE_ENSURE_VCS		(1u << 7)
+typedef guint64 AsbPackageEnsureFlags;
 
 struct _AsbPackageClass
 {
@@ -99,8 +85,6 @@ typedef enum {
 	ASB_PACKAGE_KIND_LAST
 } AsbPackageKind;
 
-GType		 asb_package_get_type		(void);
-
 void		 asb_package_log_start		(AsbPackage	*pkg);
 void		 asb_package_log		(AsbPackage	*pkg,
 						 AsbPackageLogLevel log_level,
@@ -124,11 +108,13 @@ gboolean	 asb_package_explode		(AsbPackage	*pkg,
 						 GPtrArray	*glob,
 						 GError		**error);
 AsbPackageKind	 asb_package_get_kind		(AsbPackage	*pkg);
+guint		 asb_package_get_epoch		(AsbPackage	*pkg);
 const gchar	*asb_package_get_filename	(AsbPackage	*pkg);
 const gchar	*asb_package_get_basename	(AsbPackage	*pkg);
 const gchar	*asb_package_get_arch		(AsbPackage	*pkg);
 const gchar	*asb_package_get_name		(AsbPackage	*pkg);
 const gchar	*asb_package_get_version	(AsbPackage	*pkg);
+const gchar	*asb_package_get_release_str	(AsbPackage	*pkg);
 const gchar	*asb_package_get_nevr		(AsbPackage	*pkg);
 const gchar	*asb_package_get_nevra		(AsbPackage	*pkg);
 const gchar	*asb_package_get_evr		(AsbPackage	*pkg);

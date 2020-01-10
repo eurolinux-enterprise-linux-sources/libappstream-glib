@@ -1,15 +1,15 @@
 %language=ANSI-C
 %struct-type
-%define hash-function-name as_tag_hash
-%define lookup-function-name as_tag_from_gperf
+%define hash-function-name _as_tag_hash
+%define lookup-function-name _as_tag_from_gperf
 %readonly-tables
 %includes
 %pic
 struct tag_data { gint name; guint etag; };
 %%
 unknown, AS_TAG_UNKNOWN
-components, AS_TAG_APPLICATIONS
-component, AS_TAG_APPLICATION
+components, AS_TAG_COMPONENTS
+component, AS_TAG_COMPONENT
 id, AS_TAG_ID
 pkgname, AS_TAG_PKGNAME
 name, AS_TAG_NAME
@@ -54,3 +54,15 @@ permissions, AS_TAG_PERMISSIONS
 permission, AS_TAG_PERMISSION
 location, AS_TAG_LOCATION
 checksum, AS_TAG_CHECKSUM
+size, AS_TAG_SIZE
+translation, AS_TAG_TRANSLATION
+content_rating, AS_TAG_CONTENT_RATING
+content_attribute, AS_TAG_CONTENT_ATTRIBUTE
+version, AS_TAG_VERSION
+reviews, AS_TAG_REVIEWS
+review, AS_TAG_REVIEW
+reviewer_name, AS_TAG_REVIEWER_NAME
+reviewer_id, AS_TAG_REVIEWER_ID
+suggests, AS_TAG_SUGGESTS
+requires, AS_TAG_REQUIRES
+custom, AS_TAG_CUSTOM

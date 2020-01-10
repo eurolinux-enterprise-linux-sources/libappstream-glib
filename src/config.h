@@ -4,6 +4,9 @@
 /* Build DEP-11 code */
 #define AS_BUILD_DEP11 1
 
+/* plugin API version */
+#define AS_PLUGIN_VERSION "5"
+
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #define ENABLE_NLS 1
@@ -11,14 +14,17 @@
 /* Package name for gettext */
 #define GETTEXT_PACKAGE "appstream-glib"
 
+/* gperf len type */
+#define GPERF_LEN_TYPE unsigned
+
 /* define if ALPM is installed */
 #define HAVE_ALPM 1
 
-/* Define to 1 if you have the MacOS X function CFLocaleCopyCurrent in the
+/* Define to 1 if you have the Mac OS X function CFLocaleCopyCurrent in the
    CoreFoundation framework. */
 /* #undef HAVE_CFLOCALECOPYCURRENT */
 
-/* Define to 1 if you have the MacOS X function CFPreferencesCopyAppValue in
+/* Define to 1 if you have the Mac OS X function CFPreferencesCopyAppValue in
    the CoreFoundation framework. */
 /* #undef HAVE_CFPREFERENCESCOPYAPPVALUE */
 
@@ -29,11 +35,14 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
+/* Use fonts */
+#define HAVE_FONTS 1
+
+/* Use gcab */
+#define HAVE_GCAB 1
+
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #define HAVE_GETTEXT 1
-
-/* Use gperf */
-#define HAVE_GPERF 1
 
 /* Define if you have the iconv() function and it works. */
 /* #undef HAVE_ICONV */
@@ -41,11 +50,11 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+/* define if libstemmer is installed */
+#define HAVE_LIBSTEMMER 1
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
-
-/* define if OSTREE is installed */
-/* #undef HAVE_OSTREE */
 
 /* define if RPM is installed */
 #define HAVE_RPM 1
@@ -71,8 +80,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
 /* Name of package */
@@ -85,7 +93,7 @@
 #define PACKAGE_NAME "appstream-glib"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "appstream-glib 0.3.6"
+#define PACKAGE_STRING "appstream-glib 0.6.10"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "appstream-glib"
@@ -94,13 +102,13 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.3.6"
+#define PACKAGE_VERSION "0.6.10"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.3.6"
+#define VERSION "0.6.10"
 
 /* Enable large inode numbers on Mac OS X 10.5.  */
 #ifndef _DARWIN_USE_64_BIT_INODE

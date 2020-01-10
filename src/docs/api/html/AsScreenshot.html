@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>AppStream-glib Reference Manual: AsScreenshot</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>AsScreenshot: AppStream-glib Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="AppStream-glib Reference Manual">
 <link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
 <link rel="prev" href="AsProvide.html" title="AsProvide">
 <link rel="next" href="AsStore.html" title="AsStore">
-<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -44,7 +44,7 @@ justifications.
 </div>
 <div class="refsect1">
 <a name="AsScreenshot.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -67,7 +67,7 @@ justifications.
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsScreenshot.html#as-screenshot-kind-to-string" title="as_screenshot_kind_to_string ()">as_screenshot_kind_to_string</a> <span class="c_punctuation">()</span>
@@ -83,14 +83,14 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">gint</span>
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="AsScreenshot.html#as-screenshot-get-priority" title="as_screenshot_get_priority ()">as_screenshot_get_priority</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsScreenshot.html#as-screenshot-get-caption" title="as_screenshot_get_caption ()">as_screenshot_get_caption</a> <span class="c_punctuation">()</span>
@@ -98,10 +98,18 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">GPtrArray</span> *
+<a href="/usr/share/gtk-doc/html/glibglib-Pointer-Arrays.html#GPtrArray"><span class="returnvalue">GPtrArray</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsScreenshot.html#as-screenshot-get-images" title="as_screenshot_get_images ()">as_screenshot_get_images</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Pointer-Arrays.html#GPtrArray"><span class="returnvalue">GPtrArray</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsScreenshot.html#as-screenshot-get-images-for-locale" title="as_screenshot_get_images_for_locale ()">as_screenshot_get_images_for_locale</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
@@ -110,6 +118,14 @@ justifications.
 </td>
 <td class="function_name">
 <a class="link" href="AsScreenshot.html#as-screenshot-get-image" title="as_screenshot_get_image ()">as_screenshot_get_image</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsImage.html" title="AsImage"><span class="returnvalue">AsImage</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsScreenshot.html#as-screenshot-get-image-for-locale" title="as_screenshot_get_image_for_locale ()">as_screenshot_get_image_for_locale</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
@@ -152,25 +168,47 @@ justifications.
 <a class="link" href="AsScreenshot.html#as-screenshot-add-image" title="as_screenshot_add_image ()">as_screenshot_add_image</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsScreenshot.html#as-screenshot-equal" title="as_screenshot_equal ()">as_screenshot_equal</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect1">
 <a name="AsScreenshot.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsScreenshot.html#AS-TYPE-SCREENSHOT:CAPS" title="AS_TYPE_SCREENSHOT">AS_TYPE_SCREENSHOT</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">struct</td>
+<td class="function_name"><a class="link" href="AsScreenshot.html#AsScreenshotClass" title="struct AsScreenshotClass">AsScreenshotClass</a></td>
+</tr>
+<tr>
 <td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="AsScreenshot.html#AsScreenshotKind" title="enum AsScreenshotKind">AsScreenshotKind</a></td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="AsScreenshot.html#AsScreenshot-struct" title="AsScreenshot">AsScreenshot</a></td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect1">
 <a name="AsScreenshot.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    GObject
+<pre class="screen">    <a href="/usr/share/gtk-doc/html/gobjectgobject-The-Base-Object-Type.html#GObject-struct">GObject</a>
     <span class="lineart">╰──</span> AsScreenshot
 </pre>
 </div>
@@ -193,21 +231,21 @@ of different resolution.</p>
 as_screenshot_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Creates a new <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.2.5"></a><h4>Returns</h4>
+<a name="as-screenshot-new.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a>. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-kind-from-string"></a><h3>as_screenshot_kind_from_string ()</h3>
 <pre class="programlisting"><a class="link" href="AsScreenshot.html#AsScreenshotKind" title="enum AsScreenshotKind"><span class="returnvalue">AsScreenshotKind</span></a>
-as_screenshot_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *kind</code></em>);</pre>
+as_screenshot_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *kind</code></em>);</pre>
 <p>Converts the text representation to an enumerated value.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -221,22 +259,22 @@ as_screenshot_kind_from_string (<em class="parameter"><code>const <span class="t
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.3.6"></a><h4>Returns</h4>
+<a name="as-screenshot-kind-from-string.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsScreenshot.html#AsScreenshotKind" title="enum AsScreenshotKind"><code class="literal">AsScreenshotKind</code></a>, or
 <a class="link" href="AsScreenshot.html#AS-SCREENSHOT-KIND-UNKNOWN:CAPS"><code class="literal">AS_SCREENSHOT_KIND_UNKNOWN</code></a> if not known. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-kind-to-string"></a><h3>as_screenshot_kind_to_string ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_screenshot_kind_to_string (<em class="parameter"><code><a class="link" href="AsScreenshot.html#AsScreenshotKind" title="enum AsScreenshotKind"><span class="type">AsScreenshotKind</span></a> kind</code></em>);</pre>
 <p>Converts the enumerated value to an text representation.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -250,12 +288,11 @@ as_screenshot_kind_to_string (<em class="parameter"><code><a class="link" href="
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.4.6"></a><h4>Returns</h4>
+<a name="as-screenshot-kind-to-string.returns"></a><h4>Returns</h4>
 <p> string version of <em class="parameter"><code>kind</code></em>
 </p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -264,8 +301,8 @@ as_screenshot_kind_to_string (<em class="parameter"><code><a class="link" href="
 as_screenshot_get_kind (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>);</pre>
 <p>Gets the screenshot kind.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-get-kind.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -279,21 +316,20 @@ as_screenshot_get_kind (<em class="parameter"><code><a class="link" href="AsScre
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.5.6"></a><h4>Returns</h4>
+<a name="as-screenshot-get-kind.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsScreenshot.html#AsScreenshotKind" title="enum AsScreenshotKind"><span class="type">AsScreenshotKind</span></a></p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-get-priority"></a><h3>as_screenshot_get_priority ()</h3>
-<pre class="programlisting"><span class="returnvalue">gint</span>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
 as_screenshot_get_priority (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>);</pre>
 <p>Gets the screenshot priority.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.6.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-get-priority.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -307,22 +343,21 @@ as_screenshot_get_priority (<em class="parameter"><code><a class="link" href="As
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.6.6"></a><h4>Returns</h4>
+<a name="as-screenshot-get-priority.returns"></a><h4>Returns</h4>
 <p> a priority value</p>
-<p></p>
 </div>
-<p class="since">Since 0.3.1</p>
+<p class="since">Since: 0.3.1</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-get-caption"></a><h3>as_screenshot_get_caption ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_screenshot_get_caption (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>,
-                           <em class="parameter"><code>const <span class="type">gchar</span> *locale</code></em>);</pre>
+                           <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *locale</code></em>);</pre>
 <p>Gets the image caption for a specific locale.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.7.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-get-caption.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -336,28 +371,27 @@ as_screenshot_get_caption (<em class="parameter"><code><a class="link" href="AsS
 </tr>
 <tr>
 <td class="parameter_name"><p>locale</p></td>
-<td class="parameter_description"><p>the locale, or <code class="literal">NULL</code>. e.g. "en_GB"</p></td>
+<td class="parameter_description"><p>the locale, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>. e.g. "en_GB"</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.7.6"></a><h4>Returns</h4>
+<a name="as-screenshot-get-caption.returns"></a><h4>Returns</h4>
 <p> the caption</p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-get-images"></a><h3>as_screenshot_get_images ()</h3>
-<pre class="programlisting"><span class="returnvalue">GPtrArray</span> *
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Pointer-Arrays.html#GPtrArray"><span class="returnvalue">GPtrArray</span></a> *
 as_screenshot_get_images (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>);</pre>
-<p>Gets the image sizes included in the screenshot.</p>
+<p>Gets the images included in the screenshot of all sizes and locales.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.8.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-get-images.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -371,25 +405,61 @@ as_screenshot_get_images (<em class="parameter"><code><a class="link" href="AsSc
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.8.6"></a><h4>Returns</h4>
+<a name="as-screenshot-get-images.returns"></a><h4>Returns</h4>
 <p> an array. </p>
 <p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> AsImage][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-screenshot-get-images-for-locale"></a><h3>as_screenshot_get_images_for_locale ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Pointer-Arrays.html#GPtrArray"><span class="returnvalue">GPtrArray</span></a> *
+as_screenshot_get_images_for_locale (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>,
+                                     <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *locale</code></em>);</pre>
+<p>Returns all images of all sizes that are compatible with a specific locale.</p>
+<div class="refsect3">
+<a name="as-screenshot-get-images-for-locale.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>screenshot</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>locale</p></td>
+<td class="parameter_description"><p>a locale, e.g. <code class="literal">en_GB</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-screenshot-get-images-for-locale.returns"></a><h4>Returns</h4>
+<p> an array. </p>
+<p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> AsImage][<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.5.14</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-get-image"></a><h3>as_screenshot_get_image ()</h3>
 <pre class="programlisting"><a class="link" href="AsImage.html" title="AsImage"><span class="returnvalue">AsImage</span></a> *
 as_screenshot_get_image (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>,
-                         <em class="parameter"><code><span class="type">guint</span> width</code></em>,
-                         <em class="parameter"><code><span class="type">guint</span> height</code></em>);</pre>
+                         <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> width</code></em>,
+                         <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> height</code></em>);</pre>
 <p>Gets the AsImage closest to the target size. The <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> may not actually
 be the requested size, and the application may have to pad / rescale the
 image to make it fit.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.9.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-get-image.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -415,11 +485,63 @@ image to make it fit.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.9.6"></a><h4>Returns</h4>
-<p> an <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>, or <code class="literal">NULL</code>. </p>
+<a name="as-screenshot-get-image.returns"></a><h4>Returns</h4>
+<p> an <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.2.2</p>
+<p class="since">Since: 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-screenshot-get-image-for-locale"></a><h3>as_screenshot_get_image_for_locale ()</h3>
+<pre class="programlisting"><a class="link" href="AsImage.html" title="AsImage"><span class="returnvalue">AsImage</span></a> *
+as_screenshot_get_image_for_locale (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>,
+                                    <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *locale</code></em>,
+                                    <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> width</code></em>,
+                                    <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> height</code></em>);</pre>
+<p>Gets the AsImage closest to the target size with the specified locale.
+The <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> may not actually be the requested size, and the application may
+have to pad / rescale the image to make it fit.</p>
+<p>FIXME: This function assumes the images are ordered in preference order, e.g.
+"en_GB -&gt; en -&gt; NULL"</p>
+<div class="refsect3">
+<a name="as-screenshot-get-image-for-locale.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>screenshot</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>locale</p></td>
+<td class="parameter_description"><p>locale, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>width</p></td>
+<td class="parameter_description"><p>target width</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>height</p></td>
+<td class="parameter_description"><p>target height</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-screenshot-get-image-for-locale.returns"></a><h4>Returns</h4>
+<p> an <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.5.14</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -428,8 +550,8 @@ image to make it fit.</p>
 as_screenshot_get_source (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>);</pre>
 <p>Gets the source image (the unscaled version) for the screenshot</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.10.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-get-source.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -443,11 +565,11 @@ as_screenshot_get_source (<em class="parameter"><code><a class="link" href="AsSc
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.9.10.6"></a><h4>Returns</h4>
-<p> an <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>, or <code class="literal">NULL</code>. </p>
+<a name="as-screenshot-get-source.returns"></a><h4>Returns</h4>
+<p> an <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -457,8 +579,8 @@ as_screenshot_set_kind (<em class="parameter"><code><a class="link" href="AsScre
                         <em class="parameter"><code><a class="link" href="AsScreenshot.html#AsScreenshotKind" title="enum AsScreenshotKind"><span class="type">AsScreenshotKind</span></a> kind</code></em>);</pre>
 <p>Sets the screenshot kind.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.11.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-set-kind.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -478,18 +600,18 @@ as_screenshot_set_kind (<em class="parameter"><code><a class="link" href="AsScre
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-set-priority"></a><h3>as_screenshot_set_priority ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_screenshot_set_priority (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>,
-                            <em class="parameter"><code><span class="type">gint</span> priority</code></em>);</pre>
+                            <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gint"><span class="type">gint</span></a> priority</code></em>);</pre>
 <p>Sets the screenshot priority. Higher numbers are better.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.12.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-set-priority.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -509,20 +631,19 @@ as_screenshot_set_priority (<em class="parameter"><code><a class="link" href="As
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.3.1</p>
+<p class="since">Since: 0.3.1</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-screenshot-set-caption"></a><h3>as_screenshot_set_caption ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_screenshot_set_caption (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot</code></em>,
-                           <em class="parameter"><code>const <span class="type">gchar</span> *locale</code></em>,
-                           <em class="parameter"><code>const <span class="type">gchar</span> *caption</code></em>,
-                           <em class="parameter"><code><span class="type">gsize</span> caption_len</code></em>);</pre>
+                           <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *locale</code></em>,
+                           <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *caption</code></em>);</pre>
 <p>Sets a caption on the screenshot for a specific locale.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.13.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-set-caption.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -536,7 +657,7 @@ as_screenshot_set_caption (<em class="parameter"><code><a class="link" href="AsS
 </tr>
 <tr>
 <td class="parameter_name"><p>locale</p></td>
-<td class="parameter_description"><p>the locale, or <code class="literal">NULL</code>. e.g. "en_GB"</p></td>
+<td class="parameter_description"><p>the locale, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>. e.g. "en_GB"</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -544,16 +665,10 @@ as_screenshot_set_caption (<em class="parameter"><code><a class="link" href="AsS
 <td class="parameter_description"><p>the caption text.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
-<tr>
-<td class="parameter_name"><p>caption_len</p></td>
-<td class="parameter_description"><p>the size of <em class="parameter"><code>caption</code></em>
-, or -1 if <code class="literal">NULL</code>-terminated.</p></td>
-<td class="parameter_annotations"> </td>
-</tr>
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -563,8 +678,8 @@ as_screenshot_add_image (<em class="parameter"><code><a class="link" href="AsScr
                          <em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Adds an image to the screenshot.</p>
 <div class="refsect3">
-<a name="id-1.2.8.9.14.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-screenshot-add-image.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -584,17 +699,66 @@ as_screenshot_add_image (<em class="parameter"><code><a class="link" href="AsScr
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-screenshot-equal"></a><h3>as_screenshot_equal ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+as_screenshot_equal (<em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot1</code></em>,
+                     <em class="parameter"><code><a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> *screenshot2</code></em>);</pre>
+<p>Checks if two screenshots are the same.</p>
+<div class="refsect3">
+<a name="as-screenshot-equal.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>screenshot1</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>screenshot2</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-screenshot-equal.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> for success</p>
+</div>
+<p class="since">Since: 0.5.7</p>
 </div>
 </div>
 <div class="refsect1">
 <a name="AsScreenshot.other_details"></a><h2>Types and Values</h2>
 <div class="refsect2">
+<a name="AS-TYPE-SCREENSHOT:CAPS"></a><h3>AS_TYPE_SCREENSHOT</h3>
+<pre class="programlisting">#define AS_TYPE_SCREENSHOT (as_screenshot_get_type ())
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsScreenshotClass"></a><h3>struct AsScreenshotClass</h3>
+<pre class="programlisting">struct AsScreenshotClass {
+	GObjectClass		parent_class;
+};
+</pre>
+</div>
+<hr>
+<div class="refsect2">
 <a name="AsScreenshotKind"></a><h3>enum AsScreenshotKind</h3>
 <p>The screenshot type.</p>
 <div class="refsect3">
-<a name="id-1.2.8.10.2.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsScreenshotKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -626,10 +790,14 @@ as_screenshot_add_image (<em class="parameter"><code><a class="link" href="AsScr
 </table></div>
 </div>
 </div>
+<hr>
+<div class="refsect2">
+<a name="AsScreenshot-struct"></a><h3>AsScreenshot</h3>
+<pre class="programlisting">typedef struct _AsScreenshot AsScreenshot;</pre>
+</div>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>

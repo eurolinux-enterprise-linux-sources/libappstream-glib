@@ -20,271 +20,80 @@
  */
 
 #include <config.h>
-
-#include <appstream-glib.h>
-#include <libsoup/soup.h>
+#include <fnmatch.h>
 
 #include <asb-plugin.h>
 
-struct AsbPluginPrivate {
-	SoupSession	*session;
-	GPtrArray	*filenames;
-	GMutex		 filenames_mutex;
-};
-
-/**
- * asb_plugin_get_name:
- */
 const gchar *
 asb_plugin_get_name (void)
 {
 	return "appdata";
 }
 
-/**
- * asb_plugin_initialize:
- */
-void
-asb_plugin_initialize (AsbPlugin *plugin)
-{
-	plugin->priv = ASB_PLUGIN_GET_PRIVATE (AsbPluginPrivate);
-	plugin->priv->filenames = g_ptr_array_new_with_free_func (g_free);
-	g_mutex_init (&plugin->priv->filenames_mutex);
-	plugin->priv->session = soup_session_new_with_options (SOUP_SESSION_USER_AGENT, "createrepo_as",
-							       SOUP_SESSION_TIMEOUT, 10,
-							       NULL);
-	soup_session_add_feature_by_type (plugin->priv->session,
-					  SOUP_TYPE_PROXY_RESOLVER_DEFAULT);
-}
-
-/**
- * asb_plugin_destroy:
- */
-void
-asb_plugin_destroy (AsbPlugin *plugin)
-{
-	const gchar *tmp;
-	guint i;
-
-	/* print out AppData files not used */
-	if (g_getenv ("ASB_PERFORM_EXTRA_CHECKS") != NULL) {
-		for (i = 0; i < plugin->priv->filenames->len; i++) {
-			tmp = g_ptr_array_index (plugin->priv->filenames, i);
-			g_debug ("%s was not used", tmp);
-		}
-	}
-	g_ptr_array_unref (plugin->priv->filenames);
-	g_mutex_clear (&plugin->priv->filenames_mutex);
-	g_object_unref (plugin->priv->session);
-}
-
-/**
- * asb_plugin_add_globs:
- */
 void
 asb_plugin_add_globs (AsbPlugin *plugin, GPtrArray *globs)
 {
+	asb_plugin_add_glob (globs, "/usr/share/appdata/*.metainfo.xml");
 	asb_plugin_add_glob (globs, "/usr/share/appdata/*.appdata.xml");
-	asb_plugin_add_glob (globs, "*.metainfo.xml");
+	asb_plugin_add_glob (globs, "/usr/share/metainfo/*.metainfo.xml");
+	asb_plugin_add_glob (globs, "/usr/share/metainfo/*.appdata.xml");
 }
 
-/**
- * asb_plugin_appdata_add_path:
- */
 static gboolean
-asb_plugin_appdata_add_path (AsbPlugin *plugin, const gchar *path, GError **error)
+_asb_plugin_check_filename (const gchar *filename)
 {
-	const gchar *tmp;
-	_cleanup_dir_close_ GDir *dir = NULL;
-
-	/* scan all the files */
-	dir = g_dir_open (path, 0, error);
-	if (dir == NULL)
-		return FALSE;
-	while ((tmp = g_dir_read_name (dir)) != NULL) {
-		_cleanup_free_ gchar *filename = NULL;
-		filename = g_build_filename (path, tmp, NULL);
-		if (g_file_test (filename, G_FILE_TEST_IS_DIR)) {
-			if (!asb_plugin_appdata_add_path (plugin, filename, error))
-				return FALSE;
-		} else {
-			g_ptr_array_add (plugin->priv->filenames, g_strdup (filename));
-		}
-	}
-	return TRUE;
-}
-
-/**
- * asb_plugin_appdata_add_files:
- */
-static gboolean
-asb_plugin_appdata_add_files (AsbPlugin *plugin, const gchar *path, GError **error)
-{
-	gboolean ret;
-
-	/* already done */
-	if (plugin->priv->filenames->len > 0)
+	if (asb_plugin_match_glob ("*.metainfo.xml", filename) ||
+	    asb_plugin_match_glob ("/usr/share/appdata/*.metainfo.xml", filename) ||
+	    asb_plugin_match_glob ("/usr/share/appdata/*.appdata.xml", filename) ||
+	    asb_plugin_match_glob ("/usr/share/metainfo/*.metainfo.xml", filename) ||
+	    asb_plugin_match_glob ("/usr/share/metainfo/*.appdata.xml", filename))
 		return TRUE;
-
-	g_mutex_lock (&plugin->priv->filenames_mutex);
-	ret = asb_plugin_appdata_add_path (plugin, path, error);
-	g_mutex_unlock  (&plugin->priv->filenames_mutex);
-	return ret;
+	return FALSE;
 }
 
-/**
- * asb_plugin_appdata_remove_file:
- */
-static void
-asb_plugin_appdata_remove_file (AsbPlugin *plugin, const gchar *filename)
+gboolean
+asb_plugin_check_filename (AsbPlugin *plugin, const gchar *filename)
 {
-	const gchar *tmp;
-	guint i;
-
-	g_mutex_lock (&plugin->priv->filenames_mutex);
-	for (i = 0; i < plugin->priv->filenames->len; i++) {
-		tmp = g_ptr_array_index (plugin->priv->filenames, i);
-		if (g_strcmp0 (tmp, filename) == 0) {
-			g_ptr_array_remove_fast (plugin->priv->filenames,
-						 (gpointer) tmp);
-			break;
-		}
-	}
-	g_mutex_unlock  (&plugin->priv->filenames_mutex);
+	return _asb_plugin_check_filename (filename);
 }
 
-/**
- * asb_plugin_appdata_log_overwrite:
- */
-static void
-asb_plugin_appdata_log_overwrite (AsbApp *app,
-				  const gchar *property_name,
-				  const gchar *old,
-				  const gchar *new)
-{
-	/* does the value already exist with this value */
-	if (g_strcmp0 (old, new) == 0)
-		return;
-
-	/* does the metadata exist with any value */
-	if (old != NULL) {
-		asb_package_log (asb_app_get_package (app),
-				 ASB_PACKAGE_LOG_LEVEL_INFO,
-				 "AppData %s=%s->%s",
-				 property_name, old, new);
-	}
-}
-
-/**
- * asb_plugin_appdata_load_url:
- **/
-static gboolean
-asb_plugin_appdata_load_url (AsbPlugin *plugin,
-			     AsbApp *app,
-			     const gchar *url,
-			     GError **error)
-{
-	const gchar *cache_dir;
-	gboolean ret = TRUE;
-	SoupStatus status;
-	SoupURI *uri = NULL;
-	_cleanup_free_ gchar *basename = NULL;
-	_cleanup_free_ gchar *cache_filename = NULL;
-	_cleanup_object_unref_ SoupMessage *msg = NULL;
-
-	/* download to cache if not already added */
-	basename = g_path_get_basename (url);
-	cache_dir = asb_package_get_config (asb_app_get_package (app), "CacheDir");
-	cache_filename = g_strdup_printf ("%s/%s-%s",
-					  cache_dir,
-					  as_app_get_id_filename (AS_APP (app)),
-					  basename);
-	if (!g_file_test (cache_filename, G_FILE_TEST_EXISTS)) {
-		if (asb_context_get_flag (plugin->ctx, ASB_CONTEXT_FLAG_NO_NETWORK)) {
-			asb_package_log (asb_app_get_package (app),
-					 ASB_PACKAGE_LOG_LEVEL_WARNING,
-					 "Could not download %s as no network", url);
-			goto out;
-		}
-		uri = soup_uri_new (url);
-		if (uri == NULL) {
-			ret = FALSE;
-			g_set_error (error,
-				     ASB_PLUGIN_ERROR,
-				     ASB_PLUGIN_ERROR_FAILED,
-				     "Could not parse '%s' as a URL", url);
-			goto out;
-		}
-		asb_package_log (asb_app_get_package (app),
-				 ASB_PACKAGE_LOG_LEVEL_DEBUG,
-				 "Downloading %s", url);
-		msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
-		status = soup_session_send_message (plugin->priv->session, msg);
-		if (status != SOUP_STATUS_OK) {
-			ret = FALSE;
-			g_set_error (error,
-				     ASB_PLUGIN_ERROR,
-				     ASB_PLUGIN_ERROR_FAILED,
-				     "Downloading failed: %s",
-				     soup_status_get_phrase (status));
-			goto out;
-		}
-
-		/* save new file */
-		ret = g_file_set_contents (cache_filename,
-					   msg->response_body->data,
-					   msg->response_body->length,
-					   error);
-		if (!ret)
-			goto out;
-	}
-
-	/* load the pixbuf */
-	ret = asb_app_add_screenshot_source (app, cache_filename, error);
-	if (!ret)
-		goto out;
-out:
-	if (uri != NULL)
-		soup_uri_free (uri);
-	return ret;
-}
-
-/**
- * asb_plugin_process_filename:
- */
 static gboolean
 asb_plugin_process_filename (AsbPlugin *plugin,
-			     AsbApp *app,
+			     AsbPackage *pkg,
 			     const gchar *filename,
+			     GList **apps,
 			     GError **error)
 {
 	AsProblemKind problem_kind;
 	AsProblem *problem;
-	const gchar *key;
-	const gchar *old;
+	GPtrArray *icons;
 	const gchar *tmp;
-	gboolean ret;
-	GHashTable *hash;
-	GPtrArray *array;
-	GList *l;
-	GList *list;
 	guint i;
-	_cleanup_object_unref_ AsApp *appdata = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *problems = NULL;
+	g_autoptr(AsbApp) app = NULL;
+	g_autoptr(GPtrArray) problems = NULL;
+
+	app = asb_app_new (NULL, NULL);
+	if (!as_app_parse_file (AS_APP (app), filename,
+				AS_APP_PARSE_FLAG_USE_HEURISTICS,
+				error))
+		return FALSE;
+	if (as_app_get_kind (AS_APP (app)) == AS_APP_KIND_UNKNOWN) {
+		g_set_error (error,
+			     ASB_PLUGIN_ERROR,
+			     ASB_PLUGIN_ERROR_FAILED,
+			     "%s has no recognised type",
+			     as_app_get_id (AS_APP (app)));
+		return FALSE;
+	}
 
 	/* validate */
-	appdata = as_app_new ();
-	ret = as_app_parse_file (appdata, filename,
-				 AS_APP_PARSE_FLAG_NONE,
-				 error);
-	if (!ret)
-		return FALSE;
-	problems = as_app_validate (appdata,
+	problems = as_app_validate (AS_APP (app),
 				    AS_APP_VALIDATE_FLAG_NO_NETWORK |
 				    AS_APP_VALIDATE_FLAG_RELAX,
 				    error);
 	if (problems == NULL)
 		return FALSE;
+	asb_app_set_package (app, pkg);
 	for (i = 0; i < problems->len; i++) {
 		problem = g_ptr_array_index (problems, i);
 		problem_kind = as_problem_get_kind (problem);
@@ -295,29 +104,32 @@ asb_plugin_process_filename (AsbPlugin *plugin,
 				 as_problem_get_message (problem));
 	}
 
-	/* check app id */
-	tmp = as_app_get_id (appdata);
-	if (tmp == NULL) {
-		g_set_error (error,
-			     ASB_PLUGIN_ERROR,
-			     ASB_PLUGIN_ERROR_FAILED,
-			     "AppData %s has no ID",
-			     filename);
-		return FALSE;
-	}
-	if (g_strcmp0 (tmp, as_app_get_id (AS_APP (app))) != 0) {
-		g_set_error (error,
-			     ASB_PLUGIN_ERROR,
-			     ASB_PLUGIN_ERROR_FAILED,
-			     "AppData %s does not match '%s':'%s'",
-			     filename,
-			     tmp,
-			     as_app_get_id (AS_APP (app)));
-		return FALSE;
+	/* nuke things that do not belong */
+	icons = as_app_get_icons (AS_APP (app));
+	if (icons->len > 0)
+		g_ptr_array_set_size (icons, 0);
+
+	/* fix up the project license */
+	tmp = as_app_get_project_license (AS_APP (app));
+	if (tmp != NULL && !as_utils_is_spdx_license (tmp)) {
+		g_autofree gchar *license_spdx = NULL;
+		license_spdx = as_utils_license_to_spdx (tmp);
+		if (as_utils_is_spdx_license (license_spdx)) {
+			asb_package_log (asb_app_get_package (app),
+					 ASB_PACKAGE_LOG_LEVEL_WARNING,
+					 "project license fixup: %s -> %s",
+					 tmp, license_spdx);
+			as_app_set_project_license (AS_APP (app), license_spdx);
+		} else {
+			asb_package_log (asb_app_get_package (app),
+					 ASB_PACKAGE_LOG_LEVEL_WARNING,
+					 "project license is invalid: %s", tmp);
+			as_app_set_project_license (AS_APP (app), NULL);
+		}
 	}
 
 	/* check license */
-	tmp = as_app_get_metadata_license (appdata);
+	tmp = as_app_get_metadata_license (AS_APP (app));
 	if (tmp == NULL) {
 		g_set_error (error,
 			     ASB_PLUGIN_ERROR,
@@ -335,270 +147,131 @@ asb_plugin_process_filename (AsbPlugin *plugin,
 		return FALSE;
 	}
 
-	/* other optional data */
-	tmp = as_app_get_url_item (appdata, AS_URL_KIND_HOMEPAGE);
-	if (tmp != NULL)
-		as_app_add_url (AS_APP (app), AS_URL_KIND_HOMEPAGE, tmp, -1);
-	tmp = as_app_get_project_group (appdata);
-	if (tmp != NULL) {
-		/* check the category is valid */
-		if (!as_utils_is_environment_id (tmp)) {
-			asb_package_log (asb_app_get_package (app),
-					 ASB_PACKAGE_LOG_LEVEL_WARNING,
-					 "AppData project group invalid, "
-					 "so ignoring: %s", tmp);
-		} else {
-			as_app_set_project_group (AS_APP (app), tmp, -1);
-		}
-	}
-	array = as_app_get_compulsory_for_desktops (appdata);
-	if (array->len > 0) {
-		tmp = g_ptr_array_index (array, 0);
-		as_app_add_compulsory_for_desktop (AS_APP (app), tmp, -1);
-	}
-
-	/* perhaps get name */
-	hash = as_app_get_names (appdata);
-	list = g_hash_table_get_keys (hash);
-	for (l = list; l != NULL; l = l->next) {
-		key = l->data;
-		tmp = g_hash_table_lookup (hash, key);
-		if (g_strcmp0 (key, "C") == 0) {
-			old = as_app_get_name (AS_APP (app), key);
-			asb_plugin_appdata_log_overwrite (app, "name",
-							  old, tmp);
-		}
-		as_app_set_name (AS_APP (app), key, tmp, -1);
-	}
-	if (g_list_length (list) == 1) {
-		asb_package_log (asb_app_get_package (app),
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "AppData 'name' has no translations");
-	}
-	g_list_free (list);
-
-	/* perhaps get summary */
-	hash = as_app_get_comments (appdata);
-	list = g_hash_table_get_keys (hash);
-	for (l = list; l != NULL; l = l->next) {
-		key = l->data;
-		tmp = g_hash_table_lookup (hash, key);
-		if (g_strcmp0 (key, "C") == 0) {
-			old = as_app_get_comment (AS_APP (app), key);
-			asb_plugin_appdata_log_overwrite (app, "summary",
-							  old, tmp);
-		}
-		as_app_set_comment (AS_APP (app), key, tmp, -1);
-	}
-	if (g_list_length (list) == 1) {
-		asb_package_log (asb_app_get_package (app),
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "AppData 'summary' has no translations");
-	}
-	g_list_free (list);
-
-	/* get descriptions */
-	hash = as_app_get_descriptions (appdata);
-	list = g_hash_table_get_keys (hash);
-	for (l = list; l != NULL; l = l->next) {
-		key = l->data;
-		tmp = g_hash_table_lookup (hash, key);
-		as_app_set_description (AS_APP (app), key, tmp, -1);
-	}
-	if (g_list_length (list) == 1) {
-		asb_package_log (asb_app_get_package (app),
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "AppData 'description' has no translations");
-	}
-	g_list_free (list);
-
-	/* add screenshots if not already added */
-	array = as_app_get_screenshots (AS_APP (app));
-	if (array->len == 0) {
-		array = as_app_get_screenshots (appdata);
-		for (i = 0; i < array->len; i++) {
-			GError *error_local = NULL;
-			AsScreenshot *ass;
-			AsImage *image;
-
-			ass = g_ptr_array_index (array, i);
-			image = as_screenshot_get_source (ass);
-			if (image == NULL)
-				continue;
-
-			/* if no network just use the upstream location */
-			if (asb_context_get_flag (plugin->ctx,
-						  ASB_CONTEXT_FLAG_NO_NETWORK)) {
-				asb_package_log (asb_app_get_package (app),
-						 ASB_PACKAGE_LOG_LEVEL_DEBUG,
-						 "Using upstream screenshot");
-				as_app_add_screenshot (AS_APP (app), ass);
-				continue;
-			}
-
-			/* load the URI or get from a cache */
-			tmp = as_image_get_url (image);
-			ret = asb_plugin_appdata_load_url (plugin,
-							   app,
-							   as_image_get_url (image),
-							   &error_local);
-			if (ret) {
-				asb_package_log (asb_app_get_package (app),
-						 ASB_PACKAGE_LOG_LEVEL_DEBUG,
-						 "Added screenshot %s", tmp);
-			} else {
-				asb_package_log (asb_app_get_package (app),
-						 ASB_PACKAGE_LOG_LEVEL_WARNING,
-						 "Failed to load screenshot %s: %s",
-						 tmp, error_local->message);
-				g_clear_error (&error_local);
-			}
-		}
-	} else {
-		array = as_app_get_screenshots (appdata);
-		if (array->len > 0) {
-			asb_package_log (asb_app_get_package (app),
-					 ASB_PACKAGE_LOG_LEVEL_INFO,
-					 "AppData screenshots ignored");
-		}
-	}
-
-	/* add metadata */
-	hash = as_app_get_metadata (appdata);
-	list = g_hash_table_get_keys (hash);
-	for (l = list; l != NULL; l = l->next) {
-		key = l->data;
-		tmp = g_hash_table_lookup (hash, key);
-		old = as_app_get_metadata_item (AS_APP (app), key);
-		asb_plugin_appdata_log_overwrite (app, "metadata", old, tmp);
-		as_app_add_metadata (AS_APP (app), key, tmp, -1);
-	}
-
-	/* add releases */
-	array = as_app_get_releases (appdata);
-	for (i = 0; i < array->len; i++) {
-		AsRelease *rel = g_ptr_array_index (array, i);
-		as_app_add_release (AS_APP (app), rel);
-	}
-
 	/* log updateinfo */
-	tmp = as_app_get_update_contact (AS_APP (appdata));
+	tmp = as_app_get_update_contact (AS_APP (app));
 	if (tmp != NULL) {
 		asb_package_log (asb_app_get_package (app),
 				 ASB_PACKAGE_LOG_LEVEL_INFO,
 				 "Upstream contact <%s>", tmp);
 	}
 
+	/* add icon for firmware */
+	if (as_app_get_kind (AS_APP (app)) == AS_APP_KIND_FIRMWARE) {
+		g_autoptr(AsIcon) icon = NULL;
+		icon = as_icon_new ();
+		as_icon_set_kind (icon, AS_ICON_KIND_STOCK);
+		as_icon_set_name (icon, "application-x-executable");
+		as_app_add_icon (AS_APP (app), icon);
+	}
+
+	/* fix up input methods */
+	if (as_app_get_kind (AS_APP (app)) == AS_APP_KIND_INPUT_METHOD) {
+		g_autoptr(AsIcon) icon = NULL;
+		icon = as_icon_new ();
+		as_icon_set_kind (icon, AS_ICON_KIND_STOCK);
+		as_icon_set_name (icon, "system-run-symbolic");
+		as_app_add_icon (AS_APP (app), icon);
+		as_app_add_category (AS_APP (app), "Addons");
+		as_app_add_category (AS_APP (app), "InputSources");
+	}
+
+	/* fix up codecs */
+	if (as_app_get_kind (AS_APP (app)) == AS_APP_KIND_CODEC) {
+		g_autoptr(AsIcon) icon = NULL;
+		icon = as_icon_new ();
+		as_icon_set_kind (icon, AS_ICON_KIND_STOCK);
+		as_icon_set_name (icon, "application-x-addon");
+		as_app_add_icon (AS_APP (app), icon);
+		as_app_add_category (AS_APP (app), "Addons");
+		as_app_add_category (AS_APP (app), "Codecs");
+	}
+
 	/* success */
-	asb_app_set_requires_appdata (app, FALSE);
+	asb_app_set_hidpi_enabled (app, asb_context_get_flag (plugin->ctx,
+							      ASB_CONTEXT_FLAG_HIDPI_ICONS));
+	asb_plugin_add_app (apps, AS_APP (app));
 	return TRUE;
 }
 
-/**
- * asb_plugin_appdata_get_fn_for_app:
- */
-static gchar *
-asb_plugin_appdata_get_fn_for_app (AsApp *app)
+GList *
+asb_plugin_process (AsbPlugin *plugin,
+		    AsbPackage *pkg,
+		    const gchar *tmpdir,
+		    GError **error)
 {
-	gchar *fn = g_strdup (as_app_get_id (app));
-	gchar *tmp;
+	gboolean ret;
+	GList *apps = NULL;
+	guint i;
+	gchar **filelist;
 
-	/* just cut off the last section without munging the name */
-	tmp = g_strrstr (fn, ".");
-	if (tmp != NULL)
-		*tmp = '\0';
-	return fn;
+	filelist = asb_package_get_filelist (pkg);
+	for (i = 0; filelist[i] != NULL; i++) {
+		g_autofree gchar *filename_tmp = NULL;
+		if (!_asb_plugin_check_filename (filelist[i]))
+			continue;
+		filename_tmp = g_build_filename (tmpdir, filelist[i], NULL);
+		ret = asb_plugin_process_filename (plugin,
+						   pkg,
+						   filename_tmp,
+						   &apps,
+						   error);
+		if (!ret) {
+			g_list_free_full (apps, (GDestroyNotify) g_object_unref);
+			return NULL;
+		}
+	}
+
+	/* no desktop files we care about */
+	if (apps == NULL) {
+		g_set_error (error,
+			     ASB_PLUGIN_ERROR,
+			     ASB_PLUGIN_ERROR_FAILED,
+			     "nothing interesting in %s",
+			     asb_package_get_basename (pkg));
+		return NULL;
+	}
+	return apps;
 }
 
-/**
- * asb_plugin_process_app:
- */
-gboolean
-asb_plugin_process_app (AsbPlugin *plugin,
-			AsbPackage *pkg,
-			AsbApp *app,
-			const gchar *tmpdir,
-			GError **error)
+void
+asb_plugin_merge (AsbPlugin *plugin, GList *list)
 {
-	GError *error_local = NULL;
-	const gchar *kind_str;
-	const gchar *tmp;
-	_cleanup_free_ gchar *appdata_basename = NULL;
-	_cleanup_free_ gchar *appdata_filename = NULL;
-	_cleanup_free_ gchar *appdata_filename_extra = NULL;
+	AsApp *app;
+	AsApp *found;
+	GList *l;
+	g_autoptr(GHashTable) hash = NULL;
 
-	/* get possible sources */
-	appdata_basename = asb_plugin_appdata_get_fn_for_app (AS_APP (app));
-	appdata_filename = g_strdup_printf ("%s/files/share/appdata/%s.appdata.xml",
-					    tmpdir, appdata_basename);
-	if (!g_file_test (appdata_filename, G_FILE_TEST_EXISTS)) {
-		g_free (appdata_filename);
-		appdata_filename = g_strdup_printf ("%s/usr/share/appdata/%s.appdata.xml",
-						    tmpdir, appdata_basename);
-	}
-	tmp = asb_package_get_config (pkg, "AppDataExtra");
-	if (tmp != NULL && g_file_test (tmp, G_FILE_TEST_EXISTS)) {
-		if (!asb_plugin_appdata_add_files (plugin, tmp, error))
-			return FALSE;
-		kind_str = as_id_kind_to_string (as_app_get_id_kind (AS_APP (app)));
-		appdata_filename_extra = g_strdup_printf ("%s/%s/%s.appdata.xml",
-							  tmp,
-							  kind_str,
-							  appdata_basename);
-		if (g_file_test (appdata_filename, G_FILE_TEST_EXISTS) &&
-		    g_file_test (appdata_filename_extra, G_FILE_TEST_EXISTS)) {
-			asb_package_log (pkg,
-					 ASB_PACKAGE_LOG_LEVEL_WARNING,
-					 "extra AppData file %s overwrites upstream",
-					 appdata_filename_extra);
-		}
-
-		/* we used this */
-		asb_plugin_appdata_remove_file (plugin, appdata_filename_extra);
+	/* make a hash table of ID->AsApp */
+	hash = g_hash_table_new_full (g_str_hash, g_str_equal,
+				      g_free, (GDestroyNotify) g_object_unref);
+	for (l = list; l != NULL; l = l->next) {
+		app = AS_APP (l->data);
+		if (as_app_get_kind (app) != AS_APP_KIND_DESKTOP)
+			continue;
+		g_hash_table_insert (hash,
+				     g_strdup (as_app_get_id (app)),
+				     g_object_ref (app));
 	}
 
-	/* firmware */
-	if (asb_package_get_kind (pkg) == ASB_PACKAGE_KIND_FIRMWARE) {
-		appdata_filename = g_strdup_printf ("%s/%s.metainfo.xml",
-						    tmpdir,
-						    asb_package_get_source_pkgname (pkg));
+	/* add addons where the pkgname is different from the
+	 * main package */
+	for (l = list; l != NULL; l = l->next) {
+		if (!ASB_IS_APP (l->data))
+			continue;
+		app = AS_APP (l->data);
+		if (as_app_get_kind (app) != AS_APP_KIND_ADDON)
+			continue;
+		found = g_hash_table_lookup (hash, as_app_get_id (app));
+		if (found == NULL)
+			continue;
+		if (g_strcmp0 (as_app_get_pkgname_default (app),
+			       as_app_get_pkgname_default (found)) != 0)
+			continue;
+		as_app_add_veto (app,
+				 "absorbing addon %s shipped in "
+				 "main package %s",
+				 as_app_get_id (app),
+				 as_app_get_pkgname_default (app));
+		as_app_subsume_full (found, app, AS_APP_SUBSUME_FLAG_MERGE);
 	}
-
-	/* any appdata-extra file */
-	if (appdata_filename_extra != NULL &&
-	    g_file_test (appdata_filename_extra, G_FILE_TEST_EXISTS)) {
-		as_app_add_metadata (AS_APP (app), "DistroMetadata", NULL, -1);
-		return asb_plugin_process_filename (plugin,
-						    app,
-						    appdata_filename_extra,
-						    error);
-	}
-
-	/* any installed appdata file */
-	if (g_file_test (appdata_filename, G_FILE_TEST_EXISTS)) {
-		/* be understanding if upstream gets the AppData file
-		 * wrong -- just fall back to the desktop file data */
-		if (!asb_plugin_process_filename (plugin,
-						  app,
-						  appdata_filename,
-						  &error_local)) {
-			error_local->code = ASB_PLUGIN_ERROR_IGNORE;
-			g_propagate_error (error, error_local);
-			g_prefix_error (error,
-					"AppData file '%s' invalid: ",
-					appdata_filename);
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	/* we're going to require this soon */
-	if (as_app_get_id_kind (AS_APP (app)) == AS_ID_KIND_DESKTOP &&
-	    as_app_get_metadata_item (AS_APP (app), "NoDisplay") == NULL) {
-		asb_package_log (pkg,
-				 ASB_PACKAGE_LOG_LEVEL_WARNING,
-				 "desktop application %s has no AppData",
-				 as_app_get_id (AS_APP (app)));
-	}
-	return TRUE;
 }

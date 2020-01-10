@@ -88,24 +88,24 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = appstream-util$(EXEEXT) $(am__EXEEXT_1) \
-	appdata-validate$(EXEEXT)
+bin_PROGRAMS = appstream-compose$(EXEEXT) appstream-util$(EXEEXT) \
+	$(am__EXEEXT_1)
 @HAVE_BUILDER_TRUE@am__append_1 = \
 @HAVE_BUILDER_TRUE@	appstream-builder
 
 subdir = client
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/as-linguas.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_link_flag.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/gtk-doc.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_check_xml_catalog.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_path_xml_catalog.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
-	$(top_srcdir)/m4/intltool.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -118,30 +118,31 @@ CONFIG_CLEAN_VPATH_FILES =
 @HAVE_BUILDER_TRUE@am__EXEEXT_1 = appstream-builder$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_appdata_validate_OBJECTS = appdata_validate-as-validate.$(OBJEXT)
-appdata_validate_OBJECTS = $(am_appdata_validate_OBJECTS)
-am__DEPENDENCIES_1 =
-appdata_validate_DEPENDENCIES = $(AS_GLIB_LIBS) $(am__DEPENDENCIES_1)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-appdata_validate_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(appdata_validate_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
-	-o $@
 am__appstream_builder_SOURCES_DIST = as-builder.c
 @HAVE_BUILDER_TRUE@am_appstream_builder_OBJECTS =  \
 @HAVE_BUILDER_TRUE@	appstream_builder-as-builder.$(OBJEXT)
 appstream_builder_OBJECTS = $(am_appstream_builder_OBJECTS)
+am__DEPENDENCIES_1 =
 @HAVE_BUILDER_TRUE@appstream_builder_DEPENDENCIES = $(AS_GLIB_LIBS) \
 @HAVE_BUILDER_TRUE@	$(AS_BUILDER_LIBS) $(am__DEPENDENCIES_1) \
-@HAVE_BUILDER_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@HAVE_BUILDER_TRUE@	$(am__DEPENDENCIES_1)
+@HAVE_BUILDER_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 appstream_builder_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(appstream_builder_CFLAGS) $(CFLAGS) \
 	$(appstream_builder_LDFLAGS) $(LDFLAGS) -o $@
+am_appstream_compose_OBJECTS = appstream_compose-as-compose.$(OBJEXT)
+appstream_compose_OBJECTS = $(am_appstream_compose_OBJECTS)
+appstream_compose_DEPENDENCIES = $(AS_GLIB_LIBS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+appstream_compose_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(appstream_compose_CFLAGS) $(CFLAGS) \
+	$(appstream_compose_LDFLAGS) $(LDFLAGS) -o $@
 am_appstream_util_OBJECTS = appstream_util-as-util.$(OBJEXT)
 appstream_util_OBJECTS = $(am_appstream_util_OBJECTS)
 appstream_util_DEPENDENCIES = $(AS_GLIB_LIBS) $(am__DEPENDENCIES_1) \
@@ -185,11 +186,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(appdata_validate_SOURCES) $(appstream_builder_SOURCES) \
+SOURCES = $(appstream_builder_SOURCES) $(appstream_compose_SOURCES) \
 	$(appstream_util_SOURCES)
-DIST_SOURCES = $(appdata_validate_SOURCES) \
-	$(am__appstream_builder_SOURCES_DIST) \
-	$(appstream_util_SOURCES)
+DIST_SOURCES = $(am__appstream_builder_SOURCES_DIST) \
+	$(appstream_compose_SOURCES) $(appstream_util_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -226,6 +226,7 @@ AR = @AR@
 AS_MAJOR_VERSION = @AS_MAJOR_VERSION@
 AS_MICRO_VERSION = @AS_MICRO_VERSION@
 AS_MINOR_VERSION = @AS_MINOR_VERSION@
+AS_PLUGIN_VERSION = @AS_PLUGIN_VERSION@
 AS_VERSION = @AS_VERSION@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -255,6 +256,9 @@ FGREP = @FGREP@
 FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
 FREETYPE_LIBS = @FREETYPE_LIBS@
 GCAB = @GCAB@
+GCAB_CFLAGS = @GCAB_CFLAGS@
+GCAB_DEPENDENCY = @GCAB_DEPENDENCY@
+GCAB_LIBS = @GCAB_LIBS@
 GDKPIXBUF_CFLAGS = @GDKPIXBUF_CFLAGS@
 GDKPIXBUF_LIBS = @GDKPIXBUF_LIBS@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
@@ -280,14 +284,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTLLIBS = @INTLLIBS@
-INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-INTLTOOL_MERGE = @INTLTOOL_MERGE@
-INTLTOOL_PERL = @INTLTOOL_PERL@
-INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-INTLTOOL_V_MERGE = @INTLTOOL_V_MERGE@
-INTLTOOL_V_MERGE_OPTIONS = @INTLTOOL_V_MERGE_OPTIONS@
-INTLTOOL__v_MERGE_ = @INTLTOOL__v_MERGE_@
-INTLTOOL__v_MERGE_0 = @INTLTOOL__v_MERGE_0@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 INTROSPECTION_CFLAGS = @INTROSPECTION_CFLAGS@
 INTROSPECTION_COMPILER = @INTROSPECTION_COMPILER@
@@ -297,6 +293,8 @@ INTROSPECTION_LIBS = @INTROSPECTION_LIBS@
 INTROSPECTION_MAKEFILE = @INTROSPECTION_MAKEFILE@
 INTROSPECTION_SCANNER = @INTROSPECTION_SCANNER@
 INTROSPECTION_TYPELIBDIR = @INTROSPECTION_TYPELIBDIR@
+JSON_GLIB_CFLAGS = @JSON_GLIB_CFLAGS@
+JSON_GLIB_LIBS = @JSON_GLIB_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBARCHIVE_CFLAGS = @LIBARCHIVE_CFLAGS@
@@ -314,6 +312,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_REVISION = @LT_REVISION@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -324,8 +323,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSTREE_CFLAGS = @OSTREE_CFLAGS@
-OSTREE_LIBS = @OSTREE_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -343,6 +340,7 @@ PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+RELRO_LDFLAGS = @RELRO_LDFLAGS@
 RPM_CFLAGS = @RPM_CFLAGS@
 RPM_LIBS = @RPM_LIBS@
 SED = @SED@
@@ -350,12 +348,13 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SOUP_CFLAGS = @SOUP_CFLAGS@
 SOUP_LIBS = @SOUP_LIBS@
-SQLITE_CFLAGS = @SQLITE_CFLAGS@
-SQLITE_LIBS = @SQLITE_LIBS@
+STEMMER_LIBS = @STEMMER_LIBS@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
+UUID_CFLAGS = @UUID_CFLAGS@
+UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
-WARNINGFLAGS_C = @WARNINGFLAGS_C@
+WARN_CFLAGS = @WARN_CFLAGS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -398,8 +397,6 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-intltool__v_merge_options_ = @intltool__v_merge_options_@
-intltool__v_merge_options_0 = @intltool__v_merge_options_0@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -453,10 +450,11 @@ appstream_util_LDADD = \
 	$(LIBARCHIVE_LIBS)
 
 appstream_util_LDFLAGS = \
+	$(RELRO_LDFLAGS)				\
 	$(PIE_LDFLAGS)
 
 appstream_util_CFLAGS = \
-	$(WARNINGFLAGS_C)
+	$(WARN_CFLAGS)
 
 @HAVE_BUILDER_TRUE@appstream_builder_SOURCES = \
 @HAVE_BUILDER_TRUE@	as-builder.c
@@ -470,20 +468,28 @@ appstream_util_CFLAGS = \
 @HAVE_BUILDER_TRUE@	$(LIBARCHIVE_LIBS)
 
 @HAVE_BUILDER_TRUE@appstream_builder_LDFLAGS = \
+@HAVE_BUILDER_TRUE@	$(RELRO_LDFLAGS)				\
 @HAVE_BUILDER_TRUE@	$(PIE_LDFLAGS)
 
 @HAVE_BUILDER_TRUE@appstream_builder_CFLAGS = \
-@HAVE_BUILDER_TRUE@	$(WARNINGFLAGS_C)
+@HAVE_BUILDER_TRUE@	$(WARN_CFLAGS)
 
-appdata_validate_SOURCES = \
-	as-validate.c
+appstream_compose_SOURCES = \
+	as-compose.c
 
-appdata_validate_LDADD = \
+appstream_compose_LDADD = \
 	$(AS_GLIB_LIBS)					\
-	$(GLIB_LIBS)
+	$(GLIB_LIBS)					\
+	$(SOUP_LIBS)					\
+	$(GDKPIXBUF_LIBS)				\
+	$(LIBARCHIVE_LIBS)
 
-appdata_validate_CFLAGS = \
-	$(WARNINGFLAGS_C)
+appstream_compose_LDFLAGS = \
+	$(RELRO_LDFLAGS)				\
+	$(PIE_LDFLAGS)
+
+appstream_compose_CFLAGS = \
+	$(WARN_CFLAGS)
 
 all: all-am
 
@@ -568,13 +574,13 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-appdata-validate$(EXEEXT): $(appdata_validate_OBJECTS) $(appdata_validate_DEPENDENCIES) $(EXTRA_appdata_validate_DEPENDENCIES) 
-	@rm -f appdata-validate$(EXEEXT)
-	$(AM_V_CCLD)$(appdata_validate_LINK) $(appdata_validate_OBJECTS) $(appdata_validate_LDADD) $(LIBS)
-
 appstream-builder$(EXEEXT): $(appstream_builder_OBJECTS) $(appstream_builder_DEPENDENCIES) $(EXTRA_appstream_builder_DEPENDENCIES) 
 	@rm -f appstream-builder$(EXEEXT)
 	$(AM_V_CCLD)$(appstream_builder_LINK) $(appstream_builder_OBJECTS) $(appstream_builder_LDADD) $(LIBS)
+
+appstream-compose$(EXEEXT): $(appstream_compose_OBJECTS) $(appstream_compose_DEPENDENCIES) $(EXTRA_appstream_compose_DEPENDENCIES) 
+	@rm -f appstream-compose$(EXEEXT)
+	$(AM_V_CCLD)$(appstream_compose_LINK) $(appstream_compose_OBJECTS) $(appstream_compose_LDADD) $(LIBS)
 
 appstream-util$(EXEEXT): $(appstream_util_OBJECTS) $(appstream_util_DEPENDENCIES) $(EXTRA_appstream_util_DEPENDENCIES) 
 	@rm -f appstream-util$(EXEEXT)
@@ -586,8 +592,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/appdata_validate-as-validate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/appstream_builder-as-builder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/appstream_compose-as-compose.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/appstream_util-as-util.Po@am__quote@
 
 .c.o:
@@ -611,20 +617,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-appdata_validate-as-validate.o: as-validate.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appdata_validate_CFLAGS) $(CFLAGS) -MT appdata_validate-as-validate.o -MD -MP -MF $(DEPDIR)/appdata_validate-as-validate.Tpo -c -o appdata_validate-as-validate.o `test -f 'as-validate.c' || echo '$(srcdir)/'`as-validate.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/appdata_validate-as-validate.Tpo $(DEPDIR)/appdata_validate-as-validate.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-validate.c' object='appdata_validate-as-validate.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appdata_validate_CFLAGS) $(CFLAGS) -c -o appdata_validate-as-validate.o `test -f 'as-validate.c' || echo '$(srcdir)/'`as-validate.c
-
-appdata_validate-as-validate.obj: as-validate.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appdata_validate_CFLAGS) $(CFLAGS) -MT appdata_validate-as-validate.obj -MD -MP -MF $(DEPDIR)/appdata_validate-as-validate.Tpo -c -o appdata_validate-as-validate.obj `if test -f 'as-validate.c'; then $(CYGPATH_W) 'as-validate.c'; else $(CYGPATH_W) '$(srcdir)/as-validate.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/appdata_validate-as-validate.Tpo $(DEPDIR)/appdata_validate-as-validate.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-validate.c' object='appdata_validate-as-validate.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appdata_validate_CFLAGS) $(CFLAGS) -c -o appdata_validate-as-validate.obj `if test -f 'as-validate.c'; then $(CYGPATH_W) 'as-validate.c'; else $(CYGPATH_W) '$(srcdir)/as-validate.c'; fi`
-
 appstream_builder-as-builder.o: as-builder.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_builder_CFLAGS) $(CFLAGS) -MT appstream_builder-as-builder.o -MD -MP -MF $(DEPDIR)/appstream_builder-as-builder.Tpo -c -o appstream_builder-as-builder.o `test -f 'as-builder.c' || echo '$(srcdir)/'`as-builder.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/appstream_builder-as-builder.Tpo $(DEPDIR)/appstream_builder-as-builder.Po
@@ -638,6 +630,20 @@ appstream_builder-as-builder.obj: as-builder.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-builder.c' object='appstream_builder-as-builder.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_builder_CFLAGS) $(CFLAGS) -c -o appstream_builder-as-builder.obj `if test -f 'as-builder.c'; then $(CYGPATH_W) 'as-builder.c'; else $(CYGPATH_W) '$(srcdir)/as-builder.c'; fi`
+
+appstream_compose-as-compose.o: as-compose.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_compose_CFLAGS) $(CFLAGS) -MT appstream_compose-as-compose.o -MD -MP -MF $(DEPDIR)/appstream_compose-as-compose.Tpo -c -o appstream_compose-as-compose.o `test -f 'as-compose.c' || echo '$(srcdir)/'`as-compose.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/appstream_compose-as-compose.Tpo $(DEPDIR)/appstream_compose-as-compose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-compose.c' object='appstream_compose-as-compose.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_compose_CFLAGS) $(CFLAGS) -c -o appstream_compose-as-compose.o `test -f 'as-compose.c' || echo '$(srcdir)/'`as-compose.c
+
+appstream_compose-as-compose.obj: as-compose.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_compose_CFLAGS) $(CFLAGS) -MT appstream_compose-as-compose.obj -MD -MP -MF $(DEPDIR)/appstream_compose-as-compose.Tpo -c -o appstream_compose-as-compose.obj `if test -f 'as-compose.c'; then $(CYGPATH_W) 'as-compose.c'; else $(CYGPATH_W) '$(srcdir)/as-compose.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/appstream_compose-as-compose.Tpo $(DEPDIR)/appstream_compose-as-compose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-compose.c' object='appstream_compose-as-compose.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_compose_CFLAGS) $(CFLAGS) -c -o appstream_compose-as-compose.obj `if test -f 'as-compose.c'; then $(CYGPATH_W) 'as-compose.c'; else $(CYGPATH_W) '$(srcdir)/as-compose.c'; fi`
 
 appstream_util-as-util.o: as-util.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(appstream_util_CFLAGS) $(CFLAGS) -MT appstream_util-as-util.o -MD -MP -MF $(DEPDIR)/appstream_util-as-util.Tpo -c -o appstream_util-as-util.o `test -f 'as-util.c' || echo '$(srcdir)/'`as-util.c

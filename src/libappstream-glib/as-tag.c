@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2015 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -25,7 +25,7 @@
  * @include: appstream-glib.h
  * @stability: Stable
  *
- * These functions will convert a tag enum such as %AS_TAG_APPLICATION to
+ * These functions will convert a tag enum such as %AS_TAG_COMPONENT to
  * it's string form, and also vice-versa.
  *
  * These helper functions may be useful if implementing an AppStream parser.
@@ -35,11 +35,12 @@
 
 #include "as-tag.h"
 
-#ifdef HAVE_GPERF
-  /* we need to define this now as gperf just writes a big header file */
-  const struct tag_data *as_tag_from_gperf (const char *tag, guint etag);
-  #include "as-tag-private.h"
-#endif
+const struct tag_data *_as_tag_from_gperf (const char *tag, GPERF_LEN_TYPE etag);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#include "as-tag-private.h"
+#pragma GCC diagnostic pop
 
 /**
  * as_tag_from_string:
@@ -72,30 +73,17 @@ as_tag_from_string (const gchar *tag)
 AsTag
 as_tag_from_string_full (const gchar *tag, AsTagFlags flags)
 {
-#ifdef HAVE_GPERF
 	const struct tag_data *ky;
-#else
-	guint i;
-#endif
 	AsTag etag = AS_TAG_UNKNOWN;
 
 	/* invalid */
 	if (tag == NULL)
 		return AS_TAG_UNKNOWN;
 
-#ifdef HAVE_GPERF
 	/* use a perfect hash */
-	ky = as_tag_from_gperf (tag, strlen (tag));
+	ky = _as_tag_from_gperf (tag, (GPERF_LEN_TYPE) strlen (tag));
 	if (ky != NULL)
 		etag = ky->etag;
-#else
-	for (i = 0; i < AS_TAG_LAST; i++) {
-		if (g_strcmp0 (tag, as_tag_to_string (i)) == 0) {
-			etag = i;
-			break;
-		}
-	}
-#endif
 
 	/* deprecated names */
 	if (etag == AS_TAG_UNKNOWN && (flags & AS_TAG_FLAG_USE_FALLBACKS)) {
@@ -106,9 +94,9 @@ as_tag_from_string_full (const gchar *tag, AsTagFlags flags)
 		if (g_strcmp0 (tag, "licence") == 0)
 			return AS_TAG_PROJECT_LICENSE;
 		if (g_strcmp0 (tag, "applications") == 0)
-			return AS_TAG_APPLICATIONS;
+			return AS_TAG_COMPONENTS;
 		if (g_strcmp0 (tag, "application") == 0)
-			return AS_TAG_APPLICATION;
+			return AS_TAG_COMPONENT;
 		if (g_strcmp0 (tag, "updatecontact") == 0)
 			return AS_TAG_UPDATE_CONTACT;
 		/* fix spelling error */
@@ -190,6 +178,18 @@ as_tag_to_string (AsTag tag)
 		"permission",
 		"location",
 		"checksum",
+		"size",
+		"translation",
+		"content_rating",
+		"content_attribute",
+		"version",
+		"reviews",
+		"review",
+		"reviewer_name",
+		"reviewer_id",
+		"suggests",
+		"requires",
+		"custom",
 		NULL };
 	if (tag > AS_TAG_LAST)
 		tag = AS_TAG_LAST;

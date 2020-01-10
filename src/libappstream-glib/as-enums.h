@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -41,8 +41,10 @@ G_BEGIN_DECLS
  * @AS_ID_KIND_SOURCE:			A software source
  * @AS_ID_KIND_ADDON:			An addon, e.g. a plugin
  * @AS_ID_KIND_FIRMWARE:		A firmware update
+ * @AS_ID_KIND_RUNTIME:			Runtime platform
+ * @AS_ID_KIND_GENERIC:			Generic component
  *
- * The ID type.
+ * The component type.
  **/
 typedef enum {
 	AS_ID_KIND_UNKNOWN,		/* Since: 0.1.0 */
@@ -54,9 +56,11 @@ typedef enum {
 	AS_ID_KIND_SOURCE,		/* Since: 0.1.0 */
 	AS_ID_KIND_ADDON,		/* Since: 0.1.7 */
 	AS_ID_KIND_FIRMWARE,		/* Since: 0.3.5 */
+	AS_ID_KIND_RUNTIME,		/* Since: 0.5.6 */
+	AS_ID_KIND_GENERIC,		/* Since: 0.5.8 */
 	/*< private >*/
 	AS_ID_KIND_LAST
-} AsIdKind;
+} AsIdKind G_GNUC_DEPRECATED_FOR(AsAppKind);
 
 /**
  * AsUrlKind:
@@ -67,6 +71,7 @@ typedef enum {
  * @AS_URL_KIND_DONATION:		Application donation page
  * @AS_URL_KIND_HELP:			Application help manual
  * @AS_URL_KIND_MISSING:		The package is available, but missing
+ * @AS_URL_KIND_TRANSLATE:		Application translation page
  *
  * The URL type.
  **/
@@ -78,6 +83,7 @@ typedef enum {
 	AS_URL_KIND_DONATION,		/* Since: 0.1.1 */
 	AS_URL_KIND_HELP,		/* Since: 0.1.5 */
 	AS_URL_KIND_MISSING,		/* Since: 0.2.2 */
+	AS_URL_KIND_TRANSLATE,		/* Since: 0.6.1 */
 	/*< private >*/
 	AS_URL_KIND_LAST
 } AsUrlKind;
@@ -108,14 +114,61 @@ typedef enum {
 	AS_KUDO_KIND_LAST
 } AsKudoKind;
 
-const gchar	*as_id_kind_to_string		(AsIdKind	 id_kind);
-AsIdKind	 as_id_kind_from_string		(const gchar	*id_kind);
+/**
+ * AsUrgencyKind:
+ * @AS_URGENCY_KIND_UNKNOWN:		Urgency invalid or not known
+ * @AS_URGENCY_KIND_LOW:		Low urgency release
+ * @AS_URGENCY_KIND_MEDIUM:		Medium urgency release
+ * @AS_URGENCY_KIND_HIGH:		High urgency release
+ * @AS_URGENCY_KIND_CRITICAL:		Critically urgent release
+ *
+ * The urgency of a release.
+ **/
+typedef enum {
+	AS_URGENCY_KIND_UNKNOWN,	/* Since: 0.5.1 */
+	AS_URGENCY_KIND_LOW,		/* Since: 0.5.1 */
+	AS_URGENCY_KIND_MEDIUM,		/* Since: 0.5.1 */
+	AS_URGENCY_KIND_HIGH,		/* Since: 0.5.1 */
+	AS_URGENCY_KIND_CRITICAL,	/* Since: 0.5.1 */
+	/*< private >*/
+	AS_URGENCY_KIND_LAST
+} AsUrgencyKind;
+
+/**
+ * AsSizeKind:
+ * @AS_SIZE_KIND_UNKNOWN:		Not known
+ * @AS_SIZE_KIND_INSTALLED:		Installed size
+ * @AS_SIZE_KIND_DOWNLOAD:		Download size
+ *
+ * The release size kind.
+ **/
+typedef enum {
+	AS_SIZE_KIND_UNKNOWN,		/* Since: 0.5.2 */
+	AS_SIZE_KIND_INSTALLED,		/* Since: 0.5.2 */
+	AS_SIZE_KIND_DOWNLOAD,		/* Since: 0.5.2 */
+	/*< private >*/
+	AS_SIZE_KIND_LAST
+} AsSizeKind;
+
+const gchar	*as_size_kind_to_string		(AsSizeKind	 size_kind);
+AsSizeKind	 as_size_kind_from_string	(const gchar	*size_kind);
+
+const gchar	*as_urgency_kind_to_string	(AsUrgencyKind	 urgency_kind);
+AsUrgencyKind	 as_urgency_kind_from_string	(const gchar	*urgency_kind);
 
 const gchar	*as_url_kind_to_string		(AsUrlKind	 url_kind);
 AsUrlKind	 as_url_kind_from_string	(const gchar	*url_kind);
 
 const gchar	*as_kudo_kind_to_string		(AsKudoKind	 kudo_kind);
 AsKudoKind	 as_kudo_kind_from_string	(const gchar	*kudo_kind);
+
+/* deprecated */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+const gchar	*as_id_kind_to_string		(AsIdKind	 id_kind)
+G_DEPRECATED_FOR(as_app_kind_to_string);
+AsIdKind	 as_id_kind_from_string		(const gchar	*id_kind)
+G_DEPRECATED_FOR(as_app_kind_from_string);
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_END_DECLS
 

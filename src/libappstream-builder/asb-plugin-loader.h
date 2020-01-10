@@ -26,22 +26,10 @@
 
 #include "asb-plugin.h"
 
-#define ASB_TYPE_PLUGIN_LOADER			(asb_plugin_loader_get_type())
-#define ASB_PLUGIN_LOADER(obj)			(G_TYPE_CHECK_INSTANCE_CAST((obj), ASB_TYPE_PLUGIN_LOADER, AsbPluginLoader))
-#define ASB_PLUGIN_LOADER_CLASS(cls)		(G_TYPE_CHECK_CLASS_CAST((cls), ASB_TYPE_PLUGIN_LOADER, AsbPluginLoaderClass))
-#define ASB_IS_PLUGIN_LOADER(obj)		(G_TYPE_CHECK_INSTANCE_TYPE((obj), ASB_TYPE_PLUGIN_LOADER))
-#define ASB_IS_PLUGIN_LOADER_CLASS(cls)		(G_TYPE_CHECK_CLASS_TYPE((cls), ASB_TYPE_PLUGIN_LOADER))
-#define ASB_PLUGIN_LOADER_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), ASB_TYPE_PLUGIN_LOADER, AsbPluginLoaderClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsbPluginLoader			AsbPluginLoader;
-typedef struct _AsbPluginLoaderClass		AsbPluginLoaderClass;
-
-struct _AsbPluginLoader
-{
-	GObject			parent;
-};
+#define ASB_TYPE_PLUGIN_LOADER (asb_plugin_loader_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsbPluginLoader, asb_plugin_loader, ASB, PLUGIN_LOADER, GObject)
 
 struct _AsbPluginLoaderClass
 {
@@ -57,9 +45,11 @@ struct _AsbPluginLoaderClass
 	void (*_asb_reserved8)	(void);
 };
 
-GType		 asb_plugin_loader_get_type	(void);
 AsbPluginLoader	*asb_plugin_loader_new		(AsbContext		*ctx);
 
+const gchar	*asb_plugin_loader_get_dir	(AsbPluginLoader	*plugin_loader);
+void		 asb_plugin_loader_set_dir	(AsbPluginLoader	*plugin_loader,
+						 const gchar		*plugin_dir);
 gboolean	 asb_plugin_loader_setup	(AsbPluginLoader	*plugin_loader,
 						 GError			**error);
 GPtrArray	*asb_plugin_loader_get_globs	(AsbPluginLoader	*plugin_loader);

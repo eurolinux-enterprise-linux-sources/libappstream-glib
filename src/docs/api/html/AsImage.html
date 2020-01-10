@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>AppStream-glib Reference Manual: AsImage</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>AsImage: AppStream-glib Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="AppStream-glib Reference Manual">
 <link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
 <link rel="prev" href="AsIcon.html" title="AsIcon">
-<link rel="next" href="AsRelease.html" title="AsRelease">
-<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="next" href="appstream-glib-as-markup.html" title="as-markup">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -21,7 +21,7 @@
 <td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
 <td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
 <td><a accesskey="p" href="AsIcon.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
-<td><a accesskey="n" href="AsRelease.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+<td><a accesskey="n" href="appstream-glib-as-markup.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
 </tr></table>
 <div class="refentry">
 <a name="AsImage"></a><div class="titlepage"></div>
@@ -44,7 +44,7 @@ justifications.
 </div>
 <div class="refsect1">
 <a name="AsImage.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -67,36 +67,43 @@ justifications.
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-kind-to-string" title="as_image_kind_to_string ()">as_image_kind_to_string</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-url" title="as_image_get_url ()">as_image_get_url</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-md5" title="as_image_get_md5 ()">as_image_get_md5</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-basename" title="as_image_get_basename ()">as_image_get_basename</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-locale" title="as_image_get_locale ()">as_image_get_locale</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
 <td class="function_type">
-<span class="returnvalue">guint</span>
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-width" title="as_image_get_width ()">as_image_get_width</a> <span class="c_punctuation">()</span>
@@ -104,7 +111,7 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">guint</span>
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-height" title="as_image_get_height ()">as_image_get_height</a> <span class="c_punctuation">()</span>
@@ -120,7 +127,7 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+<a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="returnvalue">GdkPixbuf</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-pixbuf" title="as_image_get_pixbuf ()">as_image_get_pixbuf</a> <span class="c_punctuation">()</span>
@@ -140,6 +147,14 @@ justifications.
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-set-basename" title="as_image_set_basename ()">as_image_set_basename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-locale" title="as_image_set_locale ()">as_image_set_locale</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
@@ -176,7 +191,7 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags"><span class="returnvalue">AsImageAlphaFlags</span></a>
+<a class="link" href="AsImage.html#AsImageAlphaFlags" title="AsImageAlphaFlags"><span class="returnvalue">AsImageAlphaFlags</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-get-alpha-flags" title="as_image_get_alpha_flags ()">as_image_get_alpha_flags</a> <span class="c_punctuation">()</span>
@@ -184,7 +199,7 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">gboolean</span>
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-load-filename" title="as_image_load_filename ()">as_image_load_filename</a> <span class="c_punctuation">()</span>
@@ -192,7 +207,15 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-load-filename-full" title="as_image_load_filename_full ()">as_image_load_filename_full</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="returnvalue">GdkPixbuf</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-save-pixbuf" title="as_image_save_pixbuf ()">as_image_save_pixbuf</a> <span class="c_punctuation">()</span>
@@ -200,10 +223,18 @@ justifications.
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">gboolean</span>
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="AsImage.html#as-image-save-filename" title="as_image_save_filename ()">as_image_save_filename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-equal" title="as_image_equal ()">as_image_equal</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 </tbody>
@@ -211,12 +242,20 @@ justifications.
 </div>
 <div class="refsect1">
 <a name="AsImage.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
 </colgroup>
 <tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-TYPE-IMAGE:CAPS" title="AS_TYPE_IMAGE">AS_TYPE_IMAGE</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">struct</td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImageClass" title="struct AsImageClass">AsImageClass</a></td>
+</tr>
 <tr>
 <td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind">AsImageKind</a></td>
@@ -227,7 +266,35 @@ justifications.
 </tr>
 <tr>
 <td class="datatype_keyword">enum</td>
-<td class="function_name"><a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags">AsImageAlphaFlags</a></td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImageLoadFlags" title="enum AsImageLoadFlags">AsImageLoadFlags</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-NONE:CAPS" title="AS_IMAGE_ALPHA_FLAG_NONE">AS_IMAGE_ALPHA_FLAG_NONE</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-TOP:CAPS" title="AS_IMAGE_ALPHA_FLAG_TOP">AS_IMAGE_ALPHA_FLAG_TOP</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-BOTTOM:CAPS" title="AS_IMAGE_ALPHA_FLAG_BOTTOM">AS_IMAGE_ALPHA_FLAG_BOTTOM</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-LEFT:CAPS" title="AS_IMAGE_ALPHA_FLAG_LEFT">AS_IMAGE_ALPHA_FLAG_LEFT</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-RIGHT:CAPS" title="AS_IMAGE_ALPHA_FLAG_RIGHT">AS_IMAGE_ALPHA_FLAG_RIGHT</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-INTERNAL:CAPS" title="AS_IMAGE_ALPHA_FLAG_INTERNAL">AS_IMAGE_ALPHA_FLAG_INTERNAL</a></td>
+</tr>
+<tr>
+<td class="typedef_keyword">typedef</td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImageAlphaFlags" title="AsImageAlphaFlags">AsImageAlphaFlags</a></td>
 </tr>
 <tr>
 <td class="define_keyword">#define</td>
@@ -253,12 +320,16 @@ justifications.
 <td class="define_keyword">#define</td>
 <td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-THUMBNAIL-WIDTH:CAPS" title="AS_IMAGE_THUMBNAIL_WIDTH">AS_IMAGE_THUMBNAIL_WIDTH</a></td>
 </tr>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImage-struct" title="AsImage">AsImage</a></td>
+</tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect1">
 <a name="AsImage.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    GObject
+<pre class="screen">    <a href="/usr/share/gtk-doc/html/gobjectgobject-The-Base-Object-Type.html#GObject-struct">GObject</a>
     <span class="lineart">╰──</span> AsImage
 </pre>
 </div>
@@ -282,21 +353,21 @@ single image.</p>
 as_image_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Creates a new <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.2.5"></a><h4>Returns</h4>
+<a name="as-image-new.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-kind-from-string"></a><h3>as_image_kind_from_string ()</h3>
 <pre class="programlisting"><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="returnvalue">AsImageKind</span></a>
-as_image_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *kind</code></em>);</pre>
+as_image_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *kind</code></em>);</pre>
 <p>Converts the text representation to an enumerated value.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -310,21 +381,21 @@ as_image_kind_from_string (<em class="parameter"><code>const <span class="type">
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.3.6"></a><h4>Returns</h4>
+<a name="as-image-kind-from-string.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a>, or <a class="link" href="AsImage.html#AS-IMAGE-KIND-UNKNOWN:CAPS"><code class="literal">AS_IMAGE_KIND_UNKNOWN</code></a> for unknown. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-kind-to-string"></a><h3>as_image_kind_to_string ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_image_kind_to_string (<em class="parameter"><code><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a> kind</code></em>);</pre>
 <p>Converts the enumerated value to an text representation.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -338,22 +409,21 @@ as_image_kind_to_string (<em class="parameter"><code><a class="link" href="AsIma
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.4.6"></a><h4>Returns</h4>
+<a name="as-image-kind-to-string.returns"></a><h4>Returns</h4>
 <p> string version of <em class="parameter"><code>kind</code></em>
 </p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-url"></a><h3>as_image_get_url ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_image_get_url (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the full qualified URL for the image, usually pointing at some mirror.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-url.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -367,21 +437,20 @@ as_image_get_url (<em class="parameter"><code><a class="link" href="AsImage.html
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.5.6"></a><h4>Returns</h4>
+<a name="as-image-get-url.returns"></a><h4>Returns</h4>
 <p> URL</p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-md5"></a><h3>as_image_get_md5 ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_image_get_md5 (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the string representation of the pixbuf hash value.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.6.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-md5.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -395,21 +464,20 @@ as_image_get_md5 (<em class="parameter"><code><a class="link" href="AsImage.html
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.6.6"></a><h4>Returns</h4>
-<p> string representing the MD5 sum, or <code class="literal">NULL</code> if unset</p>
-<p></p>
+<a name="as-image-get-md5.returns"></a><h4>Returns</h4>
+<p> string representing the MD5 sum, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a> if unset</p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-basename"></a><h3>as_image_get_basename ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_image_get_basename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the suggested basename the image, including file extension.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.7.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-basename.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -423,21 +491,47 @@ as_image_get_basename (<em class="parameter"><code><a class="link" href="AsImage
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.7.6"></a><h4>Returns</h4>
+<a name="as-image-get-basename.returns"></a><h4>Returns</h4>
 <p> filename</p>
-<p></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-locale"></a><h3>as_image_get_locale ()</h3>
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_image_get_locale (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the locale of the image.</p>
+<div class="refsect3">
+<a name="as-image-get-locale.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-image-get-locale.returns"></a><h4>Returns</h4>
+<p> locale, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p>
+</div>
+<p class="since">Since: 0.5.14</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-width"></a><h3>as_image_get_width ()</h3>
-<pre class="programlisting"><span class="returnvalue">guint</span>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
 as_image_get_width (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the image width.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.8.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-width.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -451,21 +545,20 @@ as_image_get_width (<em class="parameter"><code><a class="link" href="AsImage.ht
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.8.6"></a><h4>Returns</h4>
+<a name="as-image-get-width.returns"></a><h4>Returns</h4>
 <p> width in pixels</p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-height"></a><h3>as_image_get_height ()</h3>
-<pre class="programlisting"><span class="returnvalue">guint</span>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
 as_image_get_height (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the image height.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.9.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-height.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -479,11 +572,10 @@ as_image_get_height (<em class="parameter"><code><a class="link" href="AsImage.h
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.9.6"></a><h4>Returns</h4>
+<a name="as-image-get-height.returns"></a><h4>Returns</h4>
 <p> height in pixels</p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -492,8 +584,8 @@ as_image_get_height (<em class="parameter"><code><a class="link" href="AsImage.h
 as_image_get_kind (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the image kind.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.10.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-kind.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -507,21 +599,20 @@ as_image_get_kind (<em class="parameter"><code><a class="link" href="AsImage.htm
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.10.6"></a><h4>Returns</h4>
+<a name="as-image-get-kind.returns"></a><h4>Returns</h4>
 <p> the <a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a></p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-pixbuf"></a><h3>as_image_get_pixbuf ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="returnvalue">GdkPixbuf</span></a> *
 as_image_get_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the image pixbuf if set.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.11.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-pixbuf.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -535,23 +626,22 @@ as_image_get_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.h
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.11.6"></a><h4>Returns</h4>
-<p> the <a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>, or <code class="literal">NULL</code>. </p>
+<a name="as-image-get-pixbuf.returns"></a><h4>Returns</h4>
+<p> the <a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="type">GdkPixbuf</span></a>, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-set-url"></a><h3>as_image_set_url ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_image_set_url (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                  <em class="parameter"><code>const <span class="type">gchar</span> *url</code></em>,
-                  <em class="parameter"><code><span class="type">gssize</span> url_len</code></em>);</pre>
+                  <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *url</code></em>);</pre>
 <p>Sets the fully-qualified mirror URL to use for the image.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.12.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-set-url.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -568,27 +658,21 @@ as_image_set_url (<em class="parameter"><code><a class="link" href="AsImage.html
 <td class="parameter_description"><p>the URL.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
-<tr>
-<td class="parameter_name"><p>url_len</p></td>
-<td class="parameter_description"><p>the size of <em class="parameter"><code>url</code></em>
-, or -1 if <code class="literal">NULL</code>-terminated.</p></td>
-<td class="parameter_annotations"> </td>
-</tr>
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-set-basename"></a><h3>as_image_set_basename ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_image_set_basename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                       <em class="parameter"><code>const <span class="type">gchar</span> *basename</code></em>);</pre>
+                       <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *basename</code></em>);</pre>
 <p>Sets the image basename filename.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.13.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-set-basename.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -608,18 +692,49 @@ as_image_set_basename (<em class="parameter"><code><a class="link" href="AsImage
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-locale"></a><h3>as_image_set_locale ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_locale (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                     <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *locale</code></em>);</pre>
+<p>Sets the image locale.</p>
+<div class="refsect3">
+<a name="as-image-set-locale.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>locale</p></td>
+<td class="parameter_description"><p>the new image locale, e.g. "en_GB" or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: 0.5.14</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-set-width"></a><h3>as_image_set_width ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_image_set_width (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                    <em class="parameter"><code><span class="type">guint</span> width</code></em>);</pre>
+                    <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> width</code></em>);</pre>
 <p>Sets the image width.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.14.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-set-width.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -639,18 +754,18 @@ as_image_set_width (<em class="parameter"><code><a class="link" href="AsImage.ht
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-set-height"></a><h3>as_image_set_height ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_image_set_height (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                     <em class="parameter"><code><span class="type">guint</span> height</code></em>);</pre>
+                     <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> height</code></em>);</pre>
 <p>Sets the image height.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.15.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-set-height.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -670,7 +785,7 @@ as_image_set_height (<em class="parameter"><code><a class="link" href="AsImage.h
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -680,8 +795,8 @@ as_image_set_kind (<em class="parameter"><code><a class="link" href="AsImage.htm
                    <em class="parameter"><code><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a> kind</code></em>);</pre>
 <p>Sets the image kind.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.16.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-set-kind.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -701,18 +816,18 @@ as_image_set_kind (<em class="parameter"><code><a class="link" href="AsImage.htm
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-set-pixbuf"></a><h3>as_image_set_pixbuf ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 as_image_set_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                     <em class="parameter"><code><a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
+                     <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Sets the image pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.17.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-set-pixbuf.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -726,18 +841,18 @@ as_image_set_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.h
 </tr>
 <tr>
 <td class="parameter_name"><p>pixbuf</p></td>
-<td class="parameter_description"><p>the <a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>, or <code class="literal">NULL</code></p></td>
+<td class="parameter_description"><p>the <a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="type">GdkPixbuf</span></a>, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-get-alpha-flags"></a><h3>as_image_get_alpha_flags ()</h3>
-<pre class="programlisting"><a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags"><span class="returnvalue">AsImageAlphaFlags</span></a>
+<pre class="programlisting"><a class="link" href="AsImage.html#AsImageAlphaFlags" title="AsImageAlphaFlags"><span class="returnvalue">AsImageAlphaFlags</span></a>
 as_image_get_alpha_flags (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
 <p>Gets the alpha flags for the image. The following image would have all flags
 set, where 'x' is alpha and '@' is non-alpha.</p>
@@ -753,9 +868,10 @@ xx@@@@@@<em class="parameter"><code>xxxxxx</code></em>
 xx@@@@@@@@@@@@@@@@@@@@@@@<em class="parameter"><code>xx</code></em>
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+<p><span class="annotation">[<acronym title="Exposed in C code, not necessarily available in other languages."><span class="acronym">skip</span></acronym>]</span></p>
 <div class="refsect3">
-<a name="id-1.2.5.9.18.6"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-get-alpha-flags.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -769,25 +885,24 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.18.7"></a><h4>Returns</h4>
-<p> <a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags"><span class="type">AsImageAlphaFlags</span></a>, e.g. <a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-LEFT:CAPS"><code class="literal">AS_IMAGE_ALPHA_FLAG_LEFT</code></a></p>
-<p></p>
+<a name="as-image-get-alpha-flags.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="AsImage.html#AsImageAlphaFlags" title="AsImageAlphaFlags"><span class="type">AsImageAlphaFlags</span></a>, e.g. <a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-LEFT:CAPS" title="AS_IMAGE_ALPHA_FLAG_LEFT"><code class="literal">AS_IMAGE_ALPHA_FLAG_LEFT</code></a></p>
 </div>
-<p class="since">Since 0.2.2</p>
+<p class="since">Since: 0.2.2</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-load-filename"></a><h3>as_image_load_filename ()</h3>
-<pre class="programlisting"><span class="returnvalue">gboolean</span>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 as_image_load_filename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                        <em class="parameter"><code>const <span class="type">gchar</span> *filename</code></em>,
-                        <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+                        <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *filename</code></em>,
+                        <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>Reads a pixbuf from a file.</p>
 <p>NOTE: This function also sets the suggested filename which can be retrieved
 using <a class="link" href="AsImage.html#as-image-get-basename" title="as_image_get_basename ()"><code class="function">as_image_get_basename()</code></a>. This can be overridden if required.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.19.6"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-load-filename.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -806,31 +921,89 @@ using <a class="link" href="AsImage.html#as-image-get-basename" title="as_image_
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.19.7"></a><h4>Returns</h4>
-<p> <code class="literal">TRUE</code> for success</p>
-<p></p>
+<a name="as-image-load-filename.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> for success</p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-load-filename-full"></a><h3>as_image_load_filename_full ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+as_image_load_filename_full (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                             <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *filename</code></em>,
+                             <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> dest_size</code></em>,
+                             <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> src_size_min</code></em>,
+                             <em class="parameter"><code><a class="link" href="AsImage.html#AsImageLoadFlags" title="enum AsImageLoadFlags"><span class="type">AsImageLoadFlags</span></a> flags</code></em>,
+                             <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+<p>Reads an image from a file.</p>
+<div class="refsect3">
+<a name="as-image-load-filename-full.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>filename</p></td>
+<td class="parameter_description"><p>filename to read from</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>dest_size</p></td>
+<td class="parameter_description"><p>The size of the constructed pixbuf, or 0 for the native size</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>src_size_min</p></td>
+<td class="parameter_description"><p>The smallest source size allowed, or 0 for none</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html#AsImageLoadFlags" title="enum AsImageLoadFlags"><span class="type">AsImageLoadFlags</span></a>, e.g. <a class="link" href="AsImage.html#AS-IMAGE-LOAD-FLAG-NONE:CAPS"><code class="literal">AS_IMAGE_LOAD_FLAG_NONE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-image-load-filename-full.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> for success</p>
+</div>
+<p class="since">Since: 0.5.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-save-pixbuf"></a><h3>as_image_save_pixbuf ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="returnvalue">GdkPixbuf</span></a> *
 as_image_save_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                      <em class="parameter"><code><span class="type">guint</span> width</code></em>,
-                      <em class="parameter"><code><span class="type">guint</span> height</code></em>,
+                      <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> width</code></em>,
+                      <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> height</code></em>,
                       <em class="parameter"><code><a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags"><span class="type">AsImageSaveFlags</span></a> flags</code></em>);</pre>
 <p>Resamples a pixbuf to a specific size.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.20.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-save-pixbuf.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -861,26 +1034,26 @@ as_image_save_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.20.6"></a><h4>Returns</h4>
-<p> A <a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> of the specified size. </p>
+<a name="as-image-save-pixbuf.returns"></a><h4>Returns</h4>
+<p> A <a href="/usr/share/gtk-doc/html/gdk-pixbufgdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="type">GdkPixbuf</span></a> of the specified size. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-image-save-filename"></a><h3>as_image_save_filename ()</h3>
-<pre class="programlisting"><span class="returnvalue">gboolean</span>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
-                        <em class="parameter"><code>const <span class="type">gchar</span> *filename</code></em>,
-                        <em class="parameter"><code><span class="type">guint</span> width</code></em>,
-                        <em class="parameter"><code><span class="type">guint</span> height</code></em>,
+                        <em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *filename</code></em>,
+                        <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> width</code></em>,
+                        <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> height</code></em>,
                         <em class="parameter"><code><a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags"><span class="type">AsImageSaveFlags</span></a> flags</code></em>,
-                        <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+                        <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>Saves a pixbuf to a file.</p>
 <div class="refsect3">
-<a name="id-1.2.5.9.21.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-image-save-filename.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -914,28 +1087,76 @@ as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImag
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a>.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.5.9.21.6"></a><h4>Returns</h4>
-<p> <code class="literal">TRUE</code> for success</p>
-<p></p>
+<a name="as-image-save-filename.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> for success</p>
 </div>
-<p class="since">Since 0.1.6</p>
+<p class="since">Since: 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-equal"></a><h3>as_image_equal ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+as_image_equal (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image1</code></em>,
+                <em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image2</code></em>);</pre>
+<p>Checks if two images are the same.</p>
+<div class="refsect3">
+<a name="as-image-equal.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image1</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>image2</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-image-equal.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> for success</p>
+</div>
+<p class="since">Since: 0.5.7</p>
 </div>
 </div>
 <div class="refsect1">
 <a name="AsImage.other_details"></a><h2>Types and Values</h2>
 <div class="refsect2">
+<a name="AS-TYPE-IMAGE:CAPS"></a><h3>AS_TYPE_IMAGE</h3>
+<pre class="programlisting">#define AS_TYPE_IMAGE (as_image_get_type ())
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsImageClass"></a><h3>struct AsImageClass</h3>
+<pre class="programlisting">struct AsImageClass {
+	GObjectClass		parent_class;
+};
+</pre>
+</div>
+<hr>
+<div class="refsect2">
 <a name="AsImageKind"></a><h3>enum AsImageKind</h3>
 <p>The image type.</p>
 <div class="refsect3">
-<a name="id-1.2.5.10.2.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsImageKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -972,8 +1193,8 @@ as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImag
 <a name="AsImageSaveFlags"></a><h3>enum AsImageSaveFlags</h3>
 <p>The flags used for saving images.</p>
 <div class="refsect3">
-<a name="id-1.2.5.10.3.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsImageSaveFlags.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -996,12 +1217,16 @@ as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImag
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-IMAGE-SAVE-FLAG-SHARPEN:CAPS"></a>AS_IMAGE_SAVE_FLAG_SHARPEN</p></td>
-<td class="enum_member_description"> </td>
+<td class="enum_member_description">
+<p>Sharpen the image to clarify detail</p>
+</td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-IMAGE-SAVE-FLAG-BLUR:CAPS"></a>AS_IMAGE_SAVE_FLAG_BLUR</p></td>
-<td class="enum_member_description"> </td>
+<td class="enum_member_description">
+<p>Blur the image to clear detail</p>
+</td>
 <td class="enum_member_annotations"> </td>
 </tr>
 </tbody>
@@ -1010,11 +1235,11 @@ as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImag
 </div>
 <hr>
 <div class="refsect2">
-<a name="AsImageAlphaFlags"></a><h3>enum AsImageAlphaFlags</h3>
-<p>The flags used for reporting the alpha cutouts in the image.</p>
+<a name="AsImageLoadFlags"></a><h3>enum AsImageLoadFlags</h3>
+<p>The flags used for loading images.</p>
 <div class="refsect3">
-<a name="id-1.2.5.10.4.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsImageLoadFlags.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -1022,44 +1247,37 @@ as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImag
 </colgroup>
 <tbody>
 <tr>
-<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-NONE:CAPS"></a>AS_IMAGE_ALPHA_FLAG_NONE</p></td>
+<td class="enum_member_name"><p><a name="AS-IMAGE-LOAD-FLAG-NONE:CAPS"></a>AS_IMAGE_LOAD_FLAG_NONE</p></td>
 <td class="enum_member_description">
-<p>No padding detected</p>
+<p>No special flags set</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-TOP:CAPS"></a>AS_IMAGE_ALPHA_FLAG_TOP</p></td>
+<td class="enum_member_name"><p><a name="AS-IMAGE-LOAD-FLAG-SHARPEN:CAPS"></a>AS_IMAGE_LOAD_FLAG_SHARPEN</p></td>
 <td class="enum_member_description">
-<p>Padding detected at the image top</p>
+<p>Sharpen the resulting image</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-BOTTOM:CAPS"></a>AS_IMAGE_ALPHA_FLAG_BOTTOM</p></td>
+<td class="enum_member_name"><p><a name="AS-IMAGE-LOAD-FLAG-SET-BASENAME:CAPS"></a>AS_IMAGE_LOAD_FLAG_SET_BASENAME</p></td>
 <td class="enum_member_description">
-<p>Padding detected at the image bottom</p>
+<p>Set the image basename</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-LEFT:CAPS"></a>AS_IMAGE_ALPHA_FLAG_LEFT</p></td>
+<td class="enum_member_name"><p><a name="AS-IMAGE-LOAD-FLAG-SET-CHECKSUM:CAPS"></a>AS_IMAGE_LOAD_FLAG_SET_CHECKSUM</p></td>
 <td class="enum_member_description">
-<p>Padding detected at the image left side</p>
+<p>Set the image checksum</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-RIGHT:CAPS"></a>AS_IMAGE_ALPHA_FLAG_RIGHT</p></td>
+<td class="enum_member_name"><p><a name="AS-IMAGE-LOAD-FLAG-ONLY-SUPPORTED:CAPS"></a>AS_IMAGE_LOAD_FLAG_ONLY_SUPPORTED</p></td>
 <td class="enum_member_description">
-<p>Padding detected at the image right side</p>
-</td>
-<td class="enum_member_annotations"> </td>
-</tr>
-<tr>
-<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-INTERNAL:CAPS"></a>AS_IMAGE_ALPHA_FLAG_INTERNAL</p></td>
-<td class="enum_member_description">
-<p>Internal alpha cut out areas detected</p>
+<p>Only load supported formats like PNG and JPG</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
@@ -1069,56 +1287,91 @@ as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImag
 </div>
 <hr>
 <div class="refsect2">
+<a name="AS-IMAGE-ALPHA-FLAG-NONE:CAPS"></a><h3>AS_IMAGE_ALPHA_FLAG_NONE</h3>
+<pre class="programlisting">#define AS_IMAGE_ALPHA_FLAG_NONE (0u)		/* Since: 0.2.2 */
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-ALPHA-FLAG-TOP:CAPS"></a><h3>AS_IMAGE_ALPHA_FLAG_TOP</h3>
+<pre class="programlisting">#define AS_IMAGE_ALPHA_FLAG_TOP		(1u &lt;&lt; 0) /* Since: 0.2.2 */
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-ALPHA-FLAG-BOTTOM:CAPS"></a><h3>AS_IMAGE_ALPHA_FLAG_BOTTOM</h3>
+<pre class="programlisting">#define AS_IMAGE_ALPHA_FLAG_BOTTOM (1u &lt;&lt; 1) /* Since: 0.2.2 */
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-ALPHA-FLAG-LEFT:CAPS"></a><h3>AS_IMAGE_ALPHA_FLAG_LEFT</h3>
+<pre class="programlisting">#define AS_IMAGE_ALPHA_FLAG_LEFT (1u &lt;&lt; 2) /* Since: 0.2.2 */
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-ALPHA-FLAG-RIGHT:CAPS"></a><h3>AS_IMAGE_ALPHA_FLAG_RIGHT</h3>
+<pre class="programlisting">#define AS_IMAGE_ALPHA_FLAG_RIGHT (1u &lt;&lt; 3) /* Since: 0.2.2 */
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-ALPHA-FLAG-INTERNAL:CAPS"></a><h3>AS_IMAGE_ALPHA_FLAG_INTERNAL</h3>
+<pre class="programlisting">#define AS_IMAGE_ALPHA_FLAG_INTERNAL (1u &lt;&lt; 4) /* Since: 0.2.2 */
+</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsImageAlphaFlags"></a><h3>AsImageAlphaFlags</h3>
+<pre class="programlisting">typedef guint AsImageAlphaFlags;
+</pre>
+<p>The flags used for reporting the alpha cutouts in the image.</p>
+</div>
+<hr>
+<div class="refsect2">
 <a name="AS-IMAGE-LARGE-HEIGHT:CAPS"></a><h3>AS_IMAGE_LARGE_HEIGHT</h3>
 <pre class="programlisting">#define AS_IMAGE_LARGE_HEIGHT		423 /* Since: 0.2.2 */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="AS-IMAGE-LARGE-WIDTH:CAPS"></a><h3>AS_IMAGE_LARGE_WIDTH</h3>
 <pre class="programlisting">#define AS_IMAGE_LARGE_WIDTH		752 /* Since: 0.2.2 */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="AS-IMAGE-NORMAL-HEIGHT:CAPS"></a><h3>AS_IMAGE_NORMAL_HEIGHT</h3>
 <pre class="programlisting">#define AS_IMAGE_NORMAL_HEIGHT		351 /* Since: 0.2.2 */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="AS-IMAGE-NORMAL-WIDTH:CAPS"></a><h3>AS_IMAGE_NORMAL_WIDTH</h3>
 <pre class="programlisting">#define AS_IMAGE_NORMAL_WIDTH		624 /* Since: 0.2.2 */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="AS-IMAGE-THUMBNAIL-HEIGHT:CAPS"></a><h3>AS_IMAGE_THUMBNAIL_HEIGHT</h3>
 <pre class="programlisting">#define AS_IMAGE_THUMBNAIL_HEIGHT 63 /* Since: 0.2.2 */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="AS-IMAGE-THUMBNAIL-WIDTH:CAPS"></a><h3>AS_IMAGE_THUMBNAIL_WIDTH</h3>
 <pre class="programlisting">#define AS_IMAGE_THUMBNAIL_WIDTH 	112 /* Since: 0.2.2 */
 </pre>
-<p>
-</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsImage-struct"></a><h3>AsImage</h3>
+<pre class="programlisting">typedef struct _AsImage AsImage;</pre>
 </div>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>

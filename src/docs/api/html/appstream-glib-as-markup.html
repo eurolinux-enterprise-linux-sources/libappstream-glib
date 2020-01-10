@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>as-markup: AppStream-glib Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="AsImage.html" title="AsImage">
+<link rel="next" href="AsRelease.html" title="AsRelease">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#appstream-glib-as-markup.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="AsImage.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="AsRelease.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="appstream-glib-as-markup"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="appstream-glib-as-markup.top_of_page"></a>as-markup</span></h2>
+<p>as-markup — Functions for managing AppStream description markup</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-markup.html#as-markup-convert-simple" title="as_markup_convert_simple ()">as_markup_convert_simple</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-markup.html#as-markup-convert" title="as_markup_convert ()">as_markup_convert</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-markup.html#as-markup-convert-full" title="as_markup_convert_full ()">as_markup_convert_full</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-markup.html#as-markup-validate" title="as_markup_validate ()">as_markup_validate</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> **
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-markup.html#as-markup-strsplit-words" title="as_markup_strsplit_words ()">as_markup_strsplit_words</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-markup.html#as-markup-import" title="as_markup_import ()">as_markup_import</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat">AsMarkupConvertFormat</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFlag" title="enum AsMarkupConvertFlag">AsMarkupConvertFlag</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.description"></a><h2>Description</h2>
+<p>These functions are used internally to libappstream-glib, and some may be
+useful to user-applications.</p>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-markup-convert-simple"></a><h3>as_markup_convert_simple ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_markup_convert_simple (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *markup</code></em>,
+                          <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+<p>Converts an XML description into a printable form.</p>
+<div class="refsect3">
+<a name="as-markup-convert-simple.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>markup</p></td>
+<td class="parameter_description"><p>the text to copy.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-markup-convert-simple.returns"></a><h4>Returns</h4>
+<p> a newly allocated <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-convert"></a><h3>as_markup_convert ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_markup_convert (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *markup</code></em>,
+                   <em class="parameter"><code><a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a> format</code></em>,
+                   <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+<p>Converts an XML description into a printable form.</p>
+<div class="refsect3">
+<a name="as-markup-convert.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>markup</p></td>
+<td class="parameter_description"><p>the text to copy.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a>, e.g. <a class="link" href="appstream-glib-as-markup.html#AS-MARKUP-CONVERT-FORMAT-MARKDOWN:CAPS"><code class="literal">AS_MARKUP_CONVERT_FORMAT_MARKDOWN</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-markup-convert.returns"></a><h4>Returns</h4>
+<p> a newly allocated <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.3.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-convert-full"></a><h3>as_markup_convert_full ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_markup_convert_full (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *markup</code></em>,
+                        <em class="parameter"><code><a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a> format</code></em>,
+                        <em class="parameter"><code><a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFlag" title="enum AsMarkupConvertFlag"><span class="type">AsMarkupConvertFlag</span></a> flags</code></em>,
+                        <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+<p>Converts an XML description into a printable form.</p>
+<div class="refsect3">
+<a name="as-markup-convert-full.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>markup</p></td>
+<td class="parameter_description"><p>the text to copy.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a>, e.g. <a class="link" href="appstream-glib-as-markup.html#AS-MARKUP-CONVERT-FORMAT-MARKDOWN:CAPS"><code class="literal">AS_MARKUP_CONVERT_FORMAT_MARKDOWN</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFlag" title="enum AsMarkupConvertFlag"><span class="type">AsMarkupConvertFlag</span></a>, e.g. <a class="link" href="appstream-glib-as-markup.html#AS-MARKUP-CONVERT-FLAG-IGNORE-ERRORS:CAPS"><code class="literal">AS_MARKUP_CONVERT_FLAG_IGNORE_ERRORS</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-markup-convert-full.returns"></a><h4>Returns</h4>
+<p> a newly allocated <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.3.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-validate"></a><h3>as_markup_validate ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+as_markup_validate (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *markup</code></em>,
+                    <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+<p>Validates some markup.</p>
+<div class="refsect3">
+<a name="as-markup-validate.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>markup</p></td>
+<td class="parameter_description"><p>the text to validate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-markup-validate.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if the appstream description was valid</p>
+</div>
+<p class="since">Since: 0.5.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-strsplit-words"></a><h3>as_markup_strsplit_words ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> **
+as_markup_strsplit_words (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *text</code></em>,
+                          <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#guint"><span class="type">guint</span></a> line_len</code></em>);</pre>
+<p>Splits up a long line into an array of smaller strings, each being no longer
+than <em class="parameter"><code>line_len</code></em>
+. Words are not split.</p>
+<div class="refsect3">
+<a name="as-markup-strsplit-words.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>text</p></td>
+<td class="parameter_description"><p>the text to split.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>line_len</p></td>
+<td class="parameter_description"><p>the maximum length of the output line</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-markup-strsplit-words.returns"></a><h4>Returns</h4>
+<p> lines, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a> in event of an error. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.3.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-import"></a><h3>as_markup_import ()</h3>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_markup_import (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *text</code></em>,
+                  <em class="parameter"><code><a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a> format</code></em>,
+                  <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+<p>Imports text and converts to AppStream markup.</p>
+<div class="refsect3">
+<a name="as-markup-import.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>text</p></td>
+<td class="parameter_description"><p>the text to import.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-markup.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a>, e.g. <a class="link" href="appstream-glib-as-markup.html#AS-MARKUP-CONVERT-FORMAT-SIMPLE:CAPS"><code class="literal">AS_MARKUP_CONVERT_FORMAT_SIMPLE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-markup-import.returns"></a><h4>Returns</h4>
+<p> appstream markup, or <a href="/usr/share/gtk-doc/html/liboilliboil-liboiljunk.html#NULL:CAPS"><code class="literal">NULL</code></a> in event of an error. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: 0.5.11</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-markup.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsMarkupConvertFormat"></a><h3>enum AsMarkupConvertFormat</h3>
+<p>The format used when converting to or from AppStream descriptions.</p>
+<div class="refsect3">
+<a name="AsMarkupConvertFormat.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-SIMPLE:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_SIMPLE</p></td>
+<td class="enum_member_description">
+<p>UTF-8 text</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-MARKDOWN:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_MARKDOWN</p></td>
+<td class="enum_member_description">
+<p>Markdown format</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-NULL:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_NULL</p></td>
+<td class="enum_member_description">
+<p>No output</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-APPSTREAM:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_APPSTREAM</p></td>
+<td class="enum_member_description">
+<p>AppStream (passthrough)</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-HTML:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_HTML</p></td>
+<td class="enum_member_description">
+<p>HyperText Markup Language</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsMarkupConvertFlag"></a><h3>enum AsMarkupConvertFlag</h3>
+<p>The flags used when converting descriptions from AppStream-style.</p>
+<div class="refsect3">
+<a name="AsMarkupConvertFlag.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FLAG-NONE:CAPS"></a>AS_MARKUP_CONVERT_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No flags set</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FLAG-IGNORE-ERRORS:CAPS"></a>AS_MARKUP_CONVERT_FLAG_IGNORE_ERRORS</p></td>
+<td class="enum_member_description">
+<p>Ignore errors where possible</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.25</div>
+</body>
+</html>

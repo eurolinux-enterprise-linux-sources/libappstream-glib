@@ -34,21 +34,17 @@
 
 #include "as-problem.h"
 
-typedef struct _AsProblemPrivate	AsProblemPrivate;
-struct _AsProblemPrivate
+typedef struct
 {
 	AsProblemKind		 kind;
 	gchar			*message;
 	guint			 line_number;
-};
+} AsProblemPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsProblem, as_problem, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) (as_problem_get_instance_private (o))
 
-/**
- * as_problem_finalize:
- **/
 static void
 as_problem_finalize (GObject *object)
 {
@@ -60,9 +56,6 @@ as_problem_finalize (GObject *object)
 	G_OBJECT_CLASS (as_problem_parent_class)->finalize (object);
 }
 
-/**
- * as_problem_init:
- **/
 static void
 as_problem_init (AsProblem *problem)
 {
@@ -71,9 +64,6 @@ as_problem_init (AsProblem *problem)
 	priv->line_number = 0;
 }
 
-/**
- * as_problem_class_init:
- **/
 static void
 as_problem_class_init (AsProblemClass *klass)
 {

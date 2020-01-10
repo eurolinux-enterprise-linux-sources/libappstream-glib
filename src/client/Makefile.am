@@ -21,6 +21,7 @@ AS_BUILDER_LIBS =					\
 	$(top_builddir)/libappstream-builder/libappstream-builder.la
 
 bin_PROGRAMS =						\
+	appstream-compose				\
 	appstream-util
 
 if HAVE_BUILDER
@@ -37,9 +38,10 @@ appstream_util_LDADD =					\
 	$(SOUP_LIBS)					\
 	$(LIBARCHIVE_LIBS)
 appstream_util_LDFLAGS =				\
+	$(RELRO_LDFLAGS)				\
 	$(PIE_LDFLAGS)
 appstream_util_CFLAGS =					\
-	$(WARNINGFLAGS_C)
+	$(WARN_CFLAGS)
 
 if HAVE_BUILDER
 appstream_builder_SOURCES =				\
@@ -52,20 +54,24 @@ appstream_builder_LDADD =				\
 	$(SOUP_LIBS)					\
 	$(LIBARCHIVE_LIBS)
 appstream_builder_LDFLAGS =				\
+	$(RELRO_LDFLAGS)				\
 	$(PIE_LDFLAGS)
 appstream_builder_CFLAGS =				\
-	$(WARNINGFLAGS_C)
+	$(WARN_CFLAGS)
 endif
 
-# ship this obsolete binary
-bin_PROGRAMS +=						\
-	appdata-validate
-appdata_validate_SOURCES =				\
-	as-validate.c
-appdata_validate_LDADD =				\
+appstream_compose_SOURCES =				\
+	as-compose.c
+appstream_compose_LDADD =				\
 	$(AS_GLIB_LIBS)					\
-	$(GLIB_LIBS)
-appdata_validate_CFLAGS =				\
-	$(WARNINGFLAGS_C)
+	$(GLIB_LIBS)					\
+	$(SOUP_LIBS)					\
+	$(GDKPIXBUF_LIBS)				\
+	$(LIBARCHIVE_LIBS)
+appstream_compose_LDFLAGS =				\
+	$(RELRO_LDFLAGS)				\
+	$(PIE_LDFLAGS)
+appstream_compose_CFLAGS =				\
+	$(WARN_CFLAGS)
 
 -include $(top_srcdir)/git.mk

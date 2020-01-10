@@ -27,8 +27,6 @@
 #include <gio/gio.h>
 #include <appstream-glib.h>
 
-#include "as-cleanup.h"
-
 #include "asb-app.h"
 #include "asb-context.h"
 #include "asb-package.h"
@@ -80,8 +78,6 @@ typedef gboolean	 (*AsbPluginProcessAppFunc)	(AsbPlugin	*plugin,
 const gchar	*asb_plugin_get_name			(void);
 void		 asb_plugin_initialize			(AsbPlugin	*plugin);
 void		 asb_plugin_destroy			(AsbPlugin	*plugin);
-void		 asb_plugin_set_enabled			(AsbPlugin	*plugin,
-							 gboolean	 enabled);
 GList		*asb_plugin_process			(AsbPlugin	*plugin,
 							 AsbPackage	*pkg,
 							 const gchar	*tmpdir,

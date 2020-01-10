@@ -30,6 +30,7 @@
 
 #include "as-app.h"
 #include "as-node-private.h"
+#include "as-stemmer.h"
 
 G_BEGIN_DECLS
 
@@ -48,6 +49,12 @@ G_BEGIN_DECLS
  * @AS_APP_PROBLEM_TRANSLATED_ID:		The <id> value was translated
  * @AS_APP_PROBLEM_TRANSLATED_LICENSE:		The <license> value was translated
  * @AS_APP_PROBLEM_TRANSLATED_PROJECT_GROUP:	The <project_group> value was translated
+ * @AS_APP_PROBLEM_UPDATECONTACT_FALLBACK:	The file used <updatecontact> without a space
+ * @AS_APP_PROBLEM_INVALID_PROJECT_GROUP:	Invalid project group detected
+ * @AS_APP_PROBLEM_INVALID_XML_TAG:		Invalid XML tag name detected
+ * @AS_APP_PROBLEM_EXPECTED_CHILDREN:		Children tags expected
+ * @AS_APP_PROBLEM_INVALID_KEYWORDS:		One or more keywords was invalid
+ * @AS_APP_PROBLEM_DUPLICATE_RELEASE:		More than one release with the same version
  *
  * The application problems detected when loading.
  **/
@@ -65,6 +72,12 @@ typedef enum {
 	AS_APP_PROBLEM_TRANSLATED_ID		= 1 << 9,
 	AS_APP_PROBLEM_TRANSLATED_LICENSE	= 1 << 10,
 	AS_APP_PROBLEM_TRANSLATED_PROJECT_GROUP	= 1 << 11,
+	AS_APP_PROBLEM_UPDATECONTACT_FALLBACK	= 1 << 12,
+	AS_APP_PROBLEM_INVALID_PROJECT_GROUP	= 1 << 13,
+	AS_APP_PROBLEM_INVALID_XML_TAG		= 1 << 14,
+	AS_APP_PROBLEM_EXPECTED_CHILDREN	= 1 << 15,
+	AS_APP_PROBLEM_INVALID_KEYWORDS		= 1 << 16,
+	AS_APP_PROBLEM_DUPLICATE_RELEASE	= 1 << 17,
 	/*< private >*/
 	AS_APP_PROBLEM_LAST
 } AsAppProblems;
@@ -73,11 +86,15 @@ typedef enum {
 #define AS_APP_ICON_MIN_HEIGHT			32
 #define AS_APP_ICON_MIN_WIDTH			32
 
+/* unique */
+#define AS_APP_UNIQUE_WILDCARD			"*"
+
 AsAppProblems	 as_app_get_problems		(AsApp		*app);
 guint		 as_app_get_name_size		(AsApp		*app);
 guint		 as_app_get_comment_size	(AsApp		*app);
 guint		 as_app_get_description_size	(AsApp		*app);
 GPtrArray	*as_app_get_search_tokens	(AsApp		*app);
+AsBundleKind	 as_app_get_bundle_kind		(AsApp		*app);
 
 GNode		*as_app_node_insert		(AsApp		*app,
 						 GNode		*parent,
@@ -98,6 +115,12 @@ gboolean	 as_app_parse_inf_file		(AsApp		*app,
 						 const gchar	*filename,
 						 AsAppParseFlags flags,
 						 GError		**error);
+void		 as_app_set_stemmer		(AsApp		*app,
+						 AsStemmer	*stemmer);
+void		 as_app_set_search_blacklist	(AsApp		*app,
+						 GHashTable	*search_blacklist);
+void		 as_app_set_search_match	(AsApp		*app,
+						 AsAppSearchMatch search_match);
 
 G_END_DECLS
 

@@ -89,17 +89,17 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = data/tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/as-linguas.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_link_flag.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/gtk-doc.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_check_xml_catalog.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_path_xml_catalog.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
-	$(top_srcdir)/m4/intltool.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -141,6 +141,7 @@ AR = @AR@
 AS_MAJOR_VERSION = @AS_MAJOR_VERSION@
 AS_MICRO_VERSION = @AS_MICRO_VERSION@
 AS_MINOR_VERSION = @AS_MINOR_VERSION@
+AS_PLUGIN_VERSION = @AS_PLUGIN_VERSION@
 AS_VERSION = @AS_VERSION@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -170,6 +171,9 @@ FGREP = @FGREP@
 FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
 FREETYPE_LIBS = @FREETYPE_LIBS@
 GCAB = @GCAB@
+GCAB_CFLAGS = @GCAB_CFLAGS@
+GCAB_DEPENDENCY = @GCAB_DEPENDENCY@
+GCAB_LIBS = @GCAB_LIBS@
 GDKPIXBUF_CFLAGS = @GDKPIXBUF_CFLAGS@
 GDKPIXBUF_LIBS = @GDKPIXBUF_LIBS@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
@@ -195,14 +199,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTLLIBS = @INTLLIBS@
-INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-INTLTOOL_MERGE = @INTLTOOL_MERGE@
-INTLTOOL_PERL = @INTLTOOL_PERL@
-INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-INTLTOOL_V_MERGE = @INTLTOOL_V_MERGE@
-INTLTOOL_V_MERGE_OPTIONS = @INTLTOOL_V_MERGE_OPTIONS@
-INTLTOOL__v_MERGE_ = @INTLTOOL__v_MERGE_@
-INTLTOOL__v_MERGE_0 = @INTLTOOL__v_MERGE_0@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 INTROSPECTION_CFLAGS = @INTROSPECTION_CFLAGS@
 INTROSPECTION_COMPILER = @INTROSPECTION_COMPILER@
@@ -212,6 +208,8 @@ INTROSPECTION_LIBS = @INTROSPECTION_LIBS@
 INTROSPECTION_MAKEFILE = @INTROSPECTION_MAKEFILE@
 INTROSPECTION_SCANNER = @INTROSPECTION_SCANNER@
 INTROSPECTION_TYPELIBDIR = @INTROSPECTION_TYPELIBDIR@
+JSON_GLIB_CFLAGS = @JSON_GLIB_CFLAGS@
+JSON_GLIB_LIBS = @JSON_GLIB_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBARCHIVE_CFLAGS = @LIBARCHIVE_CFLAGS@
@@ -229,6 +227,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_REVISION = @LT_REVISION@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -239,8 +238,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSTREE_CFLAGS = @OSTREE_CFLAGS@
-OSTREE_LIBS = @OSTREE_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -258,6 +255,7 @@ PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+RELRO_LDFLAGS = @RELRO_LDFLAGS@
 RPM_CFLAGS = @RPM_CFLAGS@
 RPM_LIBS = @RPM_LIBS@
 SED = @SED@
@@ -265,12 +263,13 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SOUP_CFLAGS = @SOUP_CFLAGS@
 SOUP_LIBS = @SOUP_LIBS@
-SQLITE_CFLAGS = @SQLITE_CFLAGS@
-SQLITE_LIBS = @SQLITE_LIBS@
+STEMMER_LIBS = @STEMMER_LIBS@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
+UUID_CFLAGS = @UUID_CFLAGS@
+UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
-WARNINGFLAGS_C = @WARNINGFLAGS_C@
+WARN_CFLAGS = @WARN_CFLAGS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -313,8 +312,6 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-intltool__v_merge_options_ = @intltool__v_merge_options_@
-intltool__v_merge_options_0 = @intltool__v_merge_options_0@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -340,23 +337,20 @@ test_files = \
 	alpha-internal1.png				\
 	alpha-internal2.png				\
 	alpha-vert.png					\
-	app-1-1.fc21.i686.rpm				\
-	app-1-1.fc21.x86_64.rpm				\
-	app-console-1-1.fc21.noarch.rpm			\
-	app-extra-1-1.fc21.noarch.rpm			\
+	app-1-1.fc25.i686.rpm				\
+	app-1-1.fc25.x86_64.rpm				\
+	app-console-1-1.fc25.noarch.rpm			\
+	app-extra-1-1.fc25.noarch.rpm			\
+	appstream.xml					\
 	asb-self-test.xml.gz				\
 	broken.appdata.xml				\
 	broken.metainfo.xml				\
 	composite-1-1.fc21.x86_64.rpm			\
 	example.appdata.xml				\
 	example.desktop					\
-	example.inf					\
 	example.metainfo.xml				\
 	example-v04.xml.gz				\
 	example-v06.yml.gz				\
-	example.yml					\
-	extra-appdata/test.xml				\
-	extra-appdata/local.xml				\
 	firmware/2_0_0/firmware.bin			\
 	firmware/2_0_0/firmware.inf			\
 	firmware/2_0_1/firmware.bin			\
@@ -365,6 +359,7 @@ test_files = \
 	firmware/2_0_2/firmware.bin			\
 	firmware/2_0_2/firmware.inf			\
 	firmware/2_0_2/firmware.metainfo.xml		\
+	flatpak_remote-name.xml				\
 	font-1-1.fc21.noarch.rpm			\
 	font-serif-1-1.fc21.noarch.rpm			\
 	intltool.appdata.xml.in				\
@@ -378,20 +373,22 @@ test_files = \
 	test-0.1-1.fc21.noarch.rpm			\
 	translated.appdata.xml				\
 	usr/share/appdata/broken.appdata.xml		\
-	usr/share/app-install/desktop/test.desktop	\
-	usr/share/app-install/icons/aequorea/iceweasel.png \
-	usr/share/app-install/icons/test.png		\
+	usr/share/app-info/icons/aequorea/iceweasel.png	\
+	usr/share/app-info/yaml/aequorea.yml		\
 	usr/share/applications/broken.desktop		\
 	usr/share/applications/test.desktop		\
 	usr/share/icons/hicolor/64x64/apps/test2.png	\
 	usr/share/icons/hicolor/128x128/apps/test3.png	\
+	usr/share/kdeapp/translations/kdeapp_fr.qm	\
+	usr/share/locale/en_GB/LC_MESSAGES/app.mo	\
+	usr/share/locale/ru/LC_MESSAGES/app.mo		\
 	usr/share/pixmaps/test.png			\
 	validate.xml.gz
 
-@HAVE_BUILDER_TRUE@BUILT_SOURCES = \
-@HAVE_BUILDER_TRUE@	colorhug-als-2.0.0.cab				\
-@HAVE_BUILDER_TRUE@	colorhug-als-2.0.1.cab				\
-@HAVE_BUILDER_TRUE@	colorhug-als-2.0.2.cab
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@BUILT_SOURCES = \
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	colorhug-als-2.0.0.cab				\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	colorhug-als-2.0.1.cab				\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	colorhug-als-2.0.2.cab
 
 CLEANFILES = \
 	$(BUILT_SOURCES)				\
@@ -597,23 +594,23 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-@HAVE_BUILDER_TRUE@colorhug-als-2.0.0.cab: $(srcdir)/firmware/2_0_0/firmware.*
-@HAVE_BUILDER_TRUE@	$(AM_V_GEN) touch -c -m -d"2000-01-01T00:00:00" $?;	\
-@HAVE_BUILDER_TRUE@	$(GCAB) --create --nopath $@			\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_0/firmware.bin	\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_0/firmware.inf
-@HAVE_BUILDER_TRUE@colorhug-als-2.0.1.cab: $(srcdir)/firmware/2_0_1/firmware.*
-@HAVE_BUILDER_TRUE@	$(AM_V_GEN) touch -c -m -d"2000-01-01T00:00:00" $?;	\
-@HAVE_BUILDER_TRUE@	$(GCAB) --create --nopath $@			\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_1/firmware.bin	\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_1/firmware.inf	\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_1/firmware.metainfo.xml
-@HAVE_BUILDER_TRUE@colorhug-als-2.0.2.cab: $(srcdir)/firmware/2_0_2/firmware.*
-@HAVE_BUILDER_TRUE@	$(AM_V_GEN) touch -c -m -d"2000-01-01T00:00:00" $?;	\
-@HAVE_BUILDER_TRUE@	$(GCAB) --create --nopath $@			\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_2/firmware.bin	\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_2/firmware.inf	\
-@HAVE_BUILDER_TRUE@		$(srcdir)/firmware/2_0_2/firmware.metainfo.xml
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@colorhug-als-2.0.0.cab: $(srcdir)/firmware/2_0_0/firmware.*
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	$(AM_V_GEN) touch -c -m -d"2000-01-01T00:00:00" $?;	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	$(GCAB) --create --nopath $@			\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_0/firmware.bin	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_0/firmware.inf
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@colorhug-als-2.0.1.cab: $(srcdir)/firmware/2_0_1/firmware.*
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	$(AM_V_GEN) touch -c -m -d"2000-01-01T00:00:00" $?;	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	$(GCAB) --create --nopath $@			\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_1/firmware.bin	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_1/firmware.inf	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_1/firmware.metainfo.xml
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@colorhug-als-2.0.2.cab: $(srcdir)/firmware/2_0_2/firmware.*
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	$(AM_V_GEN) touch -c -m -d"2000-01-01T00:00:00" $?;	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@	$(GCAB) --create --nopath $@			\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_2/firmware.bin	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_2/firmware.inf	\
+@HAVE_BUILDER_TRUE@@HAVE_GCAB_TRUE@		$(srcdir)/firmware/2_0_2/firmware.metainfo.xml
 
 -include $(top_srcdir)/git.mk
 

@@ -28,22 +28,10 @@
 
 #include <glib-object.h>
 
-#define AS_TYPE_BUNDLE			(as_bundle_get_type())
-#define AS_BUNDLE(obj)			(G_TYPE_CHECK_INSTANCE_CAST((obj), AS_TYPE_BUNDLE, AsBundle))
-#define AS_BUNDLE_CLASS(cls)		(G_TYPE_CHECK_CLASS_CAST((cls), AS_TYPE_BUNDLE, AsBundleClass))
-#define AS_IS_BUNDLE(obj)		(G_TYPE_CHECK_INSTANCE_TYPE((obj), AS_TYPE_BUNDLE))
-#define AS_IS_BUNDLE_CLASS(cls)		(G_TYPE_CHECK_CLASS_TYPE((cls), AS_TYPE_BUNDLE))
-#define AS_BUNDLE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), AS_TYPE_BUNDLE, AsBundleClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsBundle		AsBundle;
-typedef struct _AsBundleClass	AsBundleClass;
-
-struct _AsBundle
-{
-	GObject			parent;
-};
+#define AS_TYPE_BUNDLE (as_bundle_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsBundle, as_bundle, AS, BUNDLE, GObject)
 
 struct _AsBundleClass
 {
@@ -63,19 +51,29 @@ struct _AsBundleClass
  * AsBundleKind:
  * @AS_BUNDLE_KIND_UNKNOWN:		Type invalid or not known
  * @AS_BUNDLE_KIND_LIMBA:		Limba application bundle
- * @AS_BUNDLE_KIND_XDG_APP:		Desktop application deployment
+ * @AS_BUNDLE_KIND_FLATPAK:		Flatpak application deployment
+ * @AS_BUNDLE_KIND_SNAP:		Snap application deployment
+ * @AS_BUNDLE_KIND_PACKAGE:		Package-based application deployment
+ * @AS_BUNDLE_KIND_CABINET:		Cabinet firmware deployment
+ * @AS_BUNDLE_KIND_APPIMAGE:		AppImage application bundle
  *
  * The bundle type.
  **/
 typedef enum {
-	AS_BUNDLE_KIND_UNKNOWN,
-	AS_BUNDLE_KIND_LIMBA,
-	AS_BUNDLE_KIND_XDG_APP,
+	AS_BUNDLE_KIND_UNKNOWN,			/* Since: 0.3.5 */
+	AS_BUNDLE_KIND_LIMBA,			/* Since: 0.3.5 */
+	AS_BUNDLE_KIND_FLATPAK,			/* Since: 0.5.15 */
+	AS_BUNDLE_KIND_SNAP,			/* Since: 0.6.1 */
+	AS_BUNDLE_KIND_PACKAGE,			/* Since: 0.6.1 */
+	AS_BUNDLE_KIND_CABINET,			/* Since: 0.6.2 */
+	AS_BUNDLE_KIND_APPIMAGE,		/* Since: 0.6.4 */
 	/*< private >*/
 	AS_BUNDLE_KIND_LAST
 } AsBundleKind;
 
-GType		 as_bundle_get_type		(void);
+/* DEPRECATED */
+#define AS_BUNDLE_KIND_XDG_APP	AS_BUNDLE_KIND_FLATPAK
+
 AsBundle	*as_bundle_new			(void);
 
 /* helpers */
@@ -84,12 +82,17 @@ const gchar	*as_bundle_kind_to_string	(AsBundleKind	 kind);
 
 /* getters */
 const gchar	*as_bundle_get_id		(AsBundle	*bundle);
+const gchar	*as_bundle_get_runtime		(AsBundle	*bundle);
+const gchar	*as_bundle_get_sdk		(AsBundle	*bundle);
 AsBundleKind	 as_bundle_get_kind		(AsBundle	*bundle);
 
 /* setters */
 void		 as_bundle_set_id		(AsBundle	*bundle,
-						 const gchar	*id,
-						 gssize		 id_len);
+						 const gchar	*id);
+void		 as_bundle_set_runtime		(AsBundle	*bundle,
+						 const gchar	*runtime);
+void		 as_bundle_set_sdk		(AsBundle	*bundle,
+						 const gchar	*sdk);
 void		 as_bundle_set_kind		(AsBundle	*bundle,
 						 AsBundleKind	 kind);
 

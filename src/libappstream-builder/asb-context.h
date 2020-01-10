@@ -27,22 +27,10 @@
 #include "asb-app.h"
 #include "asb-package.h"
 
-#define ASB_TYPE_CONTEXT		(asb_context_get_type())
-#define ASB_CONTEXT(obj)		(G_TYPE_CHECK_INSTANCE_CAST((obj), ASB_TYPE_CONTEXT, AsbContext))
-#define ASB_CONTEXT_CLASS(cls)		(G_TYPE_CHECK_CLASS_CAST((cls), ASB_TYPE_CONTEXT, AsbContextClass))
-#define ASB_IS_CONTEXT(obj)		(G_TYPE_CHECK_INSTANCE_TYPE((obj), ASB_TYPE_CONTEXT))
-#define ASB_IS_CONTEXT_CLASS(cls)	(G_TYPE_CHECK_CLASS_TYPE((cls), ASB_TYPE_CONTEXT))
-#define ASB_CONTEXT_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), ASB_TYPE_CONTEXT, AsbContextClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsbContext		AsbContext;
-typedef struct _AsbContextClass	AsbContextClass;
-
-struct _AsbContext
-{
-	GObject			 parent;
-};
+#define ASB_TYPE_CONTEXT (asb_context_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsbContext, asb_context, ASB, CONTEXT, GObject)
 
 struct _AsbContextClass
 {
@@ -69,7 +57,11 @@ struct _AsbContextClass
  * @ASB_CONTEXT_FLAG_NO_NETWORK:		Do not download files
  * @ASB_CONTEXT_FLAG_INCLUDE_FAILED:		Write the origin-ignore.xml file
  * @ASB_CONTEXT_FLAG_UNCOMPRESSED_ICONS:	Do not pack icons into a tarball
- * @ASB_CONTEXT_FLAG_BATCH_OUTPUT:		Do not write escape sequences
+ * @ASB_CONTEXT_FLAG_IGNORE_DEAD_UPSTREAM:	Include apps that are dead upstream
+ * @ASB_CONTEXT_FLAG_IGNORE_OBSOLETE_DEPS:	Include apps that use obsolete toolkits
+ * @ASB_CONTEXT_FLAG_IGNORE_LEGACY_ICONS:	Include apps that use legacy icon formats
+ * @ASB_CONTEXT_FLAG_IGNORE_SETTINGS:		Include apps that are marked as settings
+ * @ASB_CONTEXT_FLAG_USE_FALLBACKS:		Fall back to suboptimal data where required
  *
  * The flags to use when processing the context.
  **/
@@ -83,12 +75,14 @@ typedef enum {
 	ASB_CONTEXT_FLAG_NO_NETWORK		= 1 << 4,	/* Since: 0.3.5 */
 	ASB_CONTEXT_FLAG_INCLUDE_FAILED		= 1 << 5,	/* Since: 0.3.5 */
 	ASB_CONTEXT_FLAG_UNCOMPRESSED_ICONS	= 1 << 6,	/* Since: 0.3.5 */
-	ASB_CONTEXT_FLAG_BATCH_OUTPUT		= 1 << 7,	/* Since: 0.3.6 */
+	ASB_CONTEXT_FLAG_IGNORE_DEAD_UPSTREAM	= 1 << 7,	/* Since: 0.4.1 */
+	ASB_CONTEXT_FLAG_IGNORE_OBSOLETE_DEPS	= 1 << 8,	/* Since: 0.4.1 */
+	ASB_CONTEXT_FLAG_IGNORE_LEGACY_ICONS	= 1 << 9,	/* Since: 0.4.1 */
+	ASB_CONTEXT_FLAG_IGNORE_SETTINGS	= 1 << 10,	/* Since: 0.4.1 */
+	ASB_CONTEXT_FLAG_USE_FALLBACKS		= 1 << 11,	/* Since: 0.4.1 */
 	/*< private >*/
 	ASB_CONTEXT_FLAG_LAST,
 } AsbContextFlags;
-
-GType		 asb_context_get_type		(void);
 
 AsbContext	*asb_context_new		(void);
 AsbPackage	*asb_context_find_by_pkgname	(AsbContext	*ctx,
@@ -107,14 +101,6 @@ void		 asb_context_set_min_icon_size	(AsbContext	*ctx,
 						 guint		 min_icon_size);
 void		 asb_context_set_old_metadata	(AsbContext	*ctx,
 						 const gchar	*old_metadata);
-void		 asb_context_set_extra_appstream (AsbContext	*ctx,
-						 const gchar	*extra_appstream);
-void		 asb_context_set_extra_appdata	(AsbContext	*ctx,
-						 const gchar	*extra_appdata);
-void		 asb_context_set_extra_screenshots (AsbContext	*ctx,
-						 const gchar	*extra_screenshots);
-void		 asb_context_set_screenshot_uri	(AsbContext	*ctx,
-						 const gchar	*screenshot_uri);
 void		 asb_context_set_log_dir	(AsbContext	*ctx,
 						 const gchar	*log_dir);
 void		 asb_context_set_screenshot_dir	(AsbContext	*ctx,
@@ -132,6 +118,7 @@ void		 asb_context_set_basename	(AsbContext	*ctx,
 void		 asb_context_set_origin		(AsbContext	*ctx,
 						 const gchar	*origin);
 const gchar	*asb_context_get_temp_dir	(AsbContext	*ctx);
+const gchar	*asb_context_get_cache_dir	(AsbContext	*ctx);
 AsbContextFlags	 asb_context_get_flags		(AsbContext	*ctx);
 gboolean	 asb_context_get_flag		(AsbContext	*ctx,
 						 AsbContextFlags flag);

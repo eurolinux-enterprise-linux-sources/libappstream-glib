@@ -33,24 +33,19 @@
 
 #include <alpm.h>
 
-#include "as-cleanup.h"
 #include "asb-package-alpm.h"
 #include "asb-plugin.h"
 
-typedef struct _AsbPackageAlpmPrivate	AsbPackageAlpmPrivate;
-struct _AsbPackageAlpmPrivate
+typedef struct
 {
 	alpm_handle_t	*handle;
 	alpm_pkg_t	*package;
-};
+} AsbPackageAlpmPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsbPackageAlpm, asb_package_alpm, ASB_TYPE_PACKAGE)
 
 #define GET_PRIVATE(o) (asb_package_alpm_get_instance_private (o))
 
-/**
- * asb_package_alpm_finalize:
- **/
 static void
 asb_package_alpm_finalize (GObject *object)
 {
@@ -64,17 +59,11 @@ asb_package_alpm_finalize (GObject *object)
 	G_OBJECT_CLASS (asb_package_alpm_parent_class)->finalize (object);
 }
 
-/**
- * asb_package_alpm_init:
- **/
 static void
 asb_package_alpm_init (AsbPackageAlpm *pkg)
 {
 }
 
-/**
- * asb_package_alpm_list_to_array:
- **/
 static GPtrArray *
 asb_package_alpm_list_to_array (alpm_list_t *list)
 {
@@ -89,9 +78,6 @@ asb_package_alpm_list_to_array (alpm_list_t *list)
 	return array;
 }
 
-/**
- * asb_package_alpm_ensure_license:
- **/
 static gboolean
 asb_package_alpm_ensure_license (AsbPackage *pkg, GError **error)
 {
@@ -114,22 +100,19 @@ asb_package_alpm_ensure_license (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_alpm_ensure_version:
- **/
 static void
 asb_package_alpm_ensure_version (AsbPackage *pkg, GError **error)
 {
 	AsbPackageAlpm *pkg_alpm = ASB_PACKAGE_ALPM (pkg);
 	AsbPackageAlpmPrivate *priv = GET_PRIVATE (pkg_alpm);
 
-	gchar _cleanup_strv_free_ **split = NULL;
+	g_auto(GStrv) split = NULL;
 
 	split = g_strsplit (alpm_pkg_get_version (priv->package), ":-", 3);
 
 	/* epoch:version:release */
 	if (g_strv_length (split) == 3) {
-		asb_package_set_epoch (pkg, g_ascii_strtoll (split[0], NULL, 0));
+		asb_package_set_epoch (pkg, (guint) g_ascii_strtoull (split[0], NULL, 0));
 		asb_package_set_version (pkg, split[1]);
 		asb_package_set_release (pkg, split[2]);
 	} else {/* version:release */
@@ -139,9 +122,6 @@ asb_package_alpm_ensure_version (AsbPackage *pkg, GError **error)
 }
 
 #if 0
-/**
- * asb_package_alpm_ensure_releases:
- **/
 static gboolean
 asb_package_alpm_ensure_releases (AsbPackage *pkg, GError **error)
 {
@@ -151,9 +131,6 @@ asb_package_alpm_ensure_releases (AsbPackage *pkg, GError **error)
 }
 #endif
 
-/**
- * asb_package_alpm_ensure_depends:
- **/
 static gboolean
 asb_package_alpm_ensure_depends (AsbPackage *pkg, GError **error)
 {
@@ -169,9 +146,6 @@ asb_package_alpm_ensure_depends (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_alpm_ensure_filelists:
- **/
 static gboolean
 asb_package_alpm_ensure_filelists (AsbPackage *pkg, GError **error)
 {
@@ -194,9 +168,6 @@ asb_package_alpm_ensure_filelists (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_alpm_open:
- **/
 static gboolean
 asb_package_alpm_open (AsbPackage *pkg, const gchar *filename, GError **error)
 {
@@ -211,7 +182,7 @@ asb_package_alpm_open (AsbPackage *pkg, const gchar *filename, GError **error)
 		g_set_error (error,
 		             ASB_PLUGIN_ERROR,
 		             ASB_PLUGIN_ERROR_FAILED,
-		             "libalpm initialization failed %s (%d) for %s",
+		             "libalpm initialization failed %s (%u) for %s",
 		             alpm_strerror (alpm_error),
 		             alpm_error,
 		             filename);
@@ -223,7 +194,7 @@ asb_package_alpm_open (AsbPackage *pkg, const gchar *filename, GError **error)
 		g_set_error (error,
 		             ASB_PLUGIN_ERROR,
 		             ASB_PLUGIN_ERROR_FAILED,
-		             "Failed to load package %s : %s (%d)",
+		             "Failed to load package %s : %s (%u)",
 		             filename,
 		             alpm_strerror (alpm_errno (priv->handle)),
 		             alpm_errno (priv->handle));
@@ -239,9 +210,6 @@ asb_package_alpm_open (AsbPackage *pkg, const gchar *filename, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_alpm_compare:
- **/
 static gint
 asb_package_alpm_compare (AsbPackage *pkg1, AsbPackage *pkg2)
 {
@@ -257,9 +225,6 @@ asb_package_alpm_compare (AsbPackage *pkg1, AsbPackage *pkg2)
 	return alpm_pkg_vercmp (pkg1_version, pkg2_version);
 }
 
-/**
- * asb_package_alpm_ensure:
- **/
 static gboolean
 asb_package_alpm_ensure (AsbPackage *pkg,
 			 AsbPackageEnsureFlags flags,
@@ -280,9 +245,6 @@ asb_package_alpm_ensure (AsbPackage *pkg,
 	return TRUE;
 }
 
-/**
- * asb_package_alpm_class_init:
- **/
 static void
 asb_package_alpm_class_init (AsbPackageAlpmClass *klass)
 {
@@ -295,9 +257,6 @@ asb_package_alpm_class_init (AsbPackageAlpmClass *klass)
 	package_class->compare = asb_package_alpm_compare;
 }
 
-/**
- * asb_package_alpm_new:
- **/
 AsbPackage *
 asb_package_alpm_new (void)
 {

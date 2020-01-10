@@ -23,12 +23,8 @@
 #include <string.h>
 
 #include "as-app-private.h"
-#include "as-cleanup.h"
 #include "as-utils.h"
 
-/**
- * as_app_desktop_key_get_locale:
- */
 static gchar *
 as_app_desktop_key_get_locale (const gchar *key)
 {
@@ -40,23 +36,20 @@ as_app_desktop_key_get_locale (const gchar *key)
 	if (tmp1 == NULL)
 		return NULL;
 	tmp2 = g_strstr_len (tmp1, -1, "]");
-	if (tmp1 == NULL)
+	if (tmp2 == NULL)
 		return NULL;
 	locale = g_strdup (tmp1 + 1);
 	locale[tmp2 - tmp1 - 1] = '\0';
 	return locale;
 }
 
-/**
- * as_app_infer_file_key:
- **/
 static gboolean
 as_app_infer_file_key (AsApp *app,
 		       GKeyFile *kf,
 		       const gchar *key,
 		       GError **error)
 {
-	_cleanup_free_ gchar *tmp = NULL;
+	g_autofree gchar *tmp = NULL;
 
 	if (g_strcmp0 (key, "X-GNOME-UsesNotifications") == 0) {
 		as_app_add_kudo_kind (AS_APP (app),
@@ -68,13 +61,13 @@ as_app_infer_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (g_strcmp0 (tmp, "GNOME") == 0)
-			as_app_set_project_group (app, "GNOME", -1);
+			as_app_set_project_group (app, "GNOME");
 
 	} else if (g_strcmp0 (key, "X-MATE-Bugzilla-Product") == 0) {
-		as_app_set_project_group (app, "MATE", -1);
+		as_app_set_project_group (app, "MATE");
 
 	} else if (g_strcmp0 (key, "X-KDE-StartupNotify") == 0) {
-		as_app_set_project_group (app, "KDE", -1);
+		as_app_set_project_group (app, "KDE");
 
 	} else if (g_strcmp0 (key, "X-DocPath") == 0) {
 		tmp = g_key_file_get_string (kf,
@@ -82,7 +75,7 @@ as_app_infer_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (g_str_has_prefix (tmp, "http://userbase.kde.org/"))
-			as_app_set_project_group (app, "KDE", -1);
+			as_app_set_project_group (app, "KDE");
 
 	/* Exec */
 	} else if (g_strcmp0 (key, G_KEY_FILE_DESKTOP_KEY_EXEC) == 0) {
@@ -91,27 +84,116 @@ as_app_infer_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (g_str_has_prefix (tmp, "xfce4-"))
-			as_app_set_project_group (app, "XFCE", -1);
+			as_app_set_project_group (app, "XFCE");
 	}
 
 	return TRUE;
 }
 
-/**
- * as_app_parse_file_key:
- **/
+static gboolean
+_as_utils_is_stock_icon_name_fallback (const gchar *name)
+{
+	guint i;
+	const gchar *names[] = {
+		"fedora-logo-sprite",
+		"gtk-preferences",
+		"hwinfo",
+		"trash-empty",
+		"utilities-log-viewer",
+		NULL };
+	for (i = 0; names[i] != NULL; i++) {
+		if (g_strcmp0 (name, names[i]) == 0)
+			return TRUE;
+	}
+	return FALSE;
+}
+
+static void
+as_app_parse_file_metadata (AsApp *app, GKeyFile *kf, const gchar *key)
+{
+	guint i;
+	g_autofree gchar *value = NULL;
+	const gchar *blacklist[] = {
+		"X-AppInstall-*",
+		"X-Desktop-File-Install-Version",
+		"X-Geoclue-Reason*",
+		"X-GNOME-Bugzilla-*",
+		"X-GNOME-FullName*",
+		"X-GNOME-Gettext-Domain",
+		"X-GNOME-UsesNotifications",
+		NULL };
+
+	if (!g_str_has_prefix (key, "X-"))
+		return;
+
+	/* anything blacklisted */
+	for (i = 0; blacklist[i] != NULL; i++) {
+		if (fnmatch (blacklist[i], key, 0) == 0)
+			return;
+	}
+	value = g_key_file_get_string (kf,
+				       G_KEY_FILE_DESKTOP_GROUP,
+				       key,
+				       NULL);
+	as_app_add_metadata (app, key, value);
+}
+
+static AsIcon *
+as_app_desktop_create_icon (AsApp *app, const gchar *name, AsAppParseFlags flags)
+{
+	AsIcon *icon = as_icon_new ();
+	gchar *dot;
+	g_autofree gchar *name_fixed = NULL;
+
+	/* local */
+	if (g_path_is_absolute (name)) {
+		as_icon_set_kind (icon, AS_ICON_KIND_LOCAL);
+		as_icon_set_filename (icon, name);
+		return icon;
+	}
+
+	/* work around a common mistake in desktop files */
+	name_fixed = g_strdup (name);
+	dot = g_strstr_len (name_fixed, -1, ".");
+	if (dot != NULL &&
+	    (g_strcmp0 (dot, ".png") == 0 ||
+	     g_strcmp0 (dot, ".xpm") == 0 ||
+	     g_strcmp0 (dot, ".svg") == 0)) {
+		*dot = '\0';
+	}
+
+	/* stock */
+	if (as_utils_is_stock_icon_name (name_fixed)) {
+		as_icon_set_kind (icon, AS_ICON_KIND_STOCK);
+		as_icon_set_name (icon, name_fixed);
+		return icon;
+	}
+
+	/* stock, but kinda sneaky */
+	if ((flags & AS_APP_PARSE_FLAG_USE_FALLBACKS) > 0 &&
+	    _as_utils_is_stock_icon_name_fallback (name_fixed)) {
+		as_icon_set_kind (icon, AS_ICON_KIND_STOCK);
+		as_icon_set_name (icon, name_fixed);
+		return icon;
+	}
+
+	/* just use default of UNKNOWN */
+	as_icon_set_name (icon, name_fixed);
+	return icon;
+}
+
 static gboolean
 as_app_parse_file_key (AsApp *app,
 		       GKeyFile *kf,
 		       const gchar *key,
+		       AsAppParseFlags flags,
 		       GError **error)
 {
-	gchar *dot = NULL;
 	guint i;
 	guint j;
-	_cleanup_free_ gchar *locale = NULL;
-	_cleanup_free_ gchar *tmp = NULL;
-	_cleanup_strv_free_ gchar **list = NULL;
+	g_autofree gchar *locale = NULL;
+	g_autofree gchar *tmp = NULL;
+	g_auto(GStrv) list = NULL;
 
 	/* NoDisplay */
 	if (g_strcmp0 (key, G_KEY_FILE_DESKTOP_KEY_NO_DISPLAY) == 0) {
@@ -143,18 +225,8 @@ as_app_parse_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (tmp != NULL && tmp[0] != '\0') {
-			_cleanup_object_unref_ AsIcon *icon = NULL;
-			icon = as_icon_new ();
-			as_icon_set_name (icon, tmp, -1);
-			dot = g_strstr_len (tmp, -1, ".");
-			if (dot != NULL)
-				*dot = '\0';
-			if (as_utils_is_stock_icon_name (tmp)) {
-				as_icon_set_name (icon, tmp, -1);
-				as_icon_set_kind (icon, AS_ICON_KIND_STOCK);
-			} else {
-				as_icon_set_kind (icon, AS_ICON_KIND_LOCAL);
-			}
+			g_autoptr(AsIcon) icon = NULL;
+			icon = as_app_desktop_create_icon (app, tmp, flags);
 			as_app_add_icon (app, icon);
 		}
 
@@ -165,19 +237,18 @@ as_app_parse_file_key (AsApp *app,
 						   key,
 						   NULL, NULL);
 		for (i = 0; list[i] != NULL; i++) {
+			const gchar *category_blacklist[] = {
+				"X-GNOME-Settings-Panel",
+				"X-Unity-Settings-Panel",
+				NULL };
 
-			/* check categories that if present would blacklist
-			 * the application */
-			if (fnmatch ("X-*-Settings-Panel", list[i], 0) == 0 ||
-			    fnmatch ("X-*-Settings", list[i], 0) == 0 ||
-			    fnmatch ("X-*-SettingsDialog", list[i], 0) == 0) {
-				as_app_add_veto (app, "category '%s' blacklisted", list[i]);
-				continue;
+			/* we have to veto these */
+			for (j = 0; category_blacklist[j] != NULL; j++) {
+				if (g_strcmp0 (list[i], category_blacklist[j]) == 0) {
+					as_app_add_veto (app, "Has category %s",
+							 category_blacklist[j]);
+				}
 			}
-
-			/* not a standard category */
-			if (g_str_has_prefix (list[i], "X-"))
-				continue;
 
 			/* check the category is valid */
 			if (!as_utils_is_category_id (list[i]))
@@ -192,7 +263,7 @@ as_app_parse_file_key (AsApp *app,
 				continue;
 			if (g_strcmp0 (list[i], "GNOME") == 0)
 				continue;
-			as_app_add_category (app, list[i], -1);
+			as_app_add_category (app, list[i]);
 		}
 
 	} else if (g_strcmp0 (key, "Keywords") == 0) {
@@ -201,31 +272,32 @@ as_app_parse_file_key (AsApp *app,
 						   key,
 						   NULL, NULL);
 		for (i = 0; list[i] != NULL; i++) {
-			_cleanup_strv_free_ gchar **kw_split = NULL;
+			g_auto(GStrv) kw_split = NULL;
 			kw_split = g_strsplit (list[i], ",", -1);
 			for (j = 0; kw_split[j] != NULL; j++) {
 				if (kw_split[j][0] == '\0')
 					continue;
-				as_app_add_keyword (app, "C",
-						    kw_split[j], -1);
+				as_app_add_keyword (app, "C", kw_split[j]);
 			}
 		}
 
 	} else if (g_str_has_prefix (key, "Keywords")) {
 		locale = as_app_desktop_key_get_locale (key);
+		if (flags & AS_APP_PARSE_FLAG_ONLY_NATIVE_LANGS &&
+		    !g_strv_contains (g_get_language_names (), locale))
+			return TRUE;
 		list = g_key_file_get_locale_string_list (kf,
 							  G_KEY_FILE_DESKTOP_GROUP,
 							  key,
 							  locale,
 							  NULL, NULL);
 		for (i = 0; list[i] != NULL; i++) {
-			_cleanup_strv_free_ gchar **kw_split = NULL;
+			g_auto(GStrv) kw_split = NULL;
 			kw_split = g_strsplit (list[i], ",", -1);
 			for (j = 0; kw_split[j] != NULL; j++) {
 				if (kw_split[j][0] == '\0')
 					continue;
-				as_app_add_keyword (app, locale,
-						    kw_split[j], -1);
+				as_app_add_keyword (app, locale, kw_split[j]);
 			}
 		}
 
@@ -235,7 +307,7 @@ as_app_parse_file_key (AsApp *app,
 						   key,
 						   NULL, NULL);
 		for (i = 0; list[i] != NULL; i++)
-			as_app_add_mimetype (app, list[i], -1);
+			as_app_add_mimetype (app, list[i]);
 
 	} else if (g_strcmp0 (key, "X-AppInstall-Package") == 0) {
 		tmp = g_key_file_get_string (kf,
@@ -243,7 +315,7 @@ as_app_parse_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_add_pkgname (app, tmp, -1);
+			as_app_add_pkgname (app, tmp);
 
 	/* OnlyShowIn */
 	} else if (g_strcmp0 (key, G_KEY_FILE_DESKTOP_KEY_ONLY_SHOW_IN) == 0) {
@@ -253,7 +325,7 @@ as_app_parse_file_key (AsApp *app,
 						   key,
 						   NULL, NULL);
 		if (g_strv_length (list) == 1)
-			as_app_set_project_group (app, list[0], -1);
+			as_app_set_project_group (app, list[0]);
 
 	/* Name */
 	} else if (g_strcmp0 (key, G_KEY_FILE_DESKTOP_KEY_NAME) == 0 ||
@@ -263,18 +335,21 @@ as_app_parse_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_set_name (app, "C", tmp, -1);
+			as_app_set_name (app, "C", tmp);
 
 	/* Name[] */
 	} else if (g_str_has_prefix (key, G_KEY_FILE_DESKTOP_KEY_NAME)) {
 		locale = as_app_desktop_key_get_locale (key);
+		if (flags & AS_APP_PARSE_FLAG_ONLY_NATIVE_LANGS &&
+		    !g_strv_contains (g_get_language_names (), locale))
+			return TRUE;
 		tmp = g_key_file_get_locale_string (kf,
 						    G_KEY_FILE_DESKTOP_GROUP,
 						    G_KEY_FILE_DESKTOP_KEY_NAME,
 						    locale,
 						    NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_set_name (app, locale, tmp, -1);
+			as_app_set_name (app, locale, tmp);
 
 	/* Comment */
 	} else if (g_strcmp0 (key, G_KEY_FILE_DESKTOP_KEY_COMMENT) == 0 ||
@@ -284,18 +359,21 @@ as_app_parse_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_set_comment (app, "C", tmp, -1);
+			as_app_set_comment (app, "C", tmp);
 
 	/* Comment[] */
 	} else if (g_str_has_prefix (key, G_KEY_FILE_DESKTOP_KEY_COMMENT)) {
 		locale = as_app_desktop_key_get_locale (key);
+		if (flags & AS_APP_PARSE_FLAG_ONLY_NATIVE_LANGS &&
+		    !g_strv_contains (g_get_language_names (), locale))
+			return TRUE;
 		tmp = g_key_file_get_locale_string (kf,
 						    G_KEY_FILE_DESKTOP_GROUP,
 						    G_KEY_FILE_DESKTOP_KEY_COMMENT,
 						    locale,
 						    NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_set_comment (app, locale, tmp, -1);
+			as_app_set_comment (app, locale, tmp);
 
 	/* non-standard */
 	} else if (g_strcmp0 (key, "X-Ubuntu-Software-Center-Name") == 0) {
@@ -304,24 +382,72 @@ as_app_parse_file_key (AsApp *app,
 					     key,
 					     NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_set_name (app, "C", tmp, -1);
+			as_app_set_name (app, "C", tmp);
 	} else if (g_str_has_prefix (key, "X-Ubuntu-Software-Center-Name")) {
 		locale = as_app_desktop_key_get_locale (key);
+		if (flags & AS_APP_PARSE_FLAG_ONLY_NATIVE_LANGS &&
+		    !g_strv_contains (g_get_language_names (), locale))
+			return TRUE;
 		tmp = g_key_file_get_locale_string (kf,
 						    G_KEY_FILE_DESKTOP_GROUP,
 						    "X-Ubuntu-Software-Center-Name",
 						    locale,
 						    NULL);
 		if (tmp != NULL && tmp[0] != '\0')
-			as_app_set_name (app, locale, tmp, -1);
+			as_app_set_name (app, locale, tmp);
+
+	/* for Ubuntu */
+	} else if (g_strcmp0 (key, "X-AppStream-Ignore") == 0) {
+		gboolean ret;
+		ret = g_key_file_get_boolean (kf,
+					      G_KEY_FILE_DESKTOP_GROUP,
+					      key,
+					      NULL);
+		if (ret)
+			as_app_add_veto (app, "X-AppStream-Ignore");
+	}
+
+	/* add any external attribute as metadata to the application */
+	if (flags & AS_APP_PARSE_FLAG_ADD_ALL_METADATA)
+		as_app_parse_file_metadata (app, kf, key);
+
+	return TRUE;
+}
+
+static gboolean
+as_app_parse_file_key_fallback_comment (AsApp *app,
+					GKeyFile *kf,
+					const gchar *key,
+					GError **error)
+{
+	g_autofree gchar *locale = NULL;
+	g_autofree gchar *tmp = NULL;
+
+	/* GenericName */
+	if (g_strcmp0 (key, G_KEY_FILE_DESKTOP_KEY_GENERIC_NAME) == 0 ||
+	           g_strcmp0 (key, "_GenericName") == 0) {
+		tmp = g_key_file_get_string (kf,
+					     G_KEY_FILE_DESKTOP_GROUP,
+					     key,
+					     NULL);
+		if (tmp != NULL && tmp[0] != '\0')
+			as_app_set_comment (app, "C", tmp);
+
+	/* GenericName[] */
+	} else if (g_str_has_prefix (key, G_KEY_FILE_DESKTOP_KEY_GENERIC_NAME)) {
+		locale = as_app_desktop_key_get_locale (key);
+		tmp = g_key_file_get_locale_string (kf,
+						    G_KEY_FILE_DESKTOP_GROUP,
+						    G_KEY_FILE_DESKTOP_KEY_GENERIC_NAME,
+						    locale,
+						    NULL);
+		if (tmp != NULL && tmp[0] != '\0')
+			as_app_set_comment (app, locale, tmp);
 	}
 
 	return TRUE;
 }
 
-/**
- * as_app_parse_desktop_file:
- **/
 gboolean
 as_app_parse_desktop_file (AsApp *app,
 			   const gchar *desktop_file,
@@ -331,10 +457,10 @@ as_app_parse_desktop_file (AsApp *app,
 	GKeyFileFlags kf_flags = G_KEY_FILE_KEEP_TRANSLATIONS;
 	gchar *tmp;
 	guint i;
-	_cleanup_error_free_ GError *error_local = NULL;
-	_cleanup_free_ gchar *app_id = NULL;
-	_cleanup_keyfile_unref_ GKeyFile *kf = NULL;
-	_cleanup_strv_free_ gchar **keys = NULL;
+	g_autoptr(GError) error_local = NULL;
+	g_autofree gchar *app_id = NULL;
+	g_autoptr(GKeyFile) kf = NULL;
+	g_auto(GStrv) keys = NULL;
 
 	/* load file */
 	kf = g_key_file_new ();
@@ -349,30 +475,61 @@ as_app_parse_desktop_file (AsApp *app,
 		return FALSE;
 	}
 
+	/* check this is a valid desktop file */
+	if (!g_key_file_has_group (kf, G_KEY_FILE_DESKTOP_GROUP)) {
+		g_set_error (error,
+			     AS_APP_ERROR,
+			     AS_APP_ERROR_INVALID_TYPE,
+			     "Not a desktop file: no [%s]",
+			     G_KEY_FILE_DESKTOP_GROUP);
+		return FALSE;
+	}
+
 	/* create app */
 	app_id = g_path_get_basename (desktop_file);
-	as_app_set_id_kind (app, AS_ID_KIND_DESKTOP);
+	as_app_set_kind (app, AS_APP_KIND_DESKTOP);
 
-	/* is blacklisted */
-	if (as_utils_is_blacklisted_id (app_id))
-		as_app_add_veto (app, "%s is not an application", app_id);
+	/* is this really a web-app? */
+	if ((flags & AS_APP_PARSE_FLAG_USE_HEURISTICS) > 0) {
+		g_autofree gchar *exec = NULL;
+		exec = g_key_file_get_string (kf,
+					      G_KEY_FILE_DESKTOP_GROUP,
+					      G_KEY_FILE_DESKTOP_KEY_EXEC,
+					      NULL);
+		if (exec != NULL) {
+			if (g_str_has_prefix (exec, "epiphany --application-mode"))
+				as_app_set_kind (app, AS_APP_KIND_WEB_APP);
+		}
+	}
 
 	/* Ubuntu helpfully put the package name in the desktop file name */
 	tmp = g_strstr_len (app_id, -1, ":");
 	if (tmp != NULL)
-		as_app_set_id (app, tmp + 1, -1);
+		as_app_set_id (app, tmp + 1);
 	else
-		as_app_set_id (app, app_id, -1);
+		as_app_set_id (app, app_id);
 
 	/* look at all the keys */
 	keys = g_key_file_get_keys (kf, G_KEY_FILE_DESKTOP_GROUP, NULL, error);
 	if (keys == NULL)
 		return FALSE;
 	for (i = 0; keys[i] != NULL; i++) {
-		if (!as_app_parse_file_key (app, kf, keys[i], error))
+		if (!as_app_parse_file_key (app, kf, keys[i], flags, error))
 			return FALSE;
 		if ((flags & AS_APP_PARSE_FLAG_USE_HEURISTICS) > 0) {
 			if (!as_app_infer_file_key (app, kf, keys[i], error))
+				return FALSE;
+		}
+	}
+
+	/* perform any fallbacks */
+	if ((flags & AS_APP_PARSE_FLAG_USE_FALLBACKS) > 0 &&
+	    as_app_get_comment_size (app) == 0) {
+		for (i = 0; keys[i] != NULL; i++) {
+			if (!as_app_parse_file_key_fallback_comment (app,
+								     kf,
+								     keys[i],
+								     error))
 				return FALSE;
 		}
 	}

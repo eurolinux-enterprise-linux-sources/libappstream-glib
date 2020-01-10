@@ -28,26 +28,41 @@
 
 #include "as-app.h"
 #include "as-node.h"
+#include "as-ref-string.h"
 
 G_BEGIN_DECLS
 
 typedef struct _AsNodeContext	AsNodeContext;
 AsNodeContext	*as_node_context_new		(void);
+void		 as_node_context_free		(AsNodeContext	*ctx);
 gdouble		 as_node_context_get_version	(AsNodeContext	*ctx);
 void		 as_node_context_set_version	(AsNodeContext	*ctx,
 						 gdouble	 version);
-AsAppSourceKind	 as_node_context_get_source_kind (AsNodeContext	*ctx);
+AsFormatKind	 as_node_context_get_format_kind (AsNodeContext	*ctx);
+void		 as_node_context_set_format_kind (AsNodeContext	*ctx,
+						 AsFormatKind	 format_kind);
+/* Kept for ABI compatibility with as-glib < 0.9.6 */
+G_DEPRECATED_FOR(as_node_context_get_format_kind)
+AsFormatKind	 as_node_context_get_source_kind (AsNodeContext	*ctx);
+/* Kept for ABI compatibility with as-glib < 0.9.6 */
+G_DEPRECATED_FOR(as_node_context_set_format_kind)
 void		 as_node_context_set_source_kind (AsNodeContext	*ctx,
-						 AsAppSourceKind source_kind);
-AsAppSourceKind	 as_node_context_get_output	(AsNodeContext	*ctx);
+						 AsFormatKind	 source_kind);
+gboolean	 as_node_context_get_output_trusted (AsNodeContext	*ctx);
+void		 as_node_context_set_output_trusted (AsNodeContext	*ctx,
+						 gboolean output_trusted);
+AsFormatKind	 as_node_context_get_output	(AsNodeContext	*ctx);
 void		 as_node_context_set_output	(AsNodeContext	*ctx,
-						 AsAppSourceKind output);
+						 AsFormatKind output);
+const gchar	*as_node_context_get_media_base_url (AsNodeContext	*ctx);
+void		 as_node_context_set_media_base_url (AsNodeContext	*ctx,
+						     const gchar	*url);
 
-gchar		*as_node_take_data		(const GNode	*node);
-gchar		*as_node_take_attribute		(const GNode	*node,
-						 const gchar	*key);
-gchar		*as_node_reflow_text		(const gchar	*text,
+AsRefString	*as_node_reflow_text		(const gchar	*text,
 						 gssize		 text_len);
+gchar		*as_node_fix_locale		(const gchar	*locale);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(AsNodeContext, as_node_context_free)
 
 G_END_DECLS
 

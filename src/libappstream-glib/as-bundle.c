@@ -34,48 +34,45 @@
 
 #include "config.h"
 
-#include "as-cleanup.h"
 #include "as-bundle-private.h"
 #include "as-node-private.h"
+#include "as-ref-string.h"
 #include "as-utils-private.h"
 #include "as-yaml.h"
 
-typedef struct _AsBundlePrivate	AsBundlePrivate;
-struct _AsBundlePrivate
+typedef struct
 {
 	AsBundleKind		 kind;
-	gchar			*id;
-};
+	AsRefString		*id;
+	AsRefString		*runtime;
+	AsRefString		*sdk;
+} AsBundlePrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsBundle, as_bundle, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) (as_bundle_get_instance_private (o))
 
-/**
- * as_bundle_finalize:
- **/
 static void
 as_bundle_finalize (GObject *object)
 {
 	AsBundle *bundle = AS_BUNDLE (object);
 	AsBundlePrivate *priv = GET_PRIVATE (bundle);
 
-	g_free (priv->id);
+	if (priv->id != NULL)
+		as_ref_string_unref (priv->id);
+	if (priv->runtime != NULL)
+		as_ref_string_unref (priv->runtime);
+	if (priv->sdk != NULL)
+		as_ref_string_unref (priv->sdk);
 
 	G_OBJECT_CLASS (as_bundle_parent_class)->finalize (object);
 }
 
-/**
- * as_bundle_init:
- **/
 static void
 as_bundle_init (AsBundle *bundle)
 {
 }
 
-/**
- * as_bundle_class_init:
- **/
 static void
 as_bundle_class_init (AsBundleClass *klass)
 {
@@ -99,8 +96,18 @@ as_bundle_kind_from_string (const gchar *kind)
 {
 	if (g_strcmp0 (kind, "limba") == 0)
 		return AS_BUNDLE_KIND_LIMBA;
-	if (g_strcmp0 (kind, "xdg-app") == 0)
-		return AS_BUNDLE_KIND_XDG_APP;
+	if (g_strcmp0 (kind, "xdg-app") == 0) /* backwards compat */
+		return AS_BUNDLE_KIND_FLATPAK;
+	if (g_strcmp0 (kind, "flatpak") == 0)
+		return AS_BUNDLE_KIND_FLATPAK;
+	if (g_strcmp0 (kind, "snap") == 0)
+		return AS_BUNDLE_KIND_SNAP;
+	if (g_strcmp0 (kind, "package") == 0)
+		return AS_BUNDLE_KIND_PACKAGE;
+	if (g_strcmp0 (kind, "cabinet") == 0)
+		return AS_BUNDLE_KIND_CABINET;
+	if (g_strcmp0 (kind, "appimage") == 0)
+		return AS_BUNDLE_KIND_APPIMAGE;
 	return AS_BUNDLE_KIND_UNKNOWN;
 }
 
@@ -119,8 +126,16 @@ as_bundle_kind_to_string (AsBundleKind kind)
 {
 	if (kind == AS_BUNDLE_KIND_LIMBA)
 		return "limba";
-	if (kind == AS_BUNDLE_KIND_XDG_APP)
-		return "xdg-app";
+	if (kind == AS_BUNDLE_KIND_FLATPAK)
+		return "flatpak";
+	if (kind == AS_BUNDLE_KIND_SNAP)
+		return "snap";
+	if (kind == AS_BUNDLE_KIND_PACKAGE)
+		return "package";
+	if (kind == AS_BUNDLE_KIND_CABINET)
+		return "cabinet";
+	if (kind == AS_BUNDLE_KIND_APPIMAGE)
+		return "appimage";
 	return NULL;
 }
 
@@ -139,6 +154,40 @@ as_bundle_get_id (AsBundle *bundle)
 {
 	AsBundlePrivate *priv = GET_PRIVATE (bundle);
 	return priv->id;
+}
+
+/**
+ * as_bundle_get_runtime:
+ * @bundle: a #AsBundle instance.
+ *
+ * Gets the runtime required for this bundle.
+ *
+ * Returns: Runtime identifier, e.g. "org.gnome.Platform/i386/master"
+ *
+ * Since: 0.5.10
+ **/
+const gchar *
+as_bundle_get_runtime (AsBundle *bundle)
+{
+	AsBundlePrivate *priv = GET_PRIVATE (bundle);
+	return priv->runtime;
+}
+
+/**
+ * as_bundle_get_sdk:
+ * @bundle: a #AsBundle instance.
+ *
+ * Gets the SDK for this bundle.
+ *
+ * Returns: SDK identifier, e.g. "org.gnome.Sdk/i386/master"
+ *
+ * Since: 0.5.10
+ **/
+const gchar *
+as_bundle_get_sdk (AsBundle *bundle)
+{
+	AsBundlePrivate *priv = GET_PRIVATE (bundle);
+	return priv->sdk;
 }
 
 /**
@@ -162,18 +211,48 @@ as_bundle_get_kind (AsBundle *bundle)
  * as_bundle_set_id:
  * @bundle: a #AsBundle instance.
  * @id: the URL.
- * @id_len: the size of @id, or -1 if %NULL-terminated.
  *
  * Sets the ID for this bundle.
  *
  * Since: 0.3.5
  **/
 void
-as_bundle_set_id (AsBundle *bundle, const gchar *id, gssize id_len)
+as_bundle_set_id (AsBundle *bundle, const gchar *id)
 {
 	AsBundlePrivate *priv = GET_PRIVATE (bundle);
-	g_free (priv->id);
-	priv->id = as_strndup (id, id_len);
+	as_ref_string_assign_safe (&priv->id, id);
+}
+
+/**
+ * as_bundle_set_runtime:
+ * @bundle: a #AsBundle instance.
+ * @runtime: the URL.
+ *
+ * Sets the runtime required for this bundle.
+ *
+ * Since: 0.5.10
+ **/
+void
+as_bundle_set_runtime (AsBundle *bundle, const gchar *runtime)
+{
+	AsBundlePrivate *priv = GET_PRIVATE (bundle);
+	as_ref_string_assign_safe (&priv->runtime, runtime);
+}
+
+/**
+ * as_bundle_set_sdk:
+ * @bundle: a #AsBundle instance.
+ * @sdk: the URL.
+ *
+ * Sets the SDK for this bundle.
+ *
+ * Since: 0.5.10
+ **/
+void
+as_bundle_set_sdk (AsBundle *bundle, const gchar *sdk)
+{
+	AsBundlePrivate *priv = GET_PRIVATE (bundle);
+	as_ref_string_assign_safe (&priv->sdk, sdk);
 }
 
 /**
@@ -214,6 +293,11 @@ as_bundle_node_insert (AsBundle *bundle, GNode *parent, AsNodeContext *ctx)
 			    AS_NODE_INSERT_FLAG_NONE,
 			    "type", as_bundle_kind_to_string (priv->kind),
 			    NULL);
+	if (priv->runtime != NULL)
+		as_node_add_attribute (n, "runtime", priv->runtime);
+	if (priv->sdk != NULL)
+		as_node_add_attribute (n, "sdk", priv->sdk);
+
 	return n;
 }
 
@@ -236,15 +320,16 @@ as_bundle_node_parse (AsBundle *bundle, GNode *node,
 {
 	AsBundlePrivate *priv = GET_PRIVATE (bundle);
 	const gchar *tmp;
-	gchar *taken;
 
 	tmp = as_node_get_attribute (node, "type");
 	as_bundle_set_kind (bundle, as_bundle_kind_from_string (tmp));
-	taken = as_node_take_data (node);
-	if (taken != NULL) {
-		g_free (priv->id);
-		priv->id = taken;
-	}
+
+	as_ref_string_assign (&priv->id, as_node_get_data (node));
+
+	/* optional */
+	as_ref_string_assign (&priv->runtime, as_node_get_attribute (node, "runtime"));
+	as_ref_string_assign (&priv->sdk, as_node_get_attribute (node, "sdk"));
+
 	return TRUE;
 }
 
@@ -271,7 +356,7 @@ as_bundle_node_parse_dep11 (AsBundle *im, GNode *node,
 	for (n = node->children; n != NULL; n = n->next) {
 		tmp = as_yaml_node_get_key (n);
 		if (g_strcmp0 (tmp, "id") == 0)
-			as_bundle_set_id (im, as_yaml_node_get_value (n), -1);
+			as_bundle_set_id (im, as_yaml_node_get_value (n));
 	}
 	return TRUE;
 }

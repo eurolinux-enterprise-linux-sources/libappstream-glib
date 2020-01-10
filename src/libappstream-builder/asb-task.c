@@ -30,7 +30,6 @@
 
 #include "config.h"
 
-#include "as-cleanup.h"
 #include "asb-context-private.h"
 #include "asb-task.h"
 #include "asb-package.h"
@@ -38,25 +37,19 @@
 #include "asb-plugin.h"
 #include "asb-plugin-loader.h"
 
-typedef struct _AsbTaskPrivate	AsbTaskPrivate;
-struct _AsbTaskPrivate
+typedef struct
 {
 	AsbContext		*ctx;
 	AsbPackage		*pkg;
-	AsbPanel		*panel;
 	GPtrArray		*plugins_to_run;
 	gchar			*filename;
 	gchar			*tmpdir;
-	guint			 id;
-};
+} AsbTaskPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsbTask, asb_task, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) (asb_task_get_instance_private (o))
 
-/**
- * asb_task_add_suitable_plugins:
- **/
 static void
 asb_task_add_suitable_plugins (AsbTask *task)
 {
@@ -88,9 +81,6 @@ asb_task_add_suitable_plugins (AsbTask *task)
 	}
 }
 
-/**
- * asb_task_explode_extra_package:
- **/
 static gboolean
 asb_task_explode_extra_package (AsbTask *task,
 				const gchar *pkg_name,
@@ -99,9 +89,6 @@ asb_task_explode_extra_package (AsbTask *task,
 {
 	AsbTaskPrivate *priv = GET_PRIVATE (task);
 	AsbPackage *pkg_extra;
-	GPtrArray *deps;
-	guint i;
-	const gchar *dep;
 
 	/* if not found, that's fine */
 	pkg_extra = asb_context_find_by_pkgname (priv->ctx, pkg_name);
@@ -117,8 +104,7 @@ asb_task_explode_extra_package (AsbTask *task,
 	    (g_strcmp0 (asb_package_get_source (pkg_extra),
 		        asb_package_get_source (priv->pkg)) != 0))
 		return TRUE;
-	asb_panel_set_status (priv->panel, "Decompressing extra pkg %s",
-			      asb_package_get_name (pkg_extra));
+	g_debug ("decompressing extra pkg %s", asb_package_get_name (pkg_extra));
 	asb_package_log (priv->pkg,
 			 ASB_PACKAGE_LOG_LEVEL_DEBUG,
 			 "Adding extra package %s for %s",
@@ -134,13 +120,6 @@ asb_task_explode_extra_package (AsbTask *task,
 				  error))
 		return FALSE;
 
-	/* copy all the extra package requires into the main package too */
-	deps = asb_package_get_deps (pkg_extra);
-	for (i = 0; i < deps->len; i++) {
-		dep = g_ptr_array_index (deps, i);
-		asb_package_add_dep (priv->pkg, dep);
-	}
-
 	/* free resources */
 	if (!asb_package_close (pkg_extra, error))
 		return FALSE;
@@ -151,9 +130,96 @@ asb_task_explode_extra_package (AsbTask *task,
 	return TRUE;
 }
 
-/**
- * asb_task_explode_extra_packages:
- **/
+typedef struct {
+	GPtrArray	*results;
+	GHashTable	*results_hash;
+} AsbTaskExtraDeps;
+
+static void
+asb_task_extra_deps_free (AsbTaskExtraDeps *extra_deps)
+{
+	g_ptr_array_unref (extra_deps->results);
+	g_hash_table_unref (extra_deps->results_hash);
+	g_slice_free (AsbTaskExtraDeps, extra_deps);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(AsbTaskExtraDeps, asb_task_extra_deps_free);
+
+static gboolean
+asb_task_get_extra_deps_recursive (AsbTask *task,
+                                   const gchar *dep,
+                                   AsbTaskExtraDeps *extra_deps,
+                                   GError **error)
+{
+	AsbTaskPrivate *priv = GET_PRIVATE (task);
+	AsbPackage *subpkg;
+	GPtrArray *subpkg_deps;
+
+	subpkg = asb_context_find_by_pkgname (priv->ctx, dep);
+	if (subpkg == NULL)
+		return TRUE;
+
+	if (!asb_package_ensure (subpkg,
+	                         ASB_PACKAGE_ENSURE_DEPS |
+	                         ASB_PACKAGE_ENSURE_SOURCE,
+	                         error))
+		return FALSE;
+
+	/* check it's from the same source package */
+	if (g_strcmp0 (asb_package_get_source (subpkg),
+	               asb_package_get_source (priv->pkg)) != 0)
+		return TRUE;
+
+	subpkg_deps = asb_package_get_deps (subpkg);
+	for (guint i = 0; i < subpkg_deps->len; i++) {
+		const gchar *subpkg_dep = g_ptr_array_index (subpkg_deps, i);
+
+		/* already processed? */
+		if (g_hash_table_lookup (extra_deps->results_hash, subpkg_dep) != NULL)
+			continue;
+
+		/* process recursively */
+		g_hash_table_insert (extra_deps->results_hash,
+				     g_strdup (subpkg_dep),
+				     GINT_TO_POINTER (1));
+		if (!asb_task_get_extra_deps_recursive (task, subpkg_dep, extra_deps, error))
+			return FALSE;
+
+		/* add to results */
+		g_ptr_array_add (extra_deps->results, g_strdup (subpkg_dep));
+	}
+
+	return TRUE;
+}
+
+static gboolean
+asb_task_add_extra_deps (AsbTask *task, GError **error)
+{
+	AsbTaskPrivate *priv = GET_PRIVATE (task);
+	GPtrArray *deps;
+	g_autoptr(AsbTaskExtraDeps) extra_deps = NULL;
+
+	extra_deps = g_slice_new0 (AsbTaskExtraDeps);
+	extra_deps->results = g_ptr_array_new_with_free_func (g_free);
+	extra_deps->results_hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+	/* recursively get extra package deps */
+	deps = asb_package_get_deps (priv->pkg);
+	for (guint i = 0; i < deps->len; i++) {
+		const gchar *dep = g_ptr_array_index (deps, i);
+		if (!asb_task_get_extra_deps_recursive (task, dep, extra_deps, error))
+			return FALSE;
+	}
+
+	/* copy all the extra package deps into the main package */
+	for (guint i = 0; i < extra_deps->results->len; i++) {
+		const gchar *extra_dep = g_ptr_array_index (extra_deps->results, i);
+		asb_package_add_dep (priv->pkg, extra_dep);
+	}
+
+	return TRUE;
+}
+
 static gboolean
 asb_task_explode_extra_packages (AsbTask *task, GError **error)
 {
@@ -162,9 +228,13 @@ asb_task_explode_extra_packages (AsbTask *task, GError **error)
 	const gchar *ignore[] = { "rtld", NULL };
 	const gchar *tmp;
 	guint i;
-	_cleanup_hashtable_unref_ GHashTable *hash = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *array = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *icon_themes = NULL;
+	g_autoptr(GHashTable) hash = NULL;
+	g_autoptr(GPtrArray) array = NULL;
+	g_autoptr(GPtrArray) icon_themes = NULL;
+
+	/* recursively copy all the extra package deps into the main package */
+	if (!asb_task_add_extra_deps (task, error))
+		return FALSE;
 
 	/* anything the package requires */
 	hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
@@ -188,6 +258,7 @@ asb_task_explode_extra_packages (AsbTask *task, GError **error)
 			continue;
 		if (g_strcmp0 (tmp, asb_package_get_name (priv->pkg)) == 0)
 			continue;
+
 		/* if an app depends on kde-runtime, that means the
 		 * oxygen icon set is available to them */
 		if (g_strcmp0 (tmp, "oxygen-icon-theme") == 0 ||
@@ -196,6 +267,15 @@ asb_task_explode_extra_packages (AsbTask *task, GError **error)
 					     GINT_TO_POINTER (1));
 			g_ptr_array_add (icon_themes,
 					 g_strdup ("oxygen-icon-theme"));
+		/* Applications depending on yast2 have an implicit dependency
+		 * on yast2-branding-openSUSE, which brings required icons in this case.
+		 */
+		} else if (g_strcmp0 (tmp, "yast2-branding-openSUSE") == 0 ||
+			   g_strcmp0 (tmp, "yast2") == 0) {
+			g_hash_table_insert (hash, g_strdup ("yast2-branding-openSUSE"),
+					     GINT_TO_POINTER (1));
+			g_ptr_array_add (icon_themes,
+					 g_strdup ("yast2-branding-openSUSE"));
 		} else {
 			g_ptr_array_add (array, g_strdup (tmp));
 		}
@@ -241,11 +321,10 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 	GPtrArray *array;
 	gboolean ret;
 	gchar *cache_id;
-	gchar *tmp;
 	guint i;
 	guint nr_added = 0;
-	_cleanup_error_free_ GError *error = NULL;
-	_cleanup_free_ gchar *basename = NULL;
+	g_autoptr(GError) error = NULL;
+	g_autofree gchar *basename = NULL;
 
 	/* reset the profile timer */
 	asb_package_log_start (priv->pkg);
@@ -256,9 +335,43 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 				 error_not_used))
 		return FALSE;
 
-	asb_panel_set_job_number (priv->panel, priv->id + 1);
-	asb_panel_set_title (priv->panel, asb_package_get_name (priv->pkg));
-	asb_panel_set_status (priv->panel, "Starting");
+	g_debug ("starting: %s", asb_package_get_name (priv->pkg));
+
+	/* treat archive as a special case */
+	if (g_str_has_suffix (priv->filename, ".cab")) {
+		AsApp *app_tmp;
+		GPtrArray *apps_tmp;
+		g_autoptr(AsStore) store = as_store_new ();
+		g_autoptr(GFile) file = g_file_new_for_path (priv->filename);
+		if (!as_store_from_file (store, file, NULL, NULL, &error)) {
+			asb_package_log (priv->pkg,
+					 ASB_PACKAGE_LOG_LEVEL_WARNING,
+					 "Failed to parse %s: %s",
+					 asb_package_get_filename (priv->pkg),
+					 error->message);
+			return TRUE;
+		}
+		apps_tmp = as_store_get_apps (store);
+		for (i = 0; i < apps_tmp->len; i++) {
+			g_autoptr(AsbApp) app2 = NULL;
+			app_tmp = AS_APP (g_ptr_array_index (apps_tmp, i));
+			app2 = asb_app_new (priv->pkg, as_app_get_id (app_tmp));
+			as_app_subsume (AS_APP (app2), app_tmp);
+			asb_context_add_app (priv->ctx, app2);
+
+			/* set cache-id in case we want to use the metadata directly */
+			if (asb_context_get_flag (priv->ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID)) {
+				cache_id = asb_utils_get_cache_id_for_filename (priv->filename);
+				as_app_add_metadata (AS_APP (app2),
+						     "X-CacheID",
+						     cache_id);
+				g_free (cache_id);
+			}
+			nr_added++;
+		}
+		g_debug ("added %u apps from archive", apps_tmp->len);
+		goto skip;
+	}
 
 	/* ensure file list read */
 	if (!asb_package_ensure (priv->pkg,
@@ -288,7 +401,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 	}
 
 	/* explode tree */
-	asb_panel_set_status (priv->panel, "Decompressing files");
+	g_debug ("decompressing files: %s", asb_package_get_name (priv->pkg));
 	asb_package_log (priv->pkg,
 			 ASB_PACKAGE_LOG_LEVEL_DEBUG,
 			 "Exploding tree for %s",
@@ -317,11 +430,12 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 				 ASB_PACKAGE_LOG_LEVEL_WARNING,
 				 "Failed to explode extra file: %s",
 				 error->message);
+		g_clear_error (&error);
 		goto skip;
 	}
 
 	/* run plugins */
-	asb_panel_set_status (priv->panel, "Examining");
+	g_debug ("examining: %s", asb_package_get_name (priv->pkg));
 	for (i = 0; i < priv->plugins_to_run->len; i++) {
 		GList *apps_tmp = NULL;
 		plugin = g_ptr_array_index (priv->plugins_to_run, i);
@@ -348,7 +462,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 		goto skip;
 
 	/* print */
-	asb_panel_set_status (priv->panel, "Processing");
+	g_debug ("processing: %s", asb_package_get_name (priv->pkg));
 	for (l = apps; l != NULL; l = l->next) {
 		app = l->data;
 
@@ -369,30 +483,32 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 					 ASB_PACKAGE_ENSURE_URL,
 					 error_not_used))
 			return FALSE;
-		if (asb_package_get_url (priv->pkg) != NULL) {
+		if (asb_package_get_url (priv->pkg) != NULL &&
+		    as_app_get_url_item (AS_APP (app), AS_URL_KIND_HOMEPAGE) == NULL) {
 			as_app_add_url (AS_APP (app),
 					AS_URL_KIND_HOMEPAGE,
-					asb_package_get_url (priv->pkg), -1);
+					asb_package_get_url (priv->pkg));
 		}
-		if (asb_package_get_license (priv->pkg) != NULL) {
+		if (asb_package_get_license (priv->pkg) != NULL &&
+		    as_app_get_project_license (AS_APP (app)) == NULL) {
 			as_app_set_project_license (AS_APP (app),
-						    asb_package_get_license (priv->pkg),
-						    -1);
+						    asb_package_get_license (priv->pkg));
 		}
 
 		/* add the source name so we can suggest these together */
 		if (g_strcmp0 (asb_package_get_source_pkgname (priv->pkg),
 			       asb_package_get_name (priv->pkg)) != 0) {
 			as_app_set_source_pkgname (AS_APP (app),
-						   asb_package_get_source_pkgname (priv->pkg),
-						   -1);
+						   asb_package_get_source_pkgname (priv->pkg));
 		}
 
 		/* set all the releases on the app */
 		array = asb_package_get_releases (priv->pkg);
-		for (i = 0; i < array->len; i++) {
-			release = g_ptr_array_index (array, i);
-			as_app_add_release (AS_APP (app), release);
+		if (as_app_get_kind (AS_APP (app)) != AS_APP_KIND_ADDON) {
+			for (i = 0; i < array->len; i++) {
+				release = g_ptr_array_index (array, i);
+				as_app_add_release (AS_APP (app), release);
+			}
 		}
 
 		/* run each refine plugin on each app */
@@ -411,23 +527,12 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 			goto skip;
 		}
 
-		/* veto apps that *still* require appdata */
-		array = asb_app_get_requires_appdata (app);
-		for (i = 0; i < array->len; i++) {
-			tmp = g_ptr_array_index (array, i);
-			if (tmp == NULL) {
-				as_app_add_veto (AS_APP (app), "Required AppData");
-				continue;
-			}
-			as_app_add_veto (AS_APP (app), "Required AppData: %s", tmp);
-		}
-
 		/* set cache-id in case we want to use the metadata directly */
 		if (asb_context_get_flag (priv->ctx, ASB_CONTEXT_FLAG_ADD_CACHE_ID)) {
 			cache_id = asb_utils_get_cache_id_for_filename (priv->filename);
 			as_app_add_metadata (AS_APP (app),
 					     "X-CacheID",
-					     cache_id, -1);
+					     cache_id);
 			g_free (cache_id);
 		}
 
@@ -435,7 +540,7 @@ asb_task_process (AsbTask *task, GError **error_not_used)
 		if (asb_package_get_vcs (priv->pkg) != NULL) {
 			as_app_add_metadata (AS_APP (app),
 					     "VersionControlSystem",
-					     asb_package_get_vcs (priv->pkg), -1);
+					     asb_package_get_vcs (priv->pkg));
 		}
 
 		/* save any screenshots early */
@@ -457,7 +562,7 @@ skip:
 		asb_context_add_app_ignore (priv->ctx, priv->pkg);
 
 	/* delete tree */
-	asb_panel_set_status (priv->panel, "Deleting temp files");
+	g_debug ("deleting temp files: %s", asb_package_get_name (priv->pkg));
 	if (!asb_utils_rmtree (priv->tmpdir, &error)) {
 		asb_package_log (priv->pkg,
 				 ASB_PACKAGE_LOG_LEVEL_WARNING,
@@ -467,7 +572,7 @@ skip:
 	}
 
 	/* write log */
-	asb_panel_set_status (priv->panel, "Writing log");
+	g_debug ("writing log: %s", asb_package_get_name (priv->pkg));
 	if (!asb_package_log_flush (priv->pkg, &error)) {
 		asb_package_log (priv->pkg,
 				 ASB_PACKAGE_LOG_LEVEL_WARNING,
@@ -475,9 +580,6 @@ skip:
 				 error->message);
 		goto out;
 	}
-
-	/* update UI */
-	asb_panel_remove (priv->panel);
 out:
 	/* clear loaded resources */
 	asb_package_close (priv->pkg, NULL);
@@ -488,9 +590,6 @@ out:
 	return TRUE;
 }
 
-/**
- * asb_task_finalize:
- **/
 static void
 asb_task_finalize (GObject *object)
 {
@@ -501,8 +600,6 @@ asb_task_finalize (GObject *object)
 	g_ptr_array_unref (priv->plugins_to_run);
 	if (priv->pkg != NULL)
 		g_object_unref (priv->pkg);
-	if (priv->panel != NULL)
-		g_object_unref (priv->panel);
 	g_free (priv->filename);
 	g_free (priv->tmpdir);
 
@@ -528,41 +625,6 @@ asb_task_set_package (AsbTask *task, AsbPackage *pkg)
 	priv->pkg = g_object_ref (pkg);
 }
 
-/**
- * asb_task_set_panel: (skip):
- * @task: A #AsbTask
- * @panel: A #AsbPanel
- *
- * Sets the panel used for the task.
- *
- * Since: 0.2.3
- **/
-void
-asb_task_set_panel (AsbTask *task, AsbPanel *panel)
-{
-	AsbTaskPrivate *priv = GET_PRIVATE (task);
-	priv->panel = g_object_ref (panel);
-}
-
-/**
- * asb_task_set_id:
- * @task: A #AsbTask
- * @id: numeric identifier
- *
- * Sets the ID to use for the task.
- *
- * Since: 0.1.0
- **/
-void
-asb_task_set_id (AsbTask *task, guint id)
-{
-	AsbTaskPrivate *priv = GET_PRIVATE (task);
-	priv->id = id;
-}
-
-/**
- * asb_task_init:
- **/
 static void
 asb_task_init (AsbTask *task)
 {
@@ -570,9 +632,6 @@ asb_task_init (AsbTask *task)
 	priv->plugins_to_run = g_ptr_array_new ();
 }
 
-/**
- * asb_task_class_init:
- **/
 static void
 asb_task_class_init (AsbTaskClass *klass)
 {

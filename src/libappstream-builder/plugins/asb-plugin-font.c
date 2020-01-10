@@ -38,18 +38,12 @@
 #define __APPSTREAM_GLIB_PRIVATE_H
 #include <as-app-private.h>
 
-/**
- * asb_plugin_get_name:
- */
 const gchar *
 asb_plugin_get_name (void)
 {
 	return "font";
 }
 
-/**
- * asb_plugin_add_globs:
- */
 void
 asb_plugin_add_globs (AsbPlugin *plugin, GPtrArray *globs)
 {
@@ -57,9 +51,6 @@ asb_plugin_add_globs (AsbPlugin *plugin, GPtrArray *globs)
 	asb_plugin_add_glob (globs, "/usr/share/fonts/*/*.ttf");
 }
 
-/**
- * _asb_plugin_check_filename:
- */
 static gboolean
 _asb_plugin_check_filename (const gchar *filename)
 {
@@ -70,9 +61,6 @@ _asb_plugin_check_filename (const gchar *filename)
 	return FALSE;
 }
 
-/**
- * asb_font_fix_metadata:
- */
 static void
 asb_font_fix_metadata (AsbApp *app)
 {
@@ -82,14 +70,16 @@ asb_font_fix_metadata (AsbApp *app)
 	const gchar *value;
 	gint percentage;
 	guint j;
-	_cleanup_list_free_ GList *langs = NULL;
-	_cleanup_string_free_ GString *str = NULL;
+	g_autoptr(GList) langs = NULL;
+	g_autoptr(GString) str = NULL;
 	struct {
 		const gchar	*lang;
 		const gchar	*value;
 	} text_icon[] =  {
 		{ "en",		"Aa" },
 		{ "ar",		"أب" },
+		{ "as",         "অআই" },
+		{ "bn",         "অআই" },
 		{ "be",		"Аа" },
 		{ "bg",		"Аа" },
 		{ "cs",		"Aa" },
@@ -98,14 +88,21 @@ asb_font_fix_metadata (AsbApp *app)
 		{ "es",		"Aa" },
 		{ "fr",		"Aa" },
 		{ "gu",		"અબક" },
+		{ "hi",         "अआइ" },
 		{ "he",		"אב" },
 		{ "it",		"Aa" },
+		{ "kn",         "ಅಆಇ" },
 		{ "ml",		"ആഇ" },
+		{ "ne",         "अआइ" },
 		{ "nl",		"Aa" },
+		{ "or",         "ଅଆଇ" },
+		{ "pa",         "ਅਆਇ" },
 		{ "pl",		"ĄĘ" },
 		{ "pt",		"Aa" },
 		{ "ru",		"Аа" },
 		{ "sv",		"Åäö" },
+		{ "ta",         "அஆஇ" },
+		{ "te",         "అఆఇ" },
 		{ "ua",		"Аа" },
 		{ "zh-tw",	"漢" },
 		{ NULL, NULL } };
@@ -115,6 +112,8 @@ asb_font_fix_metadata (AsbApp *app)
 	} text_sample[] =  {
 		{ "en",		"How quickly daft jumping zebras vex." },
 		{ "ar",		"نصٌّ حكيمٌ لهُ سِرٌّ قاطِعٌ وَذُو شَأنٍ عَظيمٍ مكتوبٌ على ثوبٍ أخضرَ ومُغلفٌ بجلدٍ أزرق" },
+		{ "as",		"আর আপনি সাক্ষাৎ"},
+		{ "bn",		"আর আপনি সাক্ষাৎ"},
 		{ "be",		"У Іўі худы жвавы чорт у зялёнай камізэльцы пабег пад’есці фаршу з юшкай." },
 		{ "bg",		"Под южно дърво, цъфтящо в синьо, бягаше малко, пухкаво зайче." },
 		{ "cs",		"Příliš žluťoučký kůň úpěl ďábelské ódy" },
@@ -124,14 +123,21 @@ asb_font_fix_metadata (AsbApp *app)
 		{ "fr",		"Voix ambiguë d'un cœur qui, au zéphyr, préfère les jattes de kiwis." },
 		{ "gu",		"ઇ.સ. ૧૯૭૮ ની ૨૫ તારીખે, ૦૬-૩૪ વાગે, ઐશ્વર્યવાન, વફાદાર, અંગ્રેજ ઘરધણીના આ ઝાડ પાસે ઊભેલા બાદશાહ; અને ઓસરીમાંના ઠળીયા તથા છાણાના ઢગલા દુર કરીને, ઔપચારીકતાથી ઉભેલા ઋષી સમાન પ્રજ્ઞાચક્ષુ ખાલસાજી ભટ મળ્યા હતા." },
 		{ "he",		"יַעֲקֹב בֶּן־דָּגָן הַשָּׂמֵחַ טִפֵּס בֶּעֱזוּז לְרֹאשׁ סֻלָּם מָאֳרָךְ לִצְפּוֹת בִּמְעוֹף דּוּכִיפַת וְנֵץ" },
+		{ "hi",		"आपसे मिलकर खुशी हुई "},
 		{ "it",		"Senza qualche prova ho il dubbio che si finga morto." },
 		{ "ja",		"いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせす" },
+		{ "kn",		"ಸಂತೋಷ ನೀವು ಭೇಟಿ"},
 		{ "ml",		"അജവും ആനയും ഐരാവതവും ഗരുഡനും കഠോര സ്വരം പൊഴിക്കെ ഹാരവും ഒഢ്യാണവും ഫാലത്തില്‍ മഞ്ഞളും ഈറന്‍ കേശത്തില്‍ ഔഷധ എണ്ണയുമായി ഋതുമതിയും അനഘയും ഭൂനാഥയുമായ ഉമ ദുഃഖഛവിയോടെ ഇടതു പാദം ഏന്തി ങ്യേയാദൃശം നിര്‍ഝരിയിലെ ചിറ്റലകളെ ഓമനിക്കുമ്പോള്‍ ബാ‍ലയുടെ കണ്‍കളില്‍ നീര്‍ ഊര്‍ന്നു വിങ്ങി" },
+		{ "ne",		"के तपाइ नेपाली बोल्नुहुन्छ?"},
 		{ "nl",		"Pa's wijze lynx bezag vroom het fikse aquaduct." },
+		{ "or",		"ଆପଣ ଓଡ଼ିଆ କୁହନ୍ତି କି? "},
+		{ "pa",		"ਖੁਸ਼ੀ ਤੁਹਾਨੂੰ ਮੀਟਿੰਗ ਲਈ"},
 		{ "pl",		"Pójdźże, kiń tę chmurność w głąb flaszy!" },
 		{ "pt",		"À noite, vovô Kowalsky vê o ímã cair no pé do pingüim queixoso e vovó põe açúcar no chá de tâmaras do jabuti feliz." },
 		{ "ru",		"В чащах юга жил бы цитрус? Да, но фальшивый экземпляр!" },
 		{ "sv",		"Gud hjälpe qvickt Zorns mö få aw byxor" },
+		{ "ta",		"மகிழ்ச்சி நீங்கள் சந்தித்த"},
+		{ "te",		"ఆనందం మీరు సమావేశం"},
 		{ "ua",		"Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів!" },
 		{ "zh-tw",	"秋風滑過拔地紅樓角落，誤見釣人低聲吟詠離騷。" },
 		{ NULL, NULL } };
@@ -143,7 +149,7 @@ asb_font_fix_metadata (AsbApp *app)
 			if (percentage >= 0) {
 				as_app_add_metadata (AS_APP (app),
 						      "FontSampleText",
-						      text_sample[j].value, -1);
+						      text_sample[j].value);
 				break;
 			}
 		}
@@ -156,7 +162,7 @@ asb_font_fix_metadata (AsbApp *app)
 			if (percentage >= 0) {
 				as_app_add_metadata (AS_APP (app),
 						      "FontIconText",
-						      text_icon[j].value, -1);
+						      text_icon[j].value);
 				break;
 			}
 		}
@@ -179,17 +185,17 @@ asb_font_fix_metadata (AsbApp *app)
 				continue;
 			as_app_add_metadata (AS_APP (app),
 					      "FontSampleText",
-					      value, -1);
+					      value);
 			if (g_strcmp0 (value, "The quick brown fox jumps over the lazy dog.") == 0) {
 				as_app_add_metadata (AS_APP (app),
 						      "FontIconText",
-						      "Aa", -1);
+						      "Aa");
 			} else {
-				_cleanup_free_ gchar *icon_tmp = NULL;
+				g_autofree gchar *icon_tmp = NULL;
 				icon_tmp = g_utf8_substring (value, 0, 2);
 				as_app_add_metadata (AS_APP (app),
 						      "FontIconText",
-						      icon_tmp, -1);
+						      icon_tmp);
 			}
 		}
 	}
@@ -210,9 +216,6 @@ asb_font_fix_metadata (AsbApp *app)
 	}
 }
 
-/**
- * asb_font_string_is_valid:
- */
 static gboolean
 asb_font_string_is_valid (const gchar *text)
 {
@@ -227,9 +230,6 @@ asb_font_string_is_valid (const gchar *text)
 	return TRUE;
 }
 
-/**
- * asb_font_add_metadata:
- */
 static void
 asb_font_add_metadata (AsbApp *app, FT_Face ft_face)
 {
@@ -255,7 +255,7 @@ asb_font_add_metadata (AsbApp *app, FT_Face ft_face)
 	for (i = 0; i < len; i++) {
 		FT_Get_Sfnt_Name (ft_face, i, &sfname);
 		for (j = 0; tt_idx_to_md_name[j].key != NULL; j++) {
-			_cleanup_free_ gchar *val = NULL;
+			g_autofree gchar *val = NULL;
 			if (sfname.name_id != tt_idx_to_md_name[j].idx)
 				continue;
 			val = g_locale_to_utf8 ((gchar *) sfname.string,
@@ -266,7 +266,7 @@ asb_font_add_metadata (AsbApp *app, FT_Face ft_face)
 			if (asb_font_string_is_valid (val)) {
 				as_app_add_metadata (AS_APP (app),
 						     tt_idx_to_md_name[j].key,
-						     val, -1);
+						     val);
 			} else {
 				asb_package_log (asb_app_get_package (app),
 						 ASB_PACKAGE_LOG_LEVEL_WARNING,
@@ -277,9 +277,6 @@ asb_font_add_metadata (AsbApp *app, FT_Face ft_face)
 	}
 }
 
-/**
- * asb_font_is_pixbuf_empty:
- */
 static gboolean
 asb_font_is_pixbuf_empty (const GdkPixbuf *pixbuf)
 {
@@ -307,9 +304,6 @@ asb_font_is_pixbuf_empty (const GdkPixbuf *pixbuf)
 	return TRUE;
 }
 
-/**
- * asb_font_get_pixbuf:
- */
 static GdkPixbuf *
 asb_font_get_pixbuf (FT_Face ft_face,
 		     guint width,
@@ -327,7 +321,7 @@ asb_font_get_pixbuf (FT_Face ft_face,
 
 	/* set up font */
 	surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
-					      width, height);
+					      (gint) width, (gint) height);
 	cr = cairo_create (surface);
 	font_face = cairo_ft_font_face_create_for_ft_face (ft_face, FT_LOAD_DEFAULT);
 	cairo_set_font_face (cr, font_face);
@@ -349,7 +343,7 @@ asb_font_get_pixbuf (FT_Face ft_face,
 		       (height / 2) - te.height / 2 - te.y_bearing);
 	cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
 	cairo_show_text (cr, text);
-	pixbuf = gdk_pixbuf_get_from_surface (surface, 0, 0, width, height);
+	pixbuf = gdk_pixbuf_get_from_surface (surface, 0, 0, (gint) width, (gint) height);
 	if (pixbuf == NULL) {
 		g_set_error_literal (error,
 				     ASB_PLUGIN_ERROR,
@@ -363,9 +357,6 @@ asb_font_get_pixbuf (FT_Face ft_face,
 	return pixbuf;
 }
 
-/**
- * asb_font_get_caption:
- */
 static gchar *
 asb_font_get_caption (AsbApp *app)
 {
@@ -383,32 +374,34 @@ asb_font_get_caption (AsbApp *app)
 	return g_strdup_printf ("%s – %s", family, subfamily);
 }
 
-/**
- * asb_font_add_screenshot:
- */
 static gboolean
-asb_font_add_screenshot (AsbApp *app, FT_Face ft_face, GError **error)
+asb_font_add_screenshot (AsbPlugin *plugin, AsbApp *app, FT_Face ft_face,
+			 const gchar *cache_id, GError **error)
 {
+	AsImage *im_tmp;
+	AsScreenshot *ss_tmp;
+	GPtrArray *screenshots;
 	const gchar *cache_dir;
-	const gchar *mirror_uri;
+	const gchar *temp_dir;
 	const gchar *tmp;
-	_cleanup_free_ gchar *basename = NULL;
-	_cleanup_free_ gchar *cache_fn = NULL;
-	_cleanup_free_ gchar *caption = NULL;
-	_cleanup_free_ gchar *url_tmp = NULL;
-	_cleanup_object_unref_ AsImage *im = NULL;
-	_cleanup_object_unref_ AsScreenshot *ss = NULL;
-	_cleanup_object_unref_ GdkPixbuf *pixbuf = NULL;
+	guint i;
+	g_autofree gchar *basename = NULL;
+	g_autofree gchar *cache_fn = NULL;
+	g_autofree gchar *output_fn = NULL;
+	g_autofree gchar *caption = NULL;
+	g_autofree gchar *url_tmp = NULL;
+	g_autoptr(AsImage) im = NULL;
+	g_autoptr(AsScreenshot) ss = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
 
 	tmp = as_app_get_metadata_item (AS_APP (app), "FontSampleText");
 	if (tmp == NULL)
 		return TRUE;
 
 	/* is in the cache */
-	cache_dir = asb_package_get_config (asb_app_get_package (app), "CacheDir");
-	cache_fn = g_strdup_printf ("%s/%s.png",
-				    cache_dir,
-				    as_app_get_id_filename (AS_APP (app)));
+	cache_dir = asb_context_get_cache_dir (plugin->ctx);
+	cache_fn = g_strdup_printf ("%s/screenshots/%s.png",
+				    cache_dir, cache_id);
 	if (g_file_test (cache_fn, G_FILE_TEST_EXISTS)) {
 		pixbuf = gdk_pixbuf_new_from_file (cache_fn, error);
 		if (pixbuf == NULL)
@@ -428,8 +421,13 @@ asb_font_add_screenshot (AsbApp *app, FT_Face ft_face, GError **error)
 		return FALSE;
 	}
 
-	mirror_uri = asb_package_get_config (asb_app_get_package (app),
-					     "MirrorURI");
+	/* save to the cache for next time */
+	if (!g_file_test (cache_fn, G_FILE_TEST_EXISTS)) {
+		if (!gdk_pixbuf_save (pixbuf, cache_fn, "png", error, NULL))
+			return FALSE;
+	}
+
+	/* copy it to the screenshot directory */
 	im = as_image_new ();
 	as_image_set_pixbuf (im, pixbuf);
 	as_image_set_kind (im, AS_IMAGE_KIND_SOURCE);
@@ -437,18 +435,42 @@ asb_font_add_screenshot (AsbApp *app, FT_Face ft_face, GError **error)
 				    as_app_get_id_filename (AS_APP (app)),
 				    as_image_get_md5 (im));
 	as_image_set_basename (im, basename);
-	url_tmp = g_build_filename (mirror_uri,
-				    "source",
+	url_tmp = g_build_filename ("file://",
 				    basename,
 				    NULL);
-	as_image_set_url (im, url_tmp, -1);
+	as_image_set_url (im, url_tmp);
 
+	/* put this in a special place so it gets packaged up */
+	temp_dir = asb_context_get_temp_dir (plugin->ctx);
+	output_fn = g_build_filename (temp_dir, "screenshots", basename, NULL);
+	if (!gdk_pixbuf_save (pixbuf, output_fn, "png", error, NULL))
+		return FALSE;
+
+	/* check the screenshot does not already exist */
+	screenshots = as_app_get_screenshots (AS_APP (app));
+	for (i = 0; i < screenshots->len; i++) {
+		ss_tmp = g_ptr_array_index (screenshots, i);
+		im_tmp = as_screenshot_get_source (ss_tmp);
+		if (im_tmp == NULL)
+			continue;
+		if (g_strcmp0 (as_image_get_md5 (im_tmp),
+			       as_image_get_md5 (im)) == 0) {
+			g_set_error (error,
+				     ASB_PLUGIN_ERROR,
+				     ASB_PLUGIN_ERROR_FAILED,
+				     "Font screenshot already exists with hash %s",
+				     as_image_get_md5 (im));
+			return FALSE;
+		}
+	}
+
+	/* add screenshot */
 	ss = as_screenshot_new ();
 	as_screenshot_set_kind (ss, AS_SCREENSHOT_KIND_DEFAULT);
 	as_screenshot_add_image (ss, im);
 	caption = asb_font_get_caption (app);
 	if (caption != NULL)
-		as_screenshot_set_caption (ss, NULL, caption, -1);
+		as_screenshot_set_caption (ss, NULL, caption);
 	as_app_add_screenshot (AS_APP (app), ss);
 
 	/* find screenshot priority */
@@ -484,9 +506,6 @@ asb_font_add_screenshot (AsbApp *app, FT_Face ft_face, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_font_add_languages:
- */
 static void
 asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 {
@@ -495,7 +514,7 @@ asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 	FcStrList *list;
 	FcStrSet *langs;
 	FcValue fc_value;
-	guint i;
+	gint i;
 	gboolean any_added = FALSE;
 	gboolean skip_langs;
 
@@ -507,7 +526,7 @@ asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 			list = FcStrListCreate (langs);
 			FcStrListFirst (list);
 			while ((tmp = (const gchar*) FcStrListNext (list)) != NULL) {
-				as_app_add_language (AS_APP (app), 0, tmp, -1);
+				as_app_add_language (AS_APP (app), 0, tmp);
 				any_added = TRUE;
 			}
 			FcStrListDone (list);
@@ -517,18 +536,14 @@ asb_font_add_languages (AsbApp *app, const FcPattern *pattern)
 
 	/* assume 'en' is available */
 	if (!any_added)
-		as_app_add_language (AS_APP (app), 0, "en", -1);
+		as_app_add_language (AS_APP (app), 0, "en");
 }
 
-/**
- * asb_plugin_font_set_name:
- */
 static void
 asb_plugin_font_set_name (AsbApp *app, const gchar *name)
 {
 	const gchar *ptr;
 	guint i;
-	guint len;
 	const gchar *prefixes[] = { "GFS ", NULL };
 	const gchar *suffixes[] = { " SIL",
 				    " ADF",
@@ -536,13 +551,13 @@ asb_plugin_font_set_name (AsbApp *app, const gchar *name)
 				    " GPL&GNU",
 				    " SC",
 				    NULL };
-	_cleanup_free_ gchar *tmp = NULL;
+	g_autofree gchar *tmp = NULL;
 
 	/* remove font foundary suffix */
 	tmp = g_strdup (name);
 	for (i = 0; suffixes[i] != NULL; i++) {
 		if (g_str_has_suffix (tmp, suffixes[i])) {
-			len = strlen (tmp);
+			gsize len = strlen (tmp);
 			tmp[len - strlen (suffixes[i])] = '\0';
 		}
 	}
@@ -553,12 +568,9 @@ asb_plugin_font_set_name (AsbApp *app, const gchar *name)
 		if (g_str_has_prefix (tmp, prefixes[i]))
 			ptr += strlen (prefixes[i]);
 	}
-	as_app_set_name (AS_APP (app), "C", ptr, -1);
+	as_app_set_name (AS_APP (app), "C", ptr);
 }
 
-/**
- * asb_plugin_font_app:
- */
 static gboolean
 asb_plugin_font_app (AsbPlugin *plugin, AsbApp *app,
 		     const gchar *filename, GError **error)
@@ -570,13 +582,20 @@ asb_plugin_font_app (AsbPlugin *plugin, AsbApp *app,
 	FT_Library library = NULL;
 	const gchar *tmp;
 	gboolean ret = TRUE;
+	guint i;
 	const FcPattern *pattern;
-	_cleanup_free_ gchar *comment = NULL;
-	_cleanup_free_ gchar *icon_filename = NULL;
-	_cleanup_object_unref_ GdkPixbuf *pixbuf = NULL;
+	g_autofree gchar *cache_id = NULL;
+	g_autofree gchar *comment = NULL;
+	g_autofree gchar *icon_filename = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
 
-	/* load font */
+	/* create a new fontconfig configuration */
 	config = FcConfigCreate ();
+
+	/* ensure that default configuration and fonts are not loaded */
+	FcConfigSetCurrent (config);
+
+	/* add just this one font */
 	ret = FcConfigAppFontAddFile (config, (FcChar8 *) filename);
 	if (FALSE && !ret) { /* FIXME: fails since f22 even for success */
 		g_set_error (error,
@@ -607,28 +626,36 @@ asb_plugin_font_app (AsbPlugin *plugin, AsbApp *app,
 		goto out;
 	}
 
+	/* use the filename as the cache-id */
+	cache_id = g_path_get_basename (filename);
+	for (i = 0; cache_id[i] != '\0'; i++) {
+		if (g_ascii_isalnum (cache_id[i]))
+			continue;
+		cache_id[i] = '_';
+	}
+
 	/* create app that might get merged later */
-	as_app_add_category (AS_APP (app), "Addons", -1);
-	as_app_add_category (AS_APP (app), "Fonts", -1);
+	as_app_add_category (AS_APP (app), "Addons");
+	as_app_add_category (AS_APP (app), "Fonts");
 	if (as_app_get_name (AS_APP (app), NULL) == NULL)
 		asb_plugin_font_set_name (app, ft_face->family_name);
 	if (as_app_get_comment (AS_APP (app), NULL) == NULL) {
 		comment = g_strdup_printf ("A %s font from %s",
 					   ft_face->style_name,
 					   ft_face->family_name);
-		as_app_set_comment (AS_APP (app), "C", comment, -1);
+		as_app_set_comment (AS_APP (app), "C", comment);
 	}
 	asb_font_add_languages (app, pattern);
 	asb_font_add_metadata (app, ft_face);
 	asb_font_fix_metadata (app);
-	ret = asb_font_add_screenshot (app, ft_face, error);
+	ret = asb_font_add_screenshot (plugin, app, ft_face, cache_id, error);
 	if (!ret)
 		goto out;
 
 	/* generate icon */
 	tmp = as_app_get_metadata_item (AS_APP (app), "FontIconText");
 	if (tmp != NULL) {
-		_cleanup_object_unref_ AsIcon *icon = NULL;
+		g_autoptr(AsIcon) icon = NULL;
 		pixbuf = asb_font_get_pixbuf (ft_face, 64, 64, tmp, error);
 		if (pixbuf == NULL) {
 			ret = FALSE;
@@ -656,7 +683,7 @@ asb_plugin_font_app (AsbPlugin *plugin, AsbApp *app,
 		}
 		icon = as_icon_new ();
 		as_icon_set_kind (icon, AS_ICON_KIND_CACHED);
-		as_icon_set_name (icon, icon_filename, -1);
+		as_icon_set_name (icon, icon_filename);
 		as_icon_set_pixbuf (icon, pixbuf);
 		as_app_add_icon (AS_APP (app), icon);
 	}
@@ -670,9 +697,6 @@ out:
 	return ret;
 }
 
-/**
- * asb_plugin_process_app:
- */
 gboolean
 asb_plugin_process_app (AsbPlugin *plugin,
 			AsbPackage *pkg,
@@ -686,7 +710,7 @@ asb_plugin_process_app (AsbPlugin *plugin,
 	filelist = asb_package_get_filelist (pkg);
 	for (i = 0; filelist[i] != NULL; i++) {
 		GError *error_local = NULL;
-		_cleanup_free_ gchar *filename = NULL;
+		g_autofree gchar *filename = NULL;
 
 		if (!_asb_plugin_check_filename (filelist[i]))
 			continue;
@@ -703,9 +727,6 @@ asb_plugin_process_app (AsbPlugin *plugin,
 	return TRUE;
 }
 
-/**
- * asb_plugin_merge:
- */
 void
 asb_plugin_merge (AsbPlugin *plugin, GList *list)
 {
@@ -714,7 +735,7 @@ asb_plugin_merge (AsbPlugin *plugin, GList *list)
 	GList *l;
 	GPtrArray *extends_tmp;
 	const gchar *tmp;
-	_cleanup_hashtable_unref_ GHashTable *hash = NULL;
+	g_autoptr(GHashTable) hash = NULL;
 
 	/* add all the fonts to a hash */
 	hash = g_hash_table_new_full (g_str_hash, g_str_equal,
@@ -723,7 +744,7 @@ asb_plugin_merge (AsbPlugin *plugin, GList *list)
 		if (!ASB_IS_APP (l->data))
 			continue;
 		app = AS_APP (l->data);
-		if (as_app_get_id_kind (app) != AS_ID_KIND_FONT)
+		if (as_app_get_kind (app) != AS_APP_KIND_FONT)
 			continue;
 		g_hash_table_insert (hash,
 				     g_strdup (as_app_get_id (app)),
@@ -735,7 +756,7 @@ asb_plugin_merge (AsbPlugin *plugin, GList *list)
 		if (!ASB_IS_APP (l->data))
 			continue;
 		app = AS_APP (l->data);
-		if (as_app_get_id_kind (app) != AS_ID_KIND_FONT)
+		if (as_app_get_kind (app) != AS_APP_KIND_FONT)
 			continue;
 		extends_tmp = as_app_get_extends (app);
 		if (extends_tmp->len == 0)
@@ -747,7 +768,8 @@ asb_plugin_merge (AsbPlugin *plugin, GList *list)
 			continue;
 		}
 		as_app_subsume_full (found, app,
-				     AS_APP_SUBSUME_FLAG_NO_OVERWRITE);
+				     AS_APP_SUBSUME_FLAG_NO_OVERWRITE |
+				     AS_APP_SUBSUME_FLAG_DEDUPE);
 		as_app_add_veto (app,
 				 "%s was merged into %s",
 				 as_app_get_id (app),

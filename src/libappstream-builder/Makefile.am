@@ -16,7 +16,6 @@ AM_CPPFLAGS =							\
 	$(GLIB_CFLAGS)						\
 	$(GDKPIXBUF_CFLAGS)					\
 	$(GTK_CFLAGS)						\
-	$(OSTREE_CFLAGS)					\
 	$(SOUP_CFLAGS)						\
 	-I$(top_srcdir)/libappstream-glib			\
 	-I$(top_builddir)/libappstream-glib			\
@@ -24,7 +23,8 @@ AM_CPPFLAGS =							\
 	-DAS_COMPILATION					\
 	-DTESTDIRSRC=\""$(top_srcdir)/data/tests"\"		\
 	-DTESTDIRBUILD=\""$(top_builddir)/data/tests"\"		\
-	-DASB_PLUGIN_DIR=\"$(libdir)/asb-plugins\"		\
+	-DASB_PLUGIN_DIR=\"$(libdir)/asb-plugins-$(AS_PLUGIN_VERSION)\" \
+	-DTESTPLUGINDIR=\"./plugins/.libs\" \
 	-DG_LOG_DOMAIN=\"Asb\"
 
 AS_GLIB_LIBS =							\
@@ -54,8 +54,6 @@ libappstream_builder_la_SOURCES =				\
 	asb-package-deb.c					\
 	asb-package-deb.h					\
 	asb-package.h						\
-	asb-panel.c						\
-	asb-panel.h						\
 	asb-task.c						\
 	asb-task.h						\
 	asb-utils.c						\
@@ -77,17 +75,10 @@ libappstream_builder_la_SOURCES +=				\
 	asb-package-alpm.h
 endif
 
-if HAVE_OSTREE
-libappstream_builder_la_SOURCES +=				\
-	asb-package-ostree.c					\
-	asb-package-ostree.h
-endif
-
 libappstream_builder_la_LIBADD =				\
 	$(AS_GLIB_LIBS)						\
 	$(RPM_LIBS)						\
 	$(ALPM_LIBS)						\
-	$(OSTREE_LIBS)						\
 	$(GLIB_LIBS)						\
 	$(GTK_LIBS)						\
 	$(LIBARCHIVE_LIBS)
@@ -99,7 +90,7 @@ libappstream_builder_la_LDFLAGS =				\
 	-export-symbols-regex '^asb_.*'
 
 libappstream_builder_la_CFLAGS =				\
-	$(WARNINGFLAGS_C)
+	$(WARN_CFLAGS)
 
 check_PROGRAMS =						\
 	asb-self-test
@@ -109,9 +100,8 @@ asb_self_test_LDADD =						\
 	$(AS_GLIB_LIBS)						\
 	$(GLIB_LIBS)						\
 	$(GDKPIXBUF_LIBS)					\
-	$(SOUP_LIBS)						\
 	$(lib_LTLIBRARIES)
-asb_self_test_CFLAGS = $(WARNINGFLAGS_C)
+asb_self_test_CFLAGS = $(WARN_CFLAGS)
 
 TESTS = asb-self-test
 

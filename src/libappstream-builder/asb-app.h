@@ -29,22 +29,10 @@
 
 #include "asb-package.h"
 
-#define ASB_TYPE_APP		(asb_app_get_type())
-#define ASB_APP(obj)		(G_TYPE_CHECK_INSTANCE_CAST((obj), ASB_TYPE_APP, AsbApp))
-#define ASB_APP_CLASS(cls)	(G_TYPE_CHECK_CLASS_CAST((cls), ASB_TYPE_APP, AsbAppClass))
-#define ASB_IS_APP(obj)		(G_TYPE_CHECK_INSTANCE_TYPE((obj), ASB_TYPE_APP))
-#define ASB_IS_APP_CLASS(cls)	(G_TYPE_CHECK_CLASS_TYPE((cls), ASB_TYPE_APP))
-#define ASB_APP_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), ASB_TYPE_APP, AsbAppClass))
-
 G_BEGIN_DECLS
 
-typedef struct _AsbApp		AsbApp;
-typedef struct _AsbAppClass	AsbAppClass;
-
-struct _AsbApp
-{
-	AsApp			parent;
-};
+#define ASB_TYPE_APP (asb_app_get_type ())
+G_DECLARE_DERIVABLE_TYPE (AsbApp, asb_app, ASB, APP, GObject)
 
 struct _AsbAppClass
 {
@@ -76,28 +64,13 @@ typedef enum {
 	ASB_APP_SAVE_FLAG_LAST,
 } AsbAppSaveFlags;
 
-GType		 asb_app_get_type		(void);
-
-
 AsbApp		*asb_app_new			(AsbPackage	*pkg,
 						 const gchar	*id);
 void		 asb_app_set_hidpi_enabled	(AsbApp		*app,
 						 gboolean	 hidpi_enabled);
-void		 asb_app_add_requires_appdata	(AsbApp		*app,
-						 const gchar	*fmt,
-						 ...)
-						 G_GNUC_PRINTF(2,3);
-void		 asb_app_set_requires_appdata	(AsbApp		*app,
-						 gboolean	 requires_appdata);
-void		 asb_app_add_pixbuf		(AsbApp		*app,
-						 GdkPixbuf	*pixbuf);
-gboolean	 asb_app_add_screenshot_source	(AsbApp		*app,
-						 const gchar	*filename,
-						 GError		**error);
-
-GPtrArray	*asb_app_get_requires_appdata	(AsbApp		*app);
+void		 asb_app_set_package		(AsbApp		*app,
+						 AsbPackage	*pkg);
 AsbPackage	*asb_app_get_package		(AsbApp		*app);
-
 gboolean	 asb_app_save_resources		(AsbApp		*app,
 						 AsbAppSaveFlags save_flags,
 						 GError		**error);

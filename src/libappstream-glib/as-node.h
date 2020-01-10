@@ -61,13 +61,15 @@ typedef enum {
  * @AS_NODE_FROM_XML_FLAG_NONE:			No extra flags to use
  * @AS_NODE_FROM_XML_FLAG_LITERAL_TEXT:		Treat the text as an exact string
  * @AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS:	Retain comments in the XML file
+ * @AS_NODE_FROM_XML_FLAG_ONLY_NATIVE_LANGS:	Only load native languages
  *
  * The flags for converting from XML.
  **/
 typedef enum {
-	AS_NODE_FROM_XML_FLAG_NONE		= 0,	/* Since: 0.1.0 */
-	AS_NODE_FROM_XML_FLAG_LITERAL_TEXT	= 1,	/* Since: 0.1.3 */
-	AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS	= 2,	/* Since: 0.1.6 */
+	AS_NODE_FROM_XML_FLAG_NONE		= 0,		/* Since: 0.1.0 */
+	AS_NODE_FROM_XML_FLAG_LITERAL_TEXT	= 1 << 0,	/* Since: 0.1.3 */
+	AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS	= 1 << 1,	/* Since: 0.1.6 */
+	AS_NODE_FROM_XML_FLAG_ONLY_NATIVE_LANGS	= 1 << 2,	/* Since: 0.6.5 */
 	/*< private >*/
 	AS_NODE_FROM_XML_FLAG_LAST
 } AsNodeFromXmlFlags;
@@ -114,6 +116,8 @@ typedef enum {
 
 #define	AS_NODE_ERROR				as_node_error_quark ()
 
+typedef GNode AsNode;
+
 GNode		*as_node_new			(void);
 GQuark		 as_node_error_quark		(void);
 void		 as_node_unref			(GNode		*node);
@@ -126,6 +130,8 @@ const gchar	*as_node_get_attribute		(const GNode	*node,
 						 const gchar	*key);
 gint		 as_node_get_attribute_as_int	(const GNode	*node,
 						 const gchar	*key);
+guint		 as_node_get_attribute_as_uint	(const GNode	*node,
+						 const gchar	*key);
 GHashTable	*as_node_get_localized		(const GNode	*node,
 						 const gchar	*key);
 const gchar	*as_node_get_localized_best	(const GNode	*node,
@@ -137,25 +143,24 @@ void		 as_node_set_name		(GNode		*node,
 						 const gchar	*name);
 void		 as_node_set_data		(GNode		*node,
 						 const gchar	*cdata,
-						 gssize		 cdata_len,
 						 AsNodeInsertFlags insert_flags);
 void		 as_node_set_comment		(GNode		*node,
-						 const gchar	*comment,
-						 gssize		 comment_len);
+						 const gchar	*comment);
 void		 as_node_add_attribute		(GNode		*node,
 						 const gchar	*key,
-						 const gchar	*value,
-						 gssize		 value_len);
+						 const gchar	*value);
 void		 as_node_add_attribute_as_int	(GNode		*node,
 						 const gchar	*key,
 						 gint		 value);
+void		 as_node_add_attribute_as_uint	(GNode		*node,
+						 const gchar	*key,
+						 guint		 value);
 void		 as_node_remove_attribute	(GNode		*node,
 						 const gchar	*key);
 
 GString		*as_node_to_xml			(const GNode	*node,
 						 AsNodeToXmlFlags flags);
 GNode		*as_node_from_xml		(const gchar	*data,
-						 gssize		 data_len,
 						 AsNodeFromXmlFlags flags,
 						 GError		**error)
 						 G_GNUC_WARN_UNUSED_RESULT;
@@ -195,6 +200,8 @@ void		 as_node_insert_hash		(GNode		*parent,
 						 const gchar	*attr_key,
 						 GHashTable	*hash,
 						 AsNodeInsertFlags insert_flags);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(AsNode, as_node_unref)
 
 G_END_DECLS
 

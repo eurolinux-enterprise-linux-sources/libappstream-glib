@@ -6,7 +6,9 @@ MATE
 Razor
 ROX
 TDE
+Sugar
 Unity
 XFCE
 EDE
 Cinnamon
+elementary

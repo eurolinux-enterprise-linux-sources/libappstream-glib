@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -32,8 +32,8 @@
 
 G_BEGIN_DECLS
 
-gchar		*as_strndup			(const gchar	*text,
-						 gssize		 text_len);
+#define		AS_UTILS_UNIQUE_ID_PARTS	6
+
 const gchar	*as_hash_lookup_by_locale	(GHashTable	*hash,
 						 const gchar	*locale);
 void		 as_pixbuf_sharpen		(GdkPixbuf	*src,
@@ -42,6 +42,11 @@ void		 as_pixbuf_sharpen		(GdkPixbuf	*src,
 void		 as_pixbuf_blur			(GdkPixbuf	*src,
 						 gint		 radius,
 						 gint		 iterations);
+const gchar	*as_ptr_array_find_string	(GPtrArray	*array,
+						 const gchar	*value);
+gboolean	 as_utils_locale_is_compatible	(const gchar	*locale1,
+						 const gchar	*locale2);
+GDateTime	*as_utils_iso8601_to_datetime	(const gchar	*iso_date);
 
 G_END_DECLS
 

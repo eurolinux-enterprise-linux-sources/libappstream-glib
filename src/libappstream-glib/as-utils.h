@@ -28,6 +28,9 @@
 
 #include <glib.h>
 
+#include "as-app.h"
+#include "as-bundle.h"
+
 G_BEGIN_DECLS
 
 /**
@@ -77,28 +80,18 @@ typedef enum {
 } AsUtilsLocation;
 
 /**
- * AsMarkupConvertFormat:
- * @AS_MARKUP_CONVERT_FORMAT_SIMPLE		UTF-8 text
- * @AS_MARKUP_CONVERT_FORMAT_MARKDOWN:		Markdown format
+ * AsVersionParseFlag:
+ * @AS_VERSION_PARSE_FLAG_NONE:			No flags set
+ * @AS_VERSION_PARSE_FLAG_USE_TRIPLET:		Use Microsoft-style version numbers
  *
- * The output format used when converting AppStream descriptions.
+ * The flags used when parsing version numbers.
  **/
 typedef enum {
-	AS_MARKUP_CONVERT_FORMAT_SIMPLE,
-	AS_MARKUP_CONVERT_FORMAT_MARKDOWN,
+	AS_VERSION_PARSE_FLAG_NONE		= 0,
+	AS_VERSION_PARSE_FLAG_USE_TRIPLET	= 1 << 0,
 	/*< private >*/
-	AS_MARKUP_CONVERT_FORMAT_LAST
-} AsMarkupConvertFormat;
-
-gchar		*as_markup_convert_simple	(const gchar	*markup,
-						 gssize		 markup_len,
-						 GError		**error);
-gchar		*as_markup_convert		(const gchar	*markup,
-						 gssize		 markup_len,
-						 AsMarkupConvertFormat format,
-						 GError		**error);
-gchar		**as_markup_strsplit_words	(const gchar	*text,
-						 guint		 line_len);
+	AS_VERSION_PARSE_FLAG_LAST
+} AsVersionParseFlag;
 
 GQuark		 as_utils_error_quark		(void);
 gboolean	 as_utils_is_stock_icon_name	(const gchar	*name);
@@ -106,12 +99,13 @@ gboolean	 as_utils_is_spdx_license_id	(const gchar	*license_id);
 gboolean	 as_utils_is_spdx_license	(const gchar	*license);
 gboolean	 as_utils_is_environment_id	(const gchar	*environment_id);
 gboolean	 as_utils_is_category_id	(const gchar	*category_id);
+
+G_DEPRECATED
 gboolean	 as_utils_is_blacklisted_id	(const gchar	*desktop_id);
+
 gchar		**as_utils_spdx_license_tokenize (const gchar	*license);
 gchar		*as_utils_spdx_license_detokenize (gchar	**license_tokens);
-gboolean	 as_utils_check_url_exists	(const gchar	*url,
-						 guint		 timeout,
-						 GError		**error);
+gchar		*as_utils_license_to_spdx	(const gchar	*license);
 gchar		*as_utils_find_icon_filename	(const gchar	*destdir,
 						 const gchar	*search,
 						 GError		**error);
@@ -119,8 +113,6 @@ gchar		*as_utils_find_icon_filename_full (const gchar	*destdir,
 						 const gchar	*search,
 						 AsUtilsFindIconFlag flags,
 						 GError		**error);
-gchar		*as_utils_get_string_overlap	(const gchar	*s1,
-						 const gchar	*s2);
 gboolean	 as_utils_install_filename	(AsUtilsLocation location,
 						 const gchar	*filename,
 						 const gchar	*origin,
@@ -130,6 +122,28 @@ gboolean	 as_utils_search_token_valid	(const gchar	*token);
 gchar		**as_utils_search_tokenize	(const gchar	*search);
 gint		 as_utils_vercmp		(const gchar	*version_a,
 						 const gchar	*version_b);
+gboolean	 as_utils_guid_is_valid		(const gchar	*guid);
+gchar		*as_utils_guid_from_string	(const gchar	*str);
+gchar		*as_utils_version_from_uint32	(guint32	 val,
+						 AsVersionParseFlag flags);
+gchar		*as_utils_version_from_uint16	(guint16	 val,
+						 AsVersionParseFlag flags);
+gchar		*as_utils_version_parse		(const gchar	*version);
+guint		 as_utils_string_replace	(GString	*string,
+						 const gchar	*search,
+						 const gchar	*replace);
+gchar		*as_utils_unique_id_build	(AsAppScope	 scope,
+						 AsBundleKind	 bundle_kind,
+						 const gchar	*origin,
+						 AsAppKind	 kind,
+						 const gchar	*id,
+						 const gchar	*branch);
+gboolean	 as_utils_unique_id_equal	(const gchar	*unique_id1,
+						 const gchar	*unique_id2);
+gboolean	 as_utils_unique_id_valid	(const gchar	*unique_id);
+guint		 as_utils_unique_id_hash	(const gchar	*unique_id);
+gchar		*as_utils_appstream_id_build	(const gchar	*str);
+gboolean	 as_utils_appstream_id_valid	(const gchar	*str);
 
 G_END_DECLS
 

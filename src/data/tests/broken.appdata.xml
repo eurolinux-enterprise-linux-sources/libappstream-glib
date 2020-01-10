@@ -4,6 +4,7 @@
   <metadata_license>GPLv3+</metadata_license>
   <metadata_license>BSD</metadata_license>
   <project_license>CC1</project_license>
+  <project_group>GNU</project_group>
   <name>Power Statistics.</name>
   <summary>Observe power management.</summary>
   <description>
@@ -21,10 +22,26 @@
   <url type="bugtracker">www.dave.org</url>
   <updatecontact></updatecontact>
 
+  <xxx>This is not a valid tag</xxx>
   <releases>
     <release version="0.6.1" timestamp="20140330">
       <description>
         <p>See: https://mail.xfce.org/pipermail/xfce-announce/2014-March/000318.html</p>
+      </description>
+    </release>
+    <release date="2014-12-15" version="0.6.2">
+      <description>
+        <p>This is a newer release to the first entry in the file!</p>
+      </description>
+    </release>
+    <release date="2014-12-15" version="0.6.2">
+      <description>
+        <p>This is a duplicate release on the same day!</p>
+      </description>
+    </release>
+    <release date="2020-01-01" version="0.6.2">
+      <description>
+        <p>This is a release in the future!</p>
       </description>
     </release>
     <release>

@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014-2015 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -22,35 +22,48 @@
 #include "config.h"
 
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <stdlib.h>
+#include <fnmatch.h>
 
 #include "as-app-private.h"
+#include "as-app-builder.h"
 #include "as-bundle-private.h"
-#include "as-cleanup.h"
+#include "as-translation-private.h"
+#include "as-checksum-private.h"
+#include "as-content-rating-private.h"
 #include "as-enums.h"
 #include "as-icon-private.h"
 #include "as-image-private.h"
-#include "as-inf.h"
+#include "as-require-private.h"
+#include "as-review-private.h"
+#include "as-markup.h"
+#include "as-monitor.h"
 #include "as-node-private.h"
 #include "as-problem.h"
 #include "as-provide-private.h"
+#include "as-ref-string.h"
 #include "as-release-private.h"
+#include "as-suggest-private.h"
 #include "as-screenshot-private.h"
 #include "as-store.h"
 #include "as-tag.h"
 #include "as-utils-private.h"
 #include "as-yaml.h"
 
-/**
- * as_test_compare_lines:
- **/
+#define AS_TEST_WILDCARD_SHA1	"\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?"
+
 static gboolean
 as_test_compare_lines (const gchar *txt1, const gchar *txt2, GError **error)
 {
-	_cleanup_free_ gchar *output = NULL;
+	g_autofree gchar *output = NULL;
 
 	/* exactly the same */
 	if (g_strcmp0 (txt1, txt2) == 0)
+		return TRUE;
+
+	/* matches a pattern */
+	if (fnmatch (txt2, txt1, FNM_NOESCAPE) == 0)
 		return TRUE;
 
 	/* save temp files and diff them */
@@ -67,21 +80,348 @@ as_test_compare_lines (const gchar *txt1, const gchar *txt2, GError **error)
 	return FALSE;
 }
 
-/**
- * as_test_get_filename:
- **/
 static gchar *
 as_test_get_filename (const gchar *filename)
 {
-	char full_tmp[PATH_MAX];
-	gchar *tmp;
-	_cleanup_free_ gchar *path = NULL;
+	g_autofree gchar *path = NULL;
 
-	path = g_build_filename (TESTDATADIR, filename, NULL);
-	tmp = realpath (path, full_tmp);
-	if (tmp == NULL)
-		return NULL;
-	return g_strdup (full_tmp);
+	/* try the source then the destdir */
+	path = g_build_filename (TESTDIRSRC, filename, NULL);
+	if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+		g_free (path);
+		path = g_build_filename (TESTDIRBUILD, filename, NULL);
+	}
+	return realpath (path, NULL);
+}
+
+static GMainLoop *_test_loop = NULL;
+static guint _test_loop_timeout_id = 0;
+
+static gboolean
+as_test_hang_check_cb (gpointer user_data)
+{
+	g_main_loop_quit (_test_loop);
+	_test_loop_timeout_id = 0;
+	_test_loop = NULL;
+	return G_SOURCE_REMOVE;
+}
+
+static void
+as_test_loop_run_with_timeout (guint timeout_ms)
+{
+	g_assert (_test_loop_timeout_id == 0);
+	g_assert (_test_loop == NULL);
+	_test_loop = g_main_loop_new (NULL, FALSE);
+	_test_loop_timeout_id = g_timeout_add (timeout_ms, as_test_hang_check_cb, NULL);
+	g_main_loop_run (_test_loop);
+}
+
+static void
+as_test_loop_quit (void)
+{
+	if (_test_loop_timeout_id > 0) {
+		g_source_remove (_test_loop_timeout_id);
+		_test_loop_timeout_id = 0;
+	}
+	if (_test_loop != NULL) {
+		g_main_loop_quit (_test_loop);
+		g_main_loop_unref (_test_loop);
+		_test_loop = NULL;
+	}
+}
+
+static void
+monitor_test_cb (AsMonitor *mon, const gchar *filename, guint *cnt)
+{
+	(*cnt)++;
+}
+
+static void
+as_test_monitor_dir_func (void)
+{
+	gboolean ret;
+	guint cnt_added = 0;
+	guint cnt_removed = 0;
+	guint cnt_changed = 0;
+	g_autoptr(AsMonitor) mon = NULL;
+	g_autoptr(GError) error = NULL;
+	const gchar *tmpdir = "/tmp/monitor-test/usr/share/app-info/xmls";
+	g_autofree gchar *tmpfile = NULL;
+	g_autofree gchar *tmpfile_new = NULL;
+	g_autofree gchar *cmd_touch = NULL;
+
+	tmpfile = g_build_filename (tmpdir, "test.txt", NULL);
+	tmpfile_new = g_build_filename (tmpdir, "newtest.txt", NULL);
+	g_unlink (tmpfile);
+	g_unlink (tmpfile_new);
+
+	mon = as_monitor_new ();
+	g_signal_connect (mon, "added",
+			  G_CALLBACK (monitor_test_cb), &cnt_added);
+	g_signal_connect (mon, "removed",
+			  G_CALLBACK (monitor_test_cb), &cnt_removed);
+	g_signal_connect (mon, "changed",
+			  G_CALLBACK (monitor_test_cb), &cnt_changed);
+
+	/* add watch */
+	ret = as_monitor_add_directory (mon, tmpdir, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* create directory */
+	g_mkdir_with_parents (tmpdir, 0700);
+
+	/* touch file */
+	cmd_touch = g_strdup_printf ("touch %s", tmpfile);
+	ret = g_spawn_command_line_sync (cmd_touch, NULL, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	/* just change the mtime */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	ret = g_spawn_command_line_sync (cmd_touch, NULL, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 1);
+
+	/* delete it */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	g_unlink (tmpfile);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 1);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	/* save a new file with temp copy */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	ret = g_file_set_contents (tmpfile, "foo", -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	/* modify file with temp copy */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	ret = g_file_set_contents (tmpfile, "bar", -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 1);
+
+	/* rename the file */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	g_rename (tmpfile, tmpfile_new);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 1);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	g_unlink (tmpfile);
+	g_unlink (tmpfile_new);
+}
+
+static void
+as_test_monitor_file_func (void)
+{
+	gboolean ret;
+	guint cnt_added = 0;
+	guint cnt_removed = 0;
+	guint cnt_changed = 0;
+	g_autoptr(AsMonitor) mon = NULL;
+	g_autoptr(GError) error = NULL;
+	const gchar *tmpfile = "/tmp/one.txt";
+	const gchar *tmpfile_new = "/tmp/two.txt";
+	g_autofree gchar *cmd_touch = NULL;
+
+	g_unlink (tmpfile);
+	g_unlink (tmpfile_new);
+
+	mon = as_monitor_new ();
+	g_signal_connect (mon, "added",
+			  G_CALLBACK (monitor_test_cb), &cnt_added);
+	g_signal_connect (mon, "removed",
+			  G_CALLBACK (monitor_test_cb), &cnt_removed);
+	g_signal_connect (mon, "changed",
+			  G_CALLBACK (monitor_test_cb), &cnt_changed);
+
+	/* add a single file */
+	ret = as_monitor_add_file (mon, tmpfile, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* touch file */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	cmd_touch = g_strdup_printf ("touch %s", tmpfile);
+	ret = g_spawn_command_line_sync (cmd_touch, NULL, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	/* just change the mtime */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	ret = g_spawn_command_line_sync (cmd_touch, NULL, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 1);
+
+	/* delete it */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	g_unlink (tmpfile);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 1);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	/* save a new file with temp copy */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	ret = g_file_set_contents (tmpfile, "foo", -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 0);
+
+	/* modify file with temp copy */
+	cnt_added = cnt_removed = cnt_changed = 0;
+	ret = g_file_set_contents (tmpfile, "bar", -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	as_test_loop_quit ();
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 0);
+	g_assert_cmpint (cnt_changed, ==, 1);
+}
+
+static void
+as_test_app_builder_gettext_func (void)
+{
+	GError *error = NULL;
+	gboolean ret;
+	guint i;
+	g_autofree gchar *fn = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GList) list = NULL;
+	const gchar *gettext_domains[] = { "app", "notgoingtoexist", NULL };
+
+	app = as_app_new ();
+	fn = as_test_get_filename ("usr");
+	g_assert (fn != NULL);
+	for (i = 0; gettext_domains[i] != NULL; i++) {
+		g_autoptr(AsTranslation) translation = NULL;
+		translation = as_translation_new ();
+		as_translation_set_kind (translation, AS_TRANSLATION_KIND_GETTEXT);
+		as_translation_set_id (translation, gettext_domains[i]);
+		as_app_add_translation (app, translation);
+	}
+	ret = as_app_builder_search_translations (app, fn, 25,
+						  AS_APP_BUILDER_FLAG_NONE,
+						  NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* check langs */
+	g_assert_cmpint (as_app_get_language (app, "en_GB"), ==, 100);
+	g_assert_cmpint (as_app_get_language (app, "ru"), ==, 33);
+	g_assert_cmpint (as_app_get_language (app, "fr_FR"), ==, -1);
+
+	/* check fallback */
+	g_assert_cmpint (as_app_get_language (app, "ru_RU"), ==, 33);
+
+	/* check size */
+	list = as_app_get_languages (app);
+	g_assert_cmpint (g_list_length (list), ==, 2);
+}
+
+static void
+as_test_app_builder_gettext_nodomain_func (void)
+{
+	GError *error = NULL;
+	gboolean ret;
+	g_autofree gchar *fn = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GList) list = NULL;
+
+	app = as_app_new ();
+	fn = as_test_get_filename ("usr");
+	ret = as_app_builder_search_translations (app, fn, 50,
+						  AS_APP_BUILDER_FLAG_USE_FALLBACKS,
+						  NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* check langs */
+	g_assert_cmpint (as_app_get_language (app, "en_GB"), ==, 100);
+	g_assert_cmpint (as_app_get_language (app, "ru"), ==, -1);
+	g_assert_cmpint (as_app_get_language (app, "fr_FR"), ==, -1);
+
+	/* check size */
+	list = as_app_get_languages (app);
+	g_assert_cmpint (g_list_length (list), ==, 1);
+}
+
+static void
+as_test_app_builder_qt_func (void)
+{
+	GError *error = NULL;
+	gboolean ret;
+	guint i;
+	g_autofree gchar *fn = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GList) list = NULL;
+	const gchar *gettext_domains[] = { "kdeapp", "notgoingtoexist", NULL };
+
+	app = as_app_new ();
+	fn = as_test_get_filename ("usr");
+	g_assert (fn != NULL);
+	for (i = 0; gettext_domains[i] != NULL; i++) {
+		g_autoptr(AsTranslation) translation = NULL;
+		translation = as_translation_new ();
+		as_translation_set_kind (translation, AS_TRANSLATION_KIND_QT);
+		as_translation_set_id (translation, gettext_domains[i]);
+		as_app_add_translation (app, translation);
+	}
+	ret = as_app_builder_search_translations (app, fn, 25,
+						  AS_APP_BUILDER_FLAG_NONE,
+						  NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* check langs */
+	g_assert_cmpint (as_app_get_language (app, "fr"), ==, 100);
+	g_assert_cmpint (as_app_get_language (app, "en_GB"), ==, -1);
+
+	/* check size */
+	list = as_app_get_languages (app);
+	g_assert_cmpint (g_list_length (list), ==, 1);
 }
 
 static void
@@ -110,18 +450,18 @@ static void
 as_test_release_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
-	const gchar *src = "<release version=\"0.1.2\" timestamp=\"123\"/>";
+	const gchar *src = "<release timestamp=\"123\" urgency=\"critical\" version=\"0.1.2\"/>";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsRelease *release = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsRelease) release = NULL;
 
 	release = as_release_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "release");
@@ -133,8 +473,14 @@ as_test_release_func (void)
 	as_node_unref (root);
 
 	/* verify */
-	g_assert_cmpint (as_release_get_timestamp (release), ==, 123);
+	g_assert_cmpint ((gint32) as_release_get_timestamp (release), ==, 123);
+	g_assert_cmpint (as_release_get_urgency (release), ==, AS_URGENCY_KIND_CRITICAL);
+	g_assert_cmpint (as_release_get_state (release), ==, AS_RELEASE_STATE_UNKNOWN);
 	g_assert_cmpstr (as_release_get_version (release), ==, "0.1.2");
+
+	/* state is not stored in the XML */
+	as_release_set_state (release, AS_RELEASE_STATE_INSTALLED);
+	g_assert_cmpint (as_release_get_state (release), ==, AS_RELEASE_STATE_INSTALLED);
 
 	/* back to node */
 	root = as_node_new ();
@@ -149,21 +495,50 @@ as_test_release_func (void)
 }
 
 static void
+as_test_release_date_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	const gchar *src = "<release date=\"2016-01-18\"/>";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsRelease) release = NULL;
+
+	release = as_release_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "release");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_release_node_parse (release, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint ((gint32) as_release_get_timestamp (release), ==, 1453075200);
+}
+
+static void
 as_test_provide_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	const gchar *src = "<binary>/usr/bin/gnome-shell</binary>";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsProvide *provide = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsProvide) provide = NULL;
 
 	provide = as_provide_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "binary");
@@ -193,27 +568,31 @@ as_test_provide_func (void)
 static void
 as_test_release_appstream_func (void)
 {
+	AsChecksum *csum;
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	gboolean ret;
+	guint64 sz;
 	const gchar *src =
-		"<release version=\"0.1.2\" timestamp=\"123\">\n"
+		"<release timestamp=\"123\" version=\"0.1.2\">\n"
 		"<location>http://foo.com/bar.zip</location>\n"
 		"<location>http://baz.com/bar.cab</location>\n"
-		"<checksum type=\"md5\">deadbeef</checksum>\n"
-		"<checksum type=\"sha1\">12345</checksum>\n"
+		"<checksum type=\"sha1\" filename=\"firmware.cab\" target=\"container\">12345</checksum>\n"
+		"<checksum type=\"md5\" filename=\"firmware.cab\" target=\"container\">deadbeef</checksum>\n"
 		"<description><p>This is a new release</p><ul><li>Point</li></ul></description>\n"
 		"<description xml:lang=\"pl\"><p>Oprogramowanie</p></description>\n"
+		"<size type=\"installed\">123456</size>\n"
+		"<size type=\"download\">654321</size>\n"
 		"</release>\n";
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsRelease *release = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsRelease) release = NULL;
 
 	release = as_release_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "release");
@@ -225,20 +604,42 @@ as_test_release_appstream_func (void)
 	as_node_unref (root);
 
 	/* verify */
-	g_assert_cmpint (as_release_get_timestamp (release), ==, 123);
+	g_assert_cmpint ((gint32) as_release_get_timestamp (release), ==, 123);
 	g_assert_cmpstr (as_release_get_version (release), ==, "0.1.2");
 	g_assert_cmpstr (as_release_get_location_default (release), ==, "http://foo.com/bar.zip");
-	g_assert_cmpstr (as_release_get_checksum (release, G_CHECKSUM_SHA1), ==, "12345");
-	g_assert_cmpstr (as_release_get_checksum (release, G_CHECKSUM_MD5), ==, "deadbeef");
 	g_assert_cmpstr (as_release_get_description (release, "pl"), ==,
 				"<p>Oprogramowanie</p>");
 	g_assert_cmpstr (as_release_get_description (release, NULL), ==,
 				"<p>This is a new release</p><ul><li>Point</li></ul>");
 
+	/* checksum */
+	g_assert_cmpint (as_release_get_checksums(release)->len, ==, 2);
+	csum = as_release_get_checksum_by_fn (release, "firmware.inf");
+	g_assert (csum == NULL);
+	csum = as_release_get_checksum_by_fn (release, "firmware.cab");
+	g_assert (csum != NULL);
+	g_assert_cmpint (as_checksum_get_kind (csum), ==, G_CHECKSUM_SHA1);
+	g_assert_cmpint (as_checksum_get_target (csum), ==, AS_CHECKSUM_TARGET_CONTAINER);
+	g_assert_cmpstr (as_checksum_get_filename (csum), ==, "firmware.cab");
+	g_assert_cmpstr (as_checksum_get_value (csum), ==, "12345");
+
+	/* get by target type */
+	csum = as_release_get_checksum_by_target (release, AS_CHECKSUM_TARGET_CONTENT);
+	g_assert (csum == NULL);
+	csum = as_release_get_checksum_by_target (release, AS_CHECKSUM_TARGET_CONTAINER);
+	g_assert (csum != NULL);
+	g_assert_cmpstr (as_checksum_get_value (csum), ==, "12345");
+
+	/* test size */
+	sz = as_release_get_size (release, AS_SIZE_KIND_INSTALLED);
+	g_assert_cmpuint (sz, ==, 123456);
+	sz = as_release_get_size (release, AS_SIZE_KIND_DOWNLOAD);
+	g_assert_cmpuint (sz, ==, 654321);
+
 	/* back to node */
 	root = as_node_new ();
 	as_node_context_set_version (ctx, 1.0);
-	as_node_context_set_source_kind (ctx, AS_APP_SOURCE_KIND_APPSTREAM);
+	as_node_context_set_format_kind (ctx, AS_FORMAT_KIND_APPSTREAM);
 	n = as_release_node_insert (release, root, ctx);
 	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
 	ret = as_test_compare_lines (xml->str, src, &error);
@@ -253,8 +654,8 @@ static void
 as_test_release_appdata_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	gboolean ret;
 	const gchar *src =
 		"<release version=\"0.1.2\" timestamp=\"123\">\n"
@@ -263,26 +664,26 @@ as_test_release_appdata_func (void)
 		"<p xml:lang=\"pl\">Oprogramowanie</p>\n"
 		"</description>\n"
 		"</release>\n";
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsRelease *release = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsRelease) release = NULL;
 
 	release = as_release_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "release");
 	g_assert (n != NULL);
 	ctx = as_node_context_new ();
-	as_node_context_set_source_kind (ctx, AS_APP_SOURCE_KIND_APPDATA);
+	as_node_context_set_format_kind (ctx, AS_FORMAT_KIND_APPDATA);
 	ret = as_release_node_parse (release, n, ctx, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 	as_node_unref (root);
 
 	/* verify */
-	g_assert_cmpint (as_release_get_timestamp (release), ==, 123);
+	g_assert_cmpint ((gint32) as_release_get_timestamp (release), ==, 123);
 	g_assert_cmpstr (as_release_get_version (release), ==, "0.1.2");
 	g_assert_cmpstr (as_release_get_description (release, NULL), ==,
 				"<p>This is a new release</p>");
@@ -322,8 +723,8 @@ static void
 as_test_image_resize_filename (AsTestResize rz, const gchar *in, const gchar *out)
 {
 	gboolean ret;
-	_cleanup_object_unref_ GdkPixbuf *pb = NULL;
-	_cleanup_object_unref_ GdkPixbuf *pb2 = NULL;
+	g_autoptr(GdkPixbuf) pb = NULL;
+	g_autoptr(GdkPixbuf) pb2 = NULL;
 
 	pb = gdk_pixbuf_new_from_file (in, NULL);
 	g_assert (pb != NULL);
@@ -379,14 +780,14 @@ static void
 as_test_image_alpha_func (void)
 {
 	gboolean ret;
-	_cleanup_error_free_ GError *error = NULL;
-	_cleanup_free_ gchar *fn_both = NULL;
-	_cleanup_free_ gchar *fn_horiz = NULL;
-	_cleanup_free_ gchar *fn_internal1 = NULL;
-	_cleanup_free_ gchar *fn_internal2 = NULL;
-	_cleanup_free_ gchar *fn_none = NULL;
-	_cleanup_free_ gchar *fn_vert = NULL;
-	_cleanup_object_unref_ AsImage *im = NULL;
+	g_autoptr(GError) error = NULL;
+	g_autofree gchar *fn_both = NULL;
+	g_autofree gchar *fn_horiz = NULL;
+	g_autofree gchar *fn_internal1 = NULL;
+	g_autofree gchar *fn_internal2 = NULL;
+	g_autofree gchar *fn_none = NULL;
+	g_autofree gchar *fn_vert = NULL;
+	g_autoptr(AsImage) im = NULL;
 
 	/* horiz */
 	fn_horiz = as_test_get_filename ("alpha-horiz.png");
@@ -446,29 +847,29 @@ as_test_image_resize_func (void)
 {
 	GError *error = NULL;
 	const gchar *tmp;
-	_cleanup_dir_close_ GDir *dir = NULL;
-	_cleanup_free_ gchar *output_dir = NULL;
+	g_autoptr(GDir) dir = NULL;
+	g_autofree gchar *output_dir = NULL;
 
 	/* only do this test if an "output" directory exists */
-	output_dir = g_build_filename (TESTDATADIR, "output", NULL);
+	output_dir = g_build_filename (TESTDIRSRC, "output", NULL);
 	if (!g_file_test (output_dir, G_FILE_TEST_EXISTS))
 		return;
 
 	/* look for test screenshots */
-	dir = g_dir_open (TESTDATADIR, 0, &error);
+	dir = g_dir_open (TESTDIRSRC, 0, &error);
 	g_assert_no_error (error);
 	g_assert (dir != NULL);
 	while ((tmp = g_dir_read_name (dir)) != NULL) {
 		guint i;
-		_cleanup_free_ gchar *path = NULL;
+		g_autofree gchar *path = NULL;
 
 		if (!g_str_has_prefix (tmp, "ss-"))
 			continue;
-		path = g_build_filename (TESTDATADIR, tmp, NULL);
+		path = g_build_filename (TESTDIRSRC, tmp, NULL);
 
 		for (i = 0; i < AS_TEST_RESIZE_LAST; i++) {
-			_cleanup_free_ gchar *new_path = NULL;
-			_cleanup_string_free_ GString *basename = NULL;
+			g_autofree gchar *new_path = NULL;
+			g_autoptr(GString) basename = NULL;
 
 			basename = g_string_new (tmp);
 			g_string_truncate (basename, basename->len - 4);
@@ -484,20 +885,20 @@ static void
 as_test_icon_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	const gchar *src = "<icon type=\"cached\">app.png</icon>";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_free_ gchar *prefix = NULL;
-	_cleanup_object_unref_ AsIcon *icon = NULL;
-	_cleanup_object_unref_ GdkPixbuf *pixbuf = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autofree gchar *prefix = NULL;
+	g_autoptr(AsIcon) icon = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
 
 	icon = as_icon_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "icon");
@@ -544,11 +945,63 @@ as_test_icon_func (void)
 }
 
 static void
+as_test_checksum_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src = "<checksum type=\"sha1\" filename=\"fn.cab\" target=\"container\">12345</checksum>";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsChecksum) csum = NULL;
+
+	/* helpers */
+	g_assert_cmpint (as_checksum_target_from_string ("container"), ==, AS_CHECKSUM_TARGET_CONTAINER);
+	g_assert_cmpint (as_checksum_target_from_string ("content"), ==, AS_CHECKSUM_TARGET_CONTENT);
+	g_assert_cmpint (as_checksum_target_from_string (NULL), ==, AS_CHECKSUM_TARGET_UNKNOWN);
+	g_assert_cmpstr (as_checksum_target_to_string (AS_CHECKSUM_TARGET_CONTAINER), ==, "container");
+	g_assert_cmpstr (as_checksum_target_to_string (AS_CHECKSUM_TARGET_CONTENT), ==, "content");
+	g_assert_cmpstr (as_checksum_target_to_string (AS_CHECKSUM_TARGET_UNKNOWN), ==, NULL);
+
+	csum = as_checksum_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "checksum");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_checksum_node_parse (csum, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_checksum_get_kind (csum), ==, G_CHECKSUM_SHA1);
+	g_assert_cmpint (as_checksum_get_target (csum), ==, AS_CHECKSUM_TARGET_CONTAINER);
+	g_assert_cmpstr (as_checksum_get_filename (csum), ==, "fn.cab");
+	g_assert_cmpstr (as_checksum_get_value (csum), ==, "12345");
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_checksum_node_insert (csum, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
+static void
 as_test_icon_embedded_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	const gchar *src =
 "<icon type=\"embedded\"><name>app.png</name>"
@@ -597,14 +1050,14 @@ as_test_icon_embedded_func (void)
 "</filecontent>"
 "</icon>";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsIcon *icon = NULL;
-	_cleanup_object_unref_ GdkPixbuf *pixbuf = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsIcon) icon = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
 
 	icon = as_icon_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "icon");
@@ -653,22 +1106,22 @@ static void
 as_test_image_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	const gchar *src =
-		"<image type=\"thumbnail\" height=\"12\" width=\"34\">"
+		"<image type=\"thumbnail\" height=\"12\" width=\"34\" xml:lang=\"en_GB\">"
 		"http://www.hughsie.com/a.jpg</image>";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsImage *image = NULL;
-	_cleanup_object_unref_ GdkPixbuf *pixbuf = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsImage) image = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
 
 	image = as_image_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "image");
@@ -683,6 +1136,7 @@ as_test_image_func (void)
 	g_assert_cmpint (as_image_get_kind (image), ==, AS_IMAGE_KIND_THUMBNAIL);
 	g_assert_cmpint (as_image_get_height (image), ==, 12);
 	g_assert_cmpint (as_image_get_width (image), ==, 34);
+	g_assert_cmpstr (as_image_get_locale (image), ==, "en_GB");
 	g_assert_cmpstr (as_image_get_url (image), ==, "http://www.hughsie.com/a.jpg");
 
 	/* back to node */
@@ -723,23 +1177,212 @@ as_test_image_func (void)
 	g_assert (ret);
 }
 
+
+static void
+as_test_review_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src =
+		"<review date=\"2016-09-15\" id=\"17\" rating=\"80\">\n"
+		"<priority>5</priority>\n"
+		"<summary>Hello world</summary>\n"
+		"<description><p>Mighty Fine</p></description>\n"
+		"<version>1.2.3</version>\n"
+		"<reviewer_id>deadbeef</reviewer_id>\n"
+		"<reviewer_name>Richard Hughes</reviewer_name>\n"
+		"<lang>en_GB</lang>\n"
+		"<metadata>\n"
+		"<value key=\"foo\">bar</value>\n"
+		"</metadata>\n"
+		"</review>\n";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsReview) review = NULL;
+
+	review = as_review_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "review");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_review_node_parse (review, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_review_get_priority (review), ==, 5);
+	g_assert (as_review_get_date (review) != NULL);
+	g_assert_cmpstr (as_review_get_id (review), ==, "17");
+	g_assert_cmpstr (as_review_get_version (review), ==, "1.2.3");
+	g_assert_cmpstr (as_review_get_reviewer_id (review), ==, "deadbeef");
+	g_assert_cmpstr (as_review_get_reviewer_name (review), ==, "Richard Hughes");
+	g_assert_cmpstr (as_review_get_summary (review), ==, "Hello world");
+	g_assert_cmpstr (as_review_get_locale (review), ==, "en_GB");
+	g_assert_cmpstr (as_review_get_description (review), ==, "<p>Mighty Fine</p>");
+	g_assert_cmpstr (as_review_get_metadata_item (review, "foo"), ==, "bar");
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_review_node_insert (review, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
+static void
+as_test_require_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	const gchar *src =
+		"<component type=\"desktop\">\n"
+		"<requires>\n"
+		"<id>gimp.desktop</id>\n"
+		"<firmware compare=\"ge\" version=\"0.1.2\">bootloader</firmware>\n"
+		"<firmware compare=\"eq\" version=\"1.0.0\">runtime</firmware>\n"
+		"</requires>\n"
+		"</component>\n";
+	gboolean ret;
+	GPtrArray *requires;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsRequire) require = NULL;
+	g_autoptr(GString) xml = NULL;
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "component");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	app = as_app_new ();
+	ret = as_app_node_parse (app, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	requires = as_app_get_requires (app);
+	g_assert_cmpint (requires->len, ==, 3);
+	require = g_ptr_array_index (requires, 0);
+	g_assert_cmpint (as_require_get_kind (require), ==, AS_REQUIRE_KIND_ID);
+	g_assert_cmpint (as_require_get_compare (require), ==, AS_REQUIRE_COMPARE_UNKNOWN);
+	g_assert_cmpstr (as_require_get_version (require), ==, NULL);
+	g_assert_cmpstr (as_require_get_value (require), ==, "gimp.desktop");
+	require = as_app_get_require_by_value (app, AS_REQUIRE_KIND_FIRMWARE, "bootloader");
+	g_assert_cmpint (as_require_get_kind (require), ==, AS_REQUIRE_KIND_FIRMWARE);
+	g_assert_cmpint (as_require_get_compare (require), ==, AS_REQUIRE_COMPARE_GE);
+	g_assert_cmpstr (as_require_get_version (require), ==, "0.1.2");
+	g_assert_cmpstr (as_require_get_value (require), ==, "bootloader");
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_app_node_insert (app, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* test we can go back and forth */
+	for (guint i = 0; i < AS_REQUIRE_COMPARE_LAST; i++) {
+		const gchar *tmp = as_require_compare_to_string (i);
+		g_assert_cmpint (as_require_compare_from_string (tmp), ==, i);
+	}
+
+	/* check predicates */
+	require = as_require_new ();
+	as_require_set_version (require, "0.1.2");
+	as_require_set_compare (require, AS_REQUIRE_COMPARE_EQ);
+	g_assert (as_require_version_compare (require, "0.1.2", NULL));
+	as_require_set_compare (require, AS_REQUIRE_COMPARE_LT);
+	g_assert (as_require_version_compare (require, "0.1.1", NULL));
+	as_require_set_compare (require, AS_REQUIRE_COMPARE_LE);
+	g_assert (as_require_version_compare (require, "0.1.2", NULL));
+	as_require_set_compare (require, AS_REQUIRE_COMPARE_GLOB);
+	g_assert (as_require_version_compare (require, "0.?.*", NULL));
+	as_require_set_compare (require, AS_REQUIRE_COMPARE_REGEX);
+	g_assert (as_require_version_compare (require, "0.1.[0-9]", NULL));
+}
+
+static void
+as_test_suggest_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src =
+		"<suggests type=\"upstream\">\n"
+		"<id>gimp.desktop</id>\n"
+		"<id>mypaint.desktop</id>\n"
+		"</suggests>\n";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsSuggest) suggest = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
+
+	suggest = as_suggest_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "suggests");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_suggest_node_parse (suggest, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_suggest_get_kind (suggest), ==, AS_SUGGEST_KIND_UPSTREAM);
+	g_assert_cmpint (as_suggest_get_ids(suggest)->len, ==, 2);
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_suggest_node_insert (suggest, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
 static void
 as_test_bundle_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	const gchar *src =
-		"<bundle type=\"limba\">gnome-3-16</bundle>";
+		"<bundle type=\"limba\" runtime=\"1\" sdk=\"2\">gnome-3-16</bundle>";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsBundle *bundle = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsBundle) bundle = NULL;
 
 	bundle = as_bundle_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "bundle");
@@ -753,6 +1396,8 @@ as_test_bundle_func (void)
 	/* verify */
 	g_assert_cmpint (as_bundle_get_kind (bundle), ==, AS_BUNDLE_KIND_LIMBA);
 	g_assert_cmpstr (as_bundle_get_id (bundle), ==, "gnome-3-16");
+	g_assert_cmpstr (as_bundle_get_runtime (bundle), ==, "1");
+	g_assert_cmpstr (as_bundle_get_sdk (bundle), ==, "2");
 
 	/* back to node */
 	root = as_node_new ();
@@ -767,13 +1412,56 @@ as_test_bundle_func (void)
 }
 
 static void
+as_test_translation_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src =
+		"<translation type=\"gettext\">gnome-software</translation>";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsTranslation) translation = NULL;
+
+	translation = as_translation_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "translation");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_translation_node_parse (translation, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_node_unref (root);
+
+	/* verify */
+	g_assert_cmpint (as_translation_get_kind (translation), ==, AS_TRANSLATION_KIND_GETTEXT);
+	g_assert_cmpstr (as_translation_get_id (translation), ==, "gnome-software");
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.4);
+	n = as_translation_node_insert (translation, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
+static void
 as_test_screenshot_func (void)
 {
 	GPtrArray *images;
 	AsImage *im;
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	const gchar *src =
 		"<screenshot priority=\"-64\">\n"
@@ -782,13 +1470,13 @@ as_test_screenshot_func (void)
 		"<image type=\"thumbnail\" height=\"100\" width=\"100\">http://2.png</image>\n"
 		"</screenshot>\n";
 	gboolean ret;
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsScreenshot *screenshot = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsScreenshot) screenshot = NULL;
 
 	screenshot = as_screenshot_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "screenshot");
@@ -830,29 +1518,90 @@ as_test_screenshot_func (void)
 }
 
 static void
+as_test_content_rating_func (void)
+{
+	GError *error = NULL;
+	AsNode *n;
+	AsNode *root;
+	GString *xml;
+	const gchar *src =
+		"<content_rating type=\"oars-1.0\">\n"
+		"<content_attribute id=\"drugs-alcohol\">moderate</content_attribute>\n"
+		"<content_attribute id=\"violence-cartoon\">mild</content_attribute>\n"
+		"</content_rating>\n";
+	gboolean ret;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsContentRating) content_rating = NULL;
+
+	content_rating = as_content_rating_new ();
+
+	/* to object */
+	root = as_node_from_xml (src, 0, &error);
+	g_assert_no_error (error);
+	g_assert (root != NULL);
+	n = as_node_find (root, "content_rating");
+	g_assert (n != NULL);
+	ctx = as_node_context_new ();
+	ret = as_content_rating_node_parse (content_rating, n, ctx, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* verify */
+	g_assert_cmpstr (as_content_rating_get_kind (content_rating), ==, "oars-1.0");
+	g_assert_cmpint (as_content_rating_get_value (content_rating, "drugs-alcohol"), ==,
+			 AS_CONTENT_RATING_VALUE_MODERATE);
+	g_assert_cmpint (as_content_rating_get_value (content_rating, "violence-cartoon"), ==,
+			 AS_CONTENT_RATING_VALUE_MILD);
+	g_assert_cmpint (as_content_rating_get_value (content_rating, "violence-bloodshed"), ==,
+			 AS_CONTENT_RATING_VALUE_UNKNOWN);
+	as_node_unref (root);
+
+	/* check CSM */
+	g_assert_cmpint (as_content_rating_get_minimum_age (content_rating), ==, 13);
+
+	/* back to node */
+	root = as_node_new ();
+	as_node_context_set_version (ctx, 0.8);
+	n = as_content_rating_node_insert (content_rating, root, ctx);
+	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+	as_node_unref (root);
+}
+
+static void
 as_test_app_func (void)
 {
 	AsIcon *ic;
 	AsBundle *bu;
+	AsRelease *rel;
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GPtrArray *icons;
 	GString *xml;
 	gboolean ret;
 	const gchar *src =
-		"<component priority=\"-4\" type=\"desktop\">\n"
+		"<component type=\"desktop\" merge=\"replace\" priority=\"-4\">\n"
 		"<id>org.gnome.Software.desktop</id>\n"
 		"<pkgname>gnome-software</pkgname>\n"
 		"<source_pkgname>gnome-software-src</source_pkgname>\n"
-		"<bundle type=\"limba\">gnome-software-gnome-3-16</bundle>\n"
+		"<bundle type=\"flatpak\">app/org.gnome.Software/x86_64/master</bundle>\n"
+		"<translation type=\"gettext\">gnome-software</translation>\n"
+		"<suggests type=\"upstream\">\n"
+		"<id>gimp.desktop</id>\n"
+		"<id>mypaint.desktop</id>\n"
+		"</suggests>\n"
 		"<name>Software</name>\n"
 		"<name xml:lang=\"pl\">Oprogramowanie</name>\n"
 		"<summary>Application manager</summary>\n"
 		"<developer_name>GNOME Foundation</developer_name>\n"
 		"<description><p>Software allows you to find stuff</p></description>\n"
 		"<description xml:lang=\"pt_BR\"><p>O aplicativo Software.</p></description>\n"
-		"<icon height=\"64\" width=\"64\" type=\"cached\">org.gnome.Software.png</icon>\n"
+		"<icon type=\"cached\" height=\"64\" width=\"64\">org.gnome.Software1.png</icon>\n"
+		"<icon type=\"cached\" height=\"64\" width=\"64\">org.gnome.Software2.png</icon>\n"
 		"<categories>\n"
 		"<category>System</category>\n"
 		"</categories>\n"
@@ -886,8 +1635,17 @@ as_test_app_func (void)
 		"<image type=\"thumbnail\">http://b.png</image>\n"
 		"</screenshot>\n"
 		"</screenshots>\n"
+		"<reviews>\n"
+		"<review date=\"2016-09-15\">\n"
+		"<summary>Hello world</summary>\n"
+		"</review>\n"
+		"</reviews>\n"
+		"<content_rating type=\"oars-1.0\">\n"
+		"<content_attribute id=\"drugs-alcohol\">moderate</content_attribute>\n"
+		"</content_rating>\n"
 		"<releases>\n"
-		"<release version=\"3.11.90\" timestamp=\"1392724800\"/>\n"
+		"<release timestamp=\"1392724801\" version=\"3.11.91\"/>\n"
+		"<release timestamp=\"1392724800\" version=\"3.11.90\"/>\n"
 		"</releases>\n"
 		"<provides>\n"
 		"<binary>/usr/bin/gnome-shell</binary>\n"
@@ -902,13 +1660,13 @@ as_test_app_func (void)
 		"<value key=\"SomethingRandom\"/>\n"
 		"</metadata>\n"
 		"</component>\n";
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	app = as_app_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	n = as_node_find (root, "component");
@@ -921,19 +1679,20 @@ as_test_app_func (void)
 	/* verify */
 	g_assert_cmpstr (as_app_get_id (app), ==, "org.gnome.Software.desktop");
 	g_assert_cmpstr (as_app_get_id_filename (app), ==, "org.gnome.Software");
+	g_assert_cmpstr (as_app_get_unique_id (app), ==, "*/flatpak/*/desktop/org.gnome.Software.desktop/master");
 	g_assert_cmpstr (as_app_get_name (app, "pl"), ==, "Oprogramowanie");
 	g_assert_cmpstr (as_app_get_comment (app, NULL), ==, "Application manager");
 	g_assert_cmpstr (as_app_get_description (app, NULL), ==, "<p>Software allows you to find stuff</p>");
 	g_assert_cmpstr (as_app_get_description (app, "pt_BR"), ==, "<p>O aplicativo Software.</p>");
 	g_assert_cmpstr (as_app_get_developer_name (app, NULL), ==, "GNOME Foundation");
 	g_assert_cmpstr (as_app_get_source_pkgname (app), ==, "gnome-software-src");
-	g_assert_cmpint (as_app_get_source_kind (app), ==, AS_APP_SOURCE_KIND_UNKNOWN);
 	g_assert_cmpstr (as_app_get_project_group (app), ==, "GNOME");
 	g_assert_cmpstr (as_app_get_project_license (app), ==, "GPLv2+");
+	g_assert_cmpstr (as_app_get_branch (app), ==, "master");
 	g_assert_cmpint (as_app_get_categories(app)->len, ==, 1);
 	g_assert_cmpint (as_app_get_priority (app), ==, -4);
 	g_assert_cmpint (as_app_get_screenshots(app)->len, ==, 2);
-	g_assert_cmpint (as_app_get_releases(app)->len, ==, 1);
+	g_assert_cmpint (as_app_get_releases(app)->len, ==, 2);
 	g_assert_cmpint (as_app_get_provides(app)->len, ==, 3);
 	g_assert_cmpint (as_app_get_kudos(app)->len, ==, 1);
 	g_assert_cmpint (as_app_get_permissions(app)->len, ==, 1);
@@ -946,29 +1705,39 @@ as_test_app_func (void)
 	g_assert (as_app_has_permission (app, "Network"));
 	g_assert (!as_app_has_kudo (app, "MagicValue"));
 	g_assert (!as_app_has_kudo_kind (app, AS_KUDO_KIND_USER_DOCS));
+	g_assert (as_app_has_compulsory_for_desktop (app, "GNOME"));
+	g_assert (!as_app_has_compulsory_for_desktop (app, "KDE"));
 	as_node_unref (root);
+
+	/* check equality */
+	g_assert (as_app_equal (app, app));
+
+	/* check newest release */
+	rel = as_app_get_release_default (app);
+	g_assert (rel != NULL);
+	g_assert_cmpstr (as_release_get_version (rel), ==, "3.11.91");
 
 	/* check icons */
 	icons = as_app_get_icons (app);
 	g_assert (icons != NULL);
-	g_assert_cmpint (icons->len, ==, 1);
+	g_assert_cmpint (icons->len, ==, 2);
 
 	/* check bundle */
 	bu = as_app_get_bundle_default (app);
 	g_assert (bu != NULL);
-	g_assert_cmpint (as_bundle_get_kind (bu), ==, AS_BUNDLE_KIND_LIMBA);
-	g_assert_cmpstr (as_bundle_get_id (bu), ==, "gnome-software-gnome-3-16");
+	g_assert_cmpint (as_bundle_get_kind (bu), ==, AS_BUNDLE_KIND_FLATPAK);
+	g_assert_cmpstr (as_bundle_get_id (bu), ==, "app/org.gnome.Software/x86_64/master");
 
 	/* check we can get a specific icon */
 	ic = as_app_get_icon_for_size (app, 999, 999);
 	g_assert (ic == NULL);
 	ic = as_app_get_icon_for_size (app, 64, 64);
 	g_assert (ic != NULL);
-	g_assert_cmpstr (as_icon_get_name (ic), ==, "org.gnome.Software.png");
+	g_assert_cmpstr (as_icon_get_name (ic), ==, "org.gnome.Software1.png");
 	g_assert_cmpint (as_icon_get_kind (ic), ==, AS_ICON_KIND_CACHED);
 
 	/* we can't extend ourself */
-	as_app_add_extends (app, "org.gnome.Software.desktop", -1);
+	as_app_add_extends (app, "org.gnome.Software.desktop");
 	g_assert_cmpint (as_app_get_extends(app)->len, ==, 0);
 
 	/* back to node */
@@ -983,7 +1752,7 @@ as_test_app_func (void)
 	as_node_unref (root);
 
 	/* test contact demunging */
-	as_app_set_update_contact (app, "richard_at_hughsie_dot_co_dot_uk", -1);
+	as_app_set_update_contact (app, "richard_at_hughsie_dot_co_dot_uk");
 	g_assert_cmpstr (as_app_get_update_contact (app), ==, "richard@hughsie.co.uk");
 }
 
@@ -997,7 +1766,7 @@ as_test_app_validate_check (GPtrArray *array,
 	guint i;
 
 	for (i = 0; i < array->len; i++) {
-		_cleanup_free_ gchar *message_no_data = NULL;
+		g_autofree gchar *message_no_data = NULL;
 		problem = g_ptr_array_index (array, i);
 		if (as_problem_get_kind (problem) != kind)
 			continue;
@@ -1011,7 +1780,7 @@ as_test_app_validate_check (GPtrArray *array,
 	g_print ("\n");
 	for (i = 0; i < array->len; i++) {
 		problem = g_ptr_array_index (array, i);
-		g_print ("%i\t%s\n",
+		g_print ("%u\t%s\n",
 			 as_problem_get_kind (problem),
 			 as_problem_get_message (problem));
 	}
@@ -1030,8 +1799,8 @@ as_test_app_validate_appdata_good_func (void)
 	GPtrArray *screenshots;
 	gboolean ret;
 	guint i;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	/* open file */
 	app = as_app_new ();
@@ -1041,7 +1810,7 @@ as_test_app_validate_appdata_good_func (void)
 	g_assert (ret);
 
 	/* check success */
-	g_assert_cmpint (as_app_get_id_kind (app), ==, AS_ID_KIND_DESKTOP);
+	g_assert_cmpint (as_app_get_kind (app), ==, AS_APP_KIND_DESKTOP);
 	g_assert_cmpstr (as_app_get_id (app), ==, "gnome-power-statistics.desktop");
 	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "0 A.D.");
 	g_assert_cmpstr (as_app_get_comment (app, "C"), ==, "Observe power management");
@@ -1084,8 +1853,8 @@ as_test_app_validate_metainfo_good_func (void)
 	GPtrArray *probs;
 	gboolean ret;
 	guint i;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	/* open file */
 	app = as_app_new ();
@@ -1095,7 +1864,7 @@ as_test_app_validate_metainfo_good_func (void)
 	g_assert (ret);
 
 	/* check success */
-	g_assert_cmpint (as_app_get_id_kind (app), ==, AS_ID_KIND_ADDON);
+	g_assert_cmpint (as_app_get_kind (app), ==, AS_APP_KIND_ADDON);
 	g_assert_cmpstr (as_app_get_id (app), ==, "gedit-code-assistance");
 	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "Code assistance");
 	g_assert_cmpstr (as_app_get_comment (app, "C"), ==, "Code assistance for C, C++ and Objective-C");
@@ -1126,8 +1895,8 @@ as_test_app_validate_intltool_func (void)
 	GPtrArray *probs;
 	gboolean ret;
 	guint i;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	/* open file */
 	app = as_app_new ();
@@ -1137,7 +1906,7 @@ as_test_app_validate_intltool_func (void)
 	g_assert (ret);
 
 	/* check success */
-	g_assert_cmpint (as_app_get_id_kind (app), ==, AS_ID_KIND_DESKTOP);
+	g_assert_cmpint (as_app_get_kind (app), ==, AS_APP_KIND_DESKTOP);
 	g_assert_cmpstr (as_app_get_id (app), ==, "gnome-power-statistics.desktop");
 	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "0 A.D.");
 	g_assert_cmpstr (as_app_get_comment (app, "C"), ==, "Observe power management");
@@ -1157,8 +1926,8 @@ as_test_app_translated_func (void)
 {
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	/* open file */
 	app = as_app_new ();
@@ -1180,9 +1949,10 @@ as_test_app_validate_file_bad_func (void)
 	GError *error = NULL;
 	gboolean ret;
 	guint i;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *probs = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GPtrArray) probs = NULL;
+	g_autoptr(GPtrArray) probs2 = NULL;
 
 	/* open file */
 	app = as_app_new ();
@@ -1251,7 +2021,25 @@ as_test_app_validate_file_bad_func (void)
 				    "<p> requires sentence case");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_STYLE_INCORRECT,
 				    "<li> requires sentence case");
-	g_assert_cmpint (probs->len, ==, 28);
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
+				    "<project_group> is not valid");
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_MISSING,
+				    "<translation> not specified");
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
+				    "<release> versions are not in order");
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
+				    "<release> timestamps are not in order");
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_INVALID,
+				    "<release> version was duplicated");
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
+				    "<release> timestamp is in the future");
+	g_assert_cmpint (probs->len, ==, 35);
+
+	/* again, harder */
+	probs2 = as_app_validate (app, AS_APP_VALIDATE_FLAG_STRICT, &error);
+	as_test_app_validate_check (probs2, AS_PROBLEM_KIND_TAG_INVALID,
+				    "XML data contains unknown tag");
+	g_assert_cmpint (probs2->len, ==, 41);
 }
 
 static void
@@ -1261,9 +2049,9 @@ as_test_app_validate_meta_bad_func (void)
 	GError *error = NULL;
 	gboolean ret;
 	guint i;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *probs = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GPtrArray) probs = NULL;
 
 	/* open file */
 	app = as_app_new ();
@@ -1297,55 +2085,15 @@ as_test_app_validate_meta_bad_func (void)
 }
 
 static void
-as_test_store_local_app_install_func (void)
-{
-	AsApp *app;
-	AsIcon *ic;
-	GError *error = NULL;
-	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_free_ gchar *source_file = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-
-	/* open test store */
-	store = as_store_new ();
-	filename = as_test_get_filename (".");
-	as_store_set_destdir (store, filename);
-	ret = as_store_load (store, AS_STORE_LOAD_FLAG_APP_INSTALL, NULL, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	g_assert_cmpint (as_store_get_size (store), ==, 1);
-
-	/* make sure app is valid */
-	app = as_store_get_app_by_id (store, "test.desktop");
-	g_assert (app != NULL);
-	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "Test");
-	g_assert_cmpstr (as_app_get_comment (app, "C"), ==, "A test program");
-	g_assert_cmpint (as_app_get_source_kind (app), ==, AS_APP_SOURCE_KIND_APPSTREAM);
-
-	/* check icons */
-	g_assert_cmpint (as_app_get_icons(app)->len, ==, 1);
-	ic = as_app_get_icon_default (app);
-	g_assert (ic != NULL);
-	g_assert_cmpstr (as_icon_get_name (ic), ==, "test");
-	g_assert_cmpint (as_icon_get_kind (ic), ==, AS_ICON_KIND_LOCAL);
-	g_assert_cmpint (as_icon_get_width (ic), ==, 0);
-	g_assert_cmpint (as_icon_get_height (ic), ==, 0);
-
-	/* ensure we reference the correct file */
-	source_file = g_build_filename (filename, "/usr", "share", "app-install",
-					"desktop", "test.desktop", NULL);
-	g_assert_cmpstr (as_app_get_source_file (app), ==, source_file);
-}
-
-static void
 as_test_store_local_appdata_func (void)
 {
 	AsApp *app;
+	AsFormat *format;
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autofree gchar *filename_full = NULL;
+	g_autoptr(AsStore) store = NULL;
 
 	/* this are the warnings expected */
 	g_test_expect_message (G_LOG_DOMAIN,
@@ -1365,7 +2113,14 @@ as_test_store_local_appdata_func (void)
 	app = as_store_get_app_by_id (store, "broken.desktop");
 	g_assert (app != NULL);
 	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "Broken");
-	g_assert_cmpint (as_app_get_source_kind (app), ==, AS_APP_SOURCE_KIND_APPDATA);
+
+	/* check format */
+	format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_APPDATA);
+	g_assert (format != NULL);
+	filename_full = g_build_filename (filename,
+					  "usr/share/appdata/broken.appdata.xml",
+					  NULL);
+	g_assert_cmpstr (as_format_get_filename (format), ==, filename_full);
 }
 
 static void
@@ -1373,10 +2128,10 @@ as_test_store_validate_func (void)
 {
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *probs = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GPtrArray) probs = NULL;
 
 	/* open file */
 	store = as_store_new ();
@@ -1406,24 +2161,32 @@ as_test_store_validate_func (void)
 }
 
 static void
+_as_app_add_format_kind (AsApp *app, AsFormatKind kind)
+{
+	AsFormat *format = as_format_new ();
+	as_format_set_kind (format, kind);
+	as_app_add_format (app, format);
+}
+
+static void
 as_test_app_validate_style_func (void)
 {
 	AsProblem *problem;
 	GError *error = NULL;
 	guint i;
-	_cleanup_object_unref_ AsApp *app = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *probs = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GPtrArray) probs = NULL;
 
 	app = as_app_new ();
-	as_app_add_url (app, AS_URL_KIND_UNKNOWN, "dave.com", -1);
-	as_app_set_id (app, "dave.exe", -1);
-	as_app_set_id_kind (app, AS_ID_KIND_DESKTOP);
-	as_app_set_source_kind (app, AS_APP_SOURCE_KIND_APPDATA);
-	as_app_set_metadata_license (app, "BSD", -1);
-	as_app_set_project_license (app, "GPL-2.0+", -1);
-	as_app_set_name (app, "C", "Test app name that is very log indeed.", -1);
-	as_app_set_comment (app, "C", "Awesome", -1);
-	as_app_set_update_contact (app, "someone_who_cares@upstream_project.org", -1);
+	as_app_add_url (app, AS_URL_KIND_UNKNOWN, "dave.com");
+	as_app_set_id (app, "dave.exe");
+	as_app_set_kind (app, AS_APP_KIND_DESKTOP);
+	_as_app_add_format_kind (app, AS_FORMAT_KIND_APPDATA);
+	as_app_set_metadata_license (app, "BSD");
+	as_app_set_project_license (app, "GPL-2.0+");
+	as_app_set_name (app, "C", "Test app name that is very log indeed.");
+	as_app_set_comment (app, "C", "Awesome");
+	as_app_set_update_contact (app, "someone_who_cares@upstream_project.org");
 
 	probs = as_app_validate (app, AS_APP_VALIDATE_FLAG_NONE, &error);
 	g_assert_no_error (error);
@@ -1454,17 +2217,20 @@ as_test_app_validate_style_func (void)
 				    "<summary> is shorter than <name>");
 	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_MISSING,
 				    "<url> is not present");
-	g_assert_cmpint (probs->len, ==, 11);
+	as_test_app_validate_check (probs, AS_PROBLEM_KIND_TAG_MISSING,
+				    "<translation> not specified");
+	g_assert_cmpint (probs->len, ==, 12);
 }
 
 static void
 as_test_app_parse_file_desktop_func (void)
 {
+	AsFormat *format;
 	AsIcon *ic;
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	/* create an AsApp from a desktop file */
 	app = as_app_new ();
@@ -1485,12 +2251,17 @@ as_test_app_parse_file_desktop_func (void)
 		"Badanie i porównywanie zainstalowanych profilów kolorów");
 	g_assert_cmpint (as_app_get_vetos(app)->len, ==, 1);
 	g_assert_cmpstr (as_app_get_project_group (app), ==, NULL);
-	g_assert_cmpstr (as_app_get_source_file (app), ==, filename);
 	g_assert_cmpint (as_app_get_categories(app)->len, ==, 1);
 	g_assert_cmpint (as_app_get_keywords(app, NULL)->len, ==, 2);
 	g_assert_cmpint (as_app_get_keywords(app, "pl")->len, ==, 1);
 	g_assert (as_app_has_category (app, "System"));
 	g_assert (!as_app_has_category (app, "NotGoingToExist"));
+
+	/* check format */
+	g_assert_cmpint (as_app_get_formats(app)->len, ==, 1);
+	format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_DESKTOP);
+	g_assert (format != NULL);
+	g_assert_cmpstr (as_format_get_filename (format), ==, filename);
 
 	/* check icons */
 	g_assert_cmpint (as_app_get_icons(app)->len, ==, 1);
@@ -1521,76 +2292,30 @@ as_test_app_parse_file_desktop_func (void)
 }
 
 static void
-as_test_app_parse_file_inf_func (void)
-{
-	AsIcon *ic;
-	AsRelease *rel;
-	GError *error = NULL;
-	GPtrArray *releases;
-	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
-
-	/* create an AsApp from a desktop file */
-	app = as_app_new ();
-	filename = as_test_get_filename ("example.inf");
-	ret = as_app_parse_file (app,
-				 filename,
-				 AS_APP_PARSE_FLAG_NONE,
-				 &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-
-	/* test things we found */
-	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "ColorHug Firmware");
-	g_assert_cmpstr (as_app_get_comment (app, "C"), ==,
-		"Firmware for the ColorHug Colorimeter");
-	g_assert_cmpstr (as_app_get_source_file (app), ==, filename);
-
-	/* check icon */
-	g_assert_cmpint (as_app_get_icons(app)->len, ==, 1);
-	ic = as_app_get_icon_default (app);
-	g_assert (ic != NULL);
-	g_assert_cmpstr (as_icon_get_name (ic), ==, "application-x-executable");
-	g_assert_cmpint (as_icon_get_kind (ic), ==, AS_ICON_KIND_STOCK);
-	g_assert_cmpint (as_icon_get_width (ic), ==, 0);
-	g_assert_cmpint (as_icon_get_height (ic), ==, 0);
-
-	/* check releases */
-	releases = as_app_get_releases (app);
-	g_assert_cmpint (releases->len, ==, 1);
-	rel = g_ptr_array_index (releases, 0);
-	g_assert_cmpstr (as_release_get_location_default (rel), ==, "http://www.hughski.com/foo.cab");
-	g_assert_cmpint (as_release_get_timestamp (rel), ==, 1425340800);
-	g_assert_cmpstr (as_release_get_version (rel), ==, "2.0.2");
-	//g_assert_cmpstr (as_release_get_description (rel), ==, "XXX");
-}
-
-static void
 as_test_app_no_markup_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	gboolean ret;
 	const gchar *src =
-		"<application>\n"
-		"<id type=\"desktop\">org.gnome.Software.desktop</id>\n"
+		"<component type=\"desktop\">\n"
+		"<id>org.gnome.Software.desktop</id>\n"
 		"<description>Software is awesome:\n\n * Bada\n * Boom!</description>\n"
-		"</application>\n";
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+		"</component>\n";
+	g_autoptr(AsNodeContext) ctx = NULL;
+	g_autoptr(AsApp) app = NULL;
 
 	app = as_app_new ();
 
 	/* to object */
-	root = as_node_from_xml (src, -1,
+	root = as_node_from_xml (src,
 				 AS_NODE_FROM_XML_FLAG_LITERAL_TEXT,
 				 &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
-	n = as_node_find (root, "application");
+	n = as_node_find (root, "component");
 	g_assert (n != NULL);
 	ctx = as_node_context_new ();
 	ret = as_app_node_parse (app, n, ctx, &error);
@@ -1618,22 +2343,22 @@ as_test_app_no_markup_func (void)
 static void
 as_test_node_reflow_text_func (void)
 {
-	gchar *tmp;
+	AsRefString *tmp;
 
 	/* plain text */
 	tmp = as_node_reflow_text ("Dave", -1);
 	g_assert_cmpstr (tmp, ==, "Dave");
-	g_free (tmp);
+	as_ref_string_unref (tmp);
 
 	/* stripping */
 	tmp = as_node_reflow_text ("    Dave    ", -1);
 	g_assert_cmpstr (tmp, ==, "Dave");
-	g_free (tmp);
+	as_ref_string_unref (tmp);
 
 	/* paragraph */
 	tmp = as_node_reflow_text ("Dave\n\nSoftware", -1);
 	g_assert_cmpstr (tmp, ==, "Dave\n\nSoftware");
-	g_free (tmp);
+	as_ref_string_unref (tmp);
 
 	/* pathological */
 	tmp = as_node_reflow_text (
@@ -1643,17 +2368,17 @@ as_test_node_reflow_text_func (void)
 		"  awesome.\n\n\n"
 		"  Okay!\n", -1);
 	g_assert_cmpstr (tmp, ==, "Dave: Software is awesome.\n\nOkay!");
-	g_free (tmp);
+	as_ref_string_unref (tmp);
 }
 
 static void
 as_test_node_sort_func (void)
 {
-	_cleanup_error_free_ GError *error = NULL;
-	_cleanup_node_unref_ GNode *root = NULL;
-	_cleanup_string_free_ GString *str = NULL;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsNode) root = NULL;
+	g_autoptr(GString) str = NULL;
 
-	root = as_node_from_xml ("<d>ddd</d><c>ccc</c><b>bbb</b><a>aaa</a>", -1, 0, &error);
+	root = as_node_from_xml ("<d>ddd</d><c>ccc</c><b>bbb</b><a>aaa</a>", 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 
@@ -1665,9 +2390,9 @@ as_test_node_sort_func (void)
 static void
 as_test_node_func (void)
 {
-	GNode *n1;
-	GNode *n2;
-	_cleanup_node_unref_ GNode *root = NULL;
+	AsNode *n1;
+	AsNode *n2;
+	g_autoptr(AsNode) root = NULL;
 
 	/* create a simple tree */
 	root = as_node_new ();
@@ -1691,9 +2416,9 @@ as_test_node_func (void)
 	g_assert_cmpstr (as_node_get_attribute (n1, "version"), ==, NULL);
 
 	/* replace some node data */
-	as_node_set_data (n2, "udev", -1, 0);
+	as_node_set_data (n2, "udev", 0);
 	g_assert_cmpstr (as_node_get_data (n2), ==, "udev");
-	as_node_add_attribute (n2, "enabled", "true", -1);
+	as_node_add_attribute (n2, "enabled", "true");
 	g_assert_cmpstr (as_node_get_attribute (n2, "enabled"), ==, "true");
 
 	/* find the n2 node */
@@ -1721,22 +2446,22 @@ as_test_node_xml_func (void)
 			     "<bar key=\"value\">baz</bar>"
 			     "</foo>";
 	GError *error = NULL;
-	GNode *n2;
-	GNode *root;
+	AsNode *n2;
+	AsNode *root;
 	GString *xml;
 
 	/* invalid XML */
-	root = as_node_from_xml ("<moo>", -1, 0, &error);
+	root = as_node_from_xml ("<moo>", 0, &error);
 	g_assert (root == NULL);
 	g_assert_error (error, AS_NODE_ERROR, AS_NODE_ERROR_FAILED);
 	g_clear_error (&error);
-	root = as_node_from_xml ("<foo></bar>", -1, 0, &error);
+	root = as_node_from_xml ("<foo></bar>", 0, &error);
 	g_assert (root == NULL);
 	g_assert_error (error, AS_NODE_ERROR, AS_NODE_ERROR_FAILED);
 	g_clear_error (&error);
 
 	/* valid XML */
-	root = as_node_from_xml (valid, -1, 0, &error);
+	root = as_node_from_xml (valid, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 
@@ -1772,7 +2497,7 @@ as_test_node_xml_func (void)
 	as_node_unref (root);
 
 	/* convert all the children to XML */
-	root = as_node_from_xml ("<p>One</p><p>Two</p>", -1, 0, &error);
+	root = as_node_from_xml ("<p>One</p><p>Two</p>", 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 	g_assert_cmpint (g_node_n_nodes (root, G_TRAVERSE_ALL), ==, 3);
@@ -1783,7 +2508,7 @@ as_test_node_xml_func (void)
 	as_node_unref (root);
 
 	/* keep comments */
-	root = as_node_from_xml (valid, -1,
+	root = as_node_from_xml (valid,
 				 AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS,
 				 &error);
 	g_assert_no_error (error);
@@ -1797,7 +2522,7 @@ as_test_node_xml_func (void)
 	as_node_unref (root);
 
 	/* keep comment formatting */
-	root = as_node_from_xml (valid, -1,
+	root = as_node_from_xml (valid,
 				 AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS |
 				 AS_NODE_FROM_XML_FLAG_LITERAL_TEXT,
 				 &error);
@@ -1818,7 +2543,7 @@ as_test_node_xml_func (void)
 	as_node_unref (root);
 
 	/* check comments are appended together */
-	root = as_node_from_xml ("<!-- 1st -->\n<!-- 2nd -->\n<foo/>\n", -1,
+	root = as_node_from_xml ("<!-- 1st -->\n<!-- 2nd -->\n<foo/>\n",
 				 AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS |
 				 AS_NODE_FROM_XML_FLAG_LITERAL_TEXT,
 				 &error);
@@ -1840,8 +2565,8 @@ static void
 as_test_node_hash_func (void)
 {
 	GHashTable *hash;
-	GNode *n1;
-	GNode *root;
+	AsNode *n1;
+	AsNode *root;
 	GString *xml;
 
 	/* test un-swapped hash */
@@ -1879,8 +2604,8 @@ static void
 as_test_node_localized_func (void)
 {
 	GHashTable *hash;
-	GNode *n1;
-	GNode *root;
+	AsNode *n1;
+	AsNode *root;
 	GString *xml;
 
 	/* writing localized values */
@@ -1920,7 +2645,7 @@ static void
 as_test_node_localized_wrap_func (void)
 {
 	GError *error = NULL;
-	GNode *n1;
+	AsNode *n1;
 	const gchar *xml =
 		"<description>"
 		" <p>Hi</p>"
@@ -1931,10 +2656,10 @@ as_test_node_localized_wrap_func (void)
 		"  <li xml:lang=\"en_GB\">Hi</li>"
 		" </ul>"
 		"</description>";
-	_cleanup_hashtable_unref_ GHashTable *hash = NULL;
-	_cleanup_node_unref_ GNode *root = NULL;
+	g_autoptr(GHashTable) hash = NULL;
+	g_autoptr(AsNode) root = NULL;
 
-	root = as_node_from_xml (xml, -1, 0, &error);
+	root = as_node_from_xml (xml, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 
@@ -1956,9 +2681,9 @@ as_test_node_localized_wrap_func (void)
 static void
 as_test_node_intltool_func (void)
 {
-	GNode *n;
-	_cleanup_node_unref_ GNode *root = NULL;
-	_cleanup_string_free_ GString *str = NULL;
+	AsNode *n;
+	g_autoptr(AsNode) root = NULL;
+	g_autoptr(GString) str = NULL;
 
 	root = as_node_new ();
 	n = as_node_insert (root, "description", NULL, AS_NODE_INSERT_FLAG_NONE, NULL);
@@ -1974,7 +2699,7 @@ static void
 as_test_node_localized_wrap2_func (void)
 {
 	GError *error = NULL;
-	GNode *n1;
+	AsNode *n1;
 	const gchar *xml =
 		"<description>"
 		" <p>Hi</p>"
@@ -1988,10 +2713,10 @@ as_test_node_localized_wrap2_func (void)
 		"  <li>Secondski</li>"
 		" </ul>"
 		"</description>";
-	_cleanup_hashtable_unref_ GHashTable *hash = NULL;
-	_cleanup_node_unref_ GNode *root = NULL;
+	g_autoptr(GHashTable) hash = NULL;
+	g_autoptr(AsNode) root = NULL;
 
-	root = as_node_from_xml (xml, -1, 0, &error);
+	root = as_node_from_xml (xml, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
 
@@ -2018,31 +2743,38 @@ as_test_app_subsume_func (void)
 {
 	AsIcon *ic;
 	GList *list;
-	_cleanup_object_unref_ AsApp *app = NULL;
-	_cleanup_object_unref_ AsApp *donor = NULL;
-	_cleanup_object_unref_ AsIcon *icon = NULL;
-	_cleanup_object_unref_ AsScreenshot *ss = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(AsApp) donor = NULL;
+	g_autoptr(AsIcon) icon = NULL;
+	g_autoptr(AsIcon) icon2 = NULL;
+	g_autoptr(AsScreenshot) ss = NULL;
 
 	donor = as_app_new ();
 	icon = as_icon_new ();
-	as_icon_set_name (icon, "gtk-find", -1);
-	as_icon_set_kind (icon, AS_ICON_KIND_LOCAL);
+	as_icon_set_name (icon, "some-custom-icon");
+	as_icon_set_kind (icon, AS_ICON_KIND_CACHED);
 	as_app_add_icon (donor, icon);
+	icon2 = as_icon_new ();
+	as_icon_set_name (icon2, "gtk-find");
+	as_icon_set_kind (icon2, AS_ICON_KIND_STOCK);
+	as_app_add_icon (donor, icon2);
 	as_app_set_state (donor, AS_APP_STATE_INSTALLED);
-	as_app_add_pkgname (donor, "hal", -1);
-	as_app_add_language (donor, -1, "en_GB", -1);
-	as_app_add_metadata (donor, "donor", "true", -1);
-	as_app_add_metadata (donor, "overwrite", "1111", -1);
-	as_app_add_keyword (donor, "C", "klass", -1);
-	as_app_add_keyword (donor, "pl", "klaski", -1);
+	as_app_add_pkgname (donor, "hal");
+	as_app_add_language (donor, -1, "en_GB");
+	as_app_add_metadata (donor, "donor", "true");
+	as_app_add_metadata (donor, "overwrite", "1111");
+	as_app_add_keyword (donor, "C", "klass");
+	as_app_add_keyword (donor, "pl", "klaski");
 	ss = as_screenshot_new ();
 	as_app_add_screenshot (donor, ss);
 
 	/* copy all useful properties */
 	app = as_app_new ();
-	as_app_add_metadata (app, "overwrite", "2222", -1);
-	as_app_add_metadata (app, "recipient", "true", -1);
-	as_app_subsume_full (app, donor, AS_APP_SUBSUME_FLAG_NO_OVERWRITE);
+	as_app_add_metadata (app, "overwrite", "2222");
+	as_app_add_metadata (app, "recipient", "true");
+	as_app_subsume_full (app, donor,
+			     AS_APP_SUBSUME_FLAG_NO_OVERWRITE |
+			     AS_APP_SUBSUME_FLAG_DEDUPE);
 	as_app_add_screenshot (app, ss);
 
 	g_assert_cmpstr (as_app_get_metadata_item (app, "donor"), ==, "true");
@@ -2057,16 +2789,18 @@ as_test_app_subsume_func (void)
 	g_list_free (list);
 
 	/* check icon */
-	g_assert_cmpint (as_app_get_icons(app)->len, ==, 1);
+	g_assert_cmpint (as_app_get_icons(app)->len, ==, 2);
 	ic = as_app_get_icon_default (app);
 	g_assert (ic != NULL);
 	g_assert_cmpstr (as_icon_get_name (ic), ==, "gtk-find");
-	g_assert_cmpint (as_icon_get_kind (ic), ==, AS_ICON_KIND_LOCAL);
+	g_assert_cmpint (as_icon_get_kind (ic), ==, AS_ICON_KIND_STOCK);
 	g_assert_cmpint (as_icon_get_width (ic), ==, 0);
 	g_assert_cmpint (as_icon_get_height (ic), ==, 0);
 
 	/* test both ways */
-	as_app_subsume_full (app, donor, AS_APP_SUBSUME_FLAG_BOTH_WAYS);
+	as_app_subsume_full (app, donor,
+			     AS_APP_SUBSUME_FLAG_BOTH_WAYS |
+			     AS_APP_SUBSUME_FLAG_METADATA);
 	g_assert_cmpstr (as_app_get_metadata_item (app, "donor"), ==, "true");
 	g_assert_cmpstr (as_app_get_metadata_item (app, "recipient"), ==, "true");
 	g_assert_cmpstr (as_app_get_metadata_item (donor, "donor"), ==, "true");
@@ -2079,26 +2813,41 @@ as_test_app_search_func (void)
 {
 	const gchar *all[] = { "gnome", "install", "software", NULL };
 	const gchar *none[] = { "gnome", "xxx", "software", NULL };
-	const gchar *mime[] = { "vnd", "oasis", "opendocument","text", NULL };
-	_cleanup_object_unref_ AsApp *app = NULL;
+	const gchar *mime[] = { "application/vnd.oasis.opendocument.text", NULL };
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GHashTable) search_blacklist = NULL;
+	g_autoptr(AsStemmer) stemmer = as_stemmer_new ();
 
 	app = as_app_new ();
-	as_app_set_name (app, NULL, "GNOME Software", -1);
-	as_app_set_comment (app, NULL, "Install and remove software", -1);
-	as_app_add_mimetype (app, "application/vnd.oasis.opendocument.text", -1);
-	as_app_add_keyword (app, NULL, "awesome", -1);
-	as_app_add_keyword (app, NULL, "c++", -1);
-	as_app_add_keyword (app, NULL, "d-feet", -1);
+	as_app_set_stemmer (app, stemmer);
+	as_app_set_id (app, "gnome-software");
+	as_app_add_pkgname (app, "gnome-software");
+	as_app_set_name (app, NULL, "GNOME Software X-Plane");
+	as_app_set_comment (app, NULL, "Install and remove software");
+	as_app_add_mimetype (app, "application/vnd.oasis.opendocument.text");
+	as_app_add_keyword (app, NULL, "awesome");
+	as_app_add_keyword (app, NULL, "c++");
+	as_app_add_keyword (app, NULL, "d-feet");
 
-	g_assert_cmpint (as_app_search_matches (app, "software"), ==, 80);
-	g_assert_cmpint (as_app_search_matches (app, "soft"), ==, 80);
-	g_assert_cmpint (as_app_search_matches (app, "install"), ==, 60);
-	g_assert_cmpint (as_app_search_matches (app, "awesome"), ==, 90);
-	g_assert_cmpint (as_app_search_matches (app, "c++"), ==, 90);
-	g_assert_cmpint (as_app_search_matches (app, "d-feet"), ==, 90);
-	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) all), ==, 220);
+	search_blacklist = g_hash_table_new (g_str_hash, g_str_equal);
+	g_hash_table_insert (search_blacklist,
+			     (gpointer) "and",
+			     GUINT_TO_POINTER (1));
+	as_app_set_search_blacklist (app, search_blacklist);
+
+	g_assert_cmpint (as_app_search_matches (app, "software"), ==, 96);
+	g_assert_cmpint (as_app_search_matches (app, "soft"), ==, 24);
+	g_assert_cmpint (as_app_search_matches (app, "install"), ==, 32);
+	g_assert_cmpint (as_app_search_matches (app, "awesome"), ==, 128);
+	g_assert_cmpint (as_app_search_matches (app, "c++"), ==, 128);
+	g_assert_cmpint (as_app_search_matches (app, "d-feet"), ==, 128);
+	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) all), ==, 96);
 	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) none), ==, 0);
 	g_assert_cmpint (as_app_search_matches_all (app, (gchar**) mime), ==, 4);
+
+	/* test tokenization of hyphenated name */
+	g_assert_cmpint (as_app_search_matches (app, "x-plane"), ==, 64);
+	g_assert_cmpint (as_app_search_matches (app, "plane"), ==, 64);
 
 	/* do not add short or common keywords */
 	g_assert_cmpint (as_app_search_matches (app, "and"), ==, 0);
@@ -2111,11 +2860,11 @@ as_test_store_embedded_func (void)
 	AsApp *app;
 	AsIcon *icon;
 	gboolean ret;
-	_cleanup_error_free_ GError *error = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_string_free_ GString *xml = NULL;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GString) xml = NULL;
 	const gchar *xml_src =
-"<components version=\"0.6\" origin=\"origin\">"
+"<components origin=\"origin\" version=\"0.6\">"
 "<component type=\"desktop\">"
 "<id>eog.desktop</id>"
 "<pkgname>eog</pkgname>"
@@ -2172,7 +2921,7 @@ as_test_store_embedded_func (void)
 	/* load AppStream file with embedded icon */
 	store = as_store_new ();
 	as_store_set_origin (store, "origin");
-	ret = as_store_from_xml (store, xml_src, -1, "/tmp", &error);
+	ret = as_store_from_xml (store, xml_src, "/tmp/origin", &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
@@ -2180,16 +2929,18 @@ as_test_store_embedded_func (void)
 	g_assert_cmpint (as_store_get_size (store), ==, 1);
 	app = as_store_get_app_by_id (store, "eog.desktop");
 	g_assert (app != NULL);
-	g_assert_cmpint (as_app_get_id_kind (app), ==, AS_ID_KIND_DESKTOP);
+	g_assert_cmpint (as_app_get_kind (app), ==, AS_APP_KIND_DESKTOP);
 	icon = as_app_get_icon_default (app);
 	g_assert (icon != NULL);
 	g_assert_cmpint (as_icon_get_kind (icon), ==, AS_ICON_KIND_EMBEDDED);
 	g_assert_cmpstr (as_icon_get_name (icon), ==, "eog.png");
-	g_assert_cmpstr (as_icon_get_prefix (icon), ==, "/tmp/origin");
+	g_assert_cmpstr (as_icon_get_prefix (icon), ==, "/tmp/origin/icons");
 
 	/* convert back to a file */
 	xml = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_NONE);
-	g_assert_cmpstr (xml->str, ==, xml_src);
+	ret = as_test_compare_lines (xml->str, xml_src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 
 	/* strip out the embedded icons */
 	ret = as_store_convert_icons (store, AS_ICON_KIND_CACHED, &error);
@@ -2197,7 +2948,308 @@ as_test_store_embedded_func (void)
 	g_assert (ret);
 
 	/* check exists */
-	g_assert (g_file_test ("/tmp/origin/32x32/eog.png", G_FILE_TEST_EXISTS));
+	g_assert (g_file_test ("/tmp/origin/icons/32x32/eog.png", G_FILE_TEST_EXISTS));
+}
+
+static void
+store_changed_cb (AsStore *store, guint *cnt)
+{
+	as_test_loop_quit ();
+	(*cnt)++;
+	g_debug ("changed callback, now #%u", *cnt);
+}
+
+static void
+store_app_changed_cb (AsStore *store, AsApp *app, guint *cnt)
+{
+	(*cnt)++;
+}
+
+/* automatically reload changed directories */
+static void
+as_test_store_auto_reload_dir_func (void)
+{
+	AsApp *app;
+	gboolean ret;
+	guint cnt = 0;
+	guint cnt_added = 0;
+	guint cnt_removed = 0;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsStore) store = NULL;
+
+	/* add this file to a store */
+	store = as_store_new ();
+	g_signal_connect (store, "changed",
+			  G_CALLBACK (store_changed_cb), &cnt);
+	g_signal_connect (store, "app-added",
+			  G_CALLBACK (store_app_changed_cb), &cnt_added);
+	g_signal_connect (store, "app-removed",
+			  G_CALLBACK (store_app_changed_cb), &cnt_removed);
+	as_store_set_watch_flags (store, AS_STORE_WATCH_FLAG_ADDED |
+					   AS_STORE_WATCH_FLAG_REMOVED);
+
+	as_store_set_destdir (store, "/tmp/repo-tmp");
+	g_mkdir_with_parents ("/tmp/repo-tmp/usr/share/app-info/xmls", 0700);
+	g_unlink ("/tmp/repo-tmp/usr/share/app-info/xmls/foo.xml");
+
+	/* load store */
+	ret = as_store_load (store, AS_STORE_LOAD_FLAG_APP_INFO_SYSTEM, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_assert_cmpint (cnt, ==, 1);
+	g_assert_cmpint (cnt_added, ==, 0);
+	g_assert_cmpint (cnt_removed, ==, 0);
+
+	/* create file */
+	ret = g_file_set_contents ("/tmp/repo-tmp/usr/share/app-info/xmls/foo.xml",
+				   "<components version=\"0.6\">"
+				   "<component type=\"desktop\">"
+				   "<id>test.desktop</id>"
+				   "</component>"
+				   "</components>",
+				   -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	as_test_loop_run_with_timeout (2000);
+	g_assert_cmpint (cnt, ==, 2);
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 0);
+
+	/* verify */
+	app = as_store_get_app_by_id (store, "test.desktop");
+	g_assert (app != NULL);
+
+	/* remove file */
+	g_unlink ("/tmp/repo-tmp/usr/share/app-info/xmls/foo.xml");
+	as_test_loop_run_with_timeout (2000);
+	g_assert_cmpint (cnt, ==, 3);
+	g_assert_cmpint (cnt_added, ==, 1);
+	g_assert_cmpint (cnt_removed, ==, 1);
+	app = as_store_get_app_by_id (store, "test.desktop");
+	g_assert (app == NULL);
+}
+
+/* automatically reload changed files */
+static void
+as_test_store_auto_reload_file_func (void)
+{
+	AsApp *app;
+	AsFormat *format;
+	AsRelease *rel;
+	gboolean ret;
+	guint cnt = 0;
+	guint cnt_added = 0;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
+
+	/* set initial file */
+	ret = g_file_set_contents ("/tmp/foo.xml",
+				   "<components version=\"0.6\">"
+				   "<component type=\"desktop\">"
+				   "<id>test.desktop</id>"
+				   "<releases>"
+				   "<release version=\"0.1.2\" timestamp=\"123\">"
+				   "</release>"
+				   "</releases>"
+				   "</component>"
+				   "</components>",
+				   -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* add this file to a store */
+	store = as_store_new ();
+	g_signal_connect (store, "changed",
+			  G_CALLBACK (store_changed_cb), &cnt);
+	g_signal_connect (store, "app-added",
+			  G_CALLBACK (store_app_changed_cb), &cnt_added);
+	g_signal_connect (store, "app-removed",
+			  G_CALLBACK (store_app_changed_cb), &cnt_added);
+	as_store_set_watch_flags (store, AS_STORE_WATCH_FLAG_ADDED |
+					   AS_STORE_WATCH_FLAG_REMOVED);
+	file = g_file_new_for_path ("/tmp/foo.xml");
+	ret = as_store_from_file (store, file, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_assert_cmpint (cnt, ==, 1);
+
+	/* verify */
+	app = as_store_get_app_by_id (store, "test.desktop");
+	g_assert (app != NULL);
+	rel = as_app_get_release_default (app);
+	g_assert_cmpstr (as_release_get_version (rel), ==, "0.1.2");
+
+	/* check format */
+	format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_APPSTREAM);
+	g_assert (format != NULL);
+	g_assert_cmpstr (as_format_get_filename (format), ==, "/tmp/foo.xml");
+
+	/* change the file, and ensure we get the callback */
+	g_debug ("changing file");
+	ret = g_file_set_contents ("/tmp/foo.xml",
+				   "<components version=\"0.6\">"
+				   "<component type=\"desktop\">"
+				   "<id>test.desktop</id>"
+				   "<releases>"
+				   "<release version=\"0.1.0\" timestamp=\"100\">"
+				   "</release>"
+				   "</releases>"
+				   "</component>"
+				   "<component type=\"desktop\">"
+				   "<id>baz.desktop</id>"
+				   "</component>"
+				   "</components>",
+				   -1, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	as_test_loop_run_with_timeout (2000);
+	g_assert_cmpint (cnt, ==, 2);
+
+	/* verify */
+	app = as_store_get_app_by_id (store, "baz.desktop");
+	g_assert (app != NULL);
+	app = as_store_get_app_by_id (store, "test.desktop");
+	g_assert (app != NULL);
+	rel = as_app_get_release_default (app);
+	g_assert_cmpstr (as_release_get_version (rel), ==, "0.1.0");
+
+	/* remove file */
+	g_unlink ("/tmp/foo.xml");
+	as_test_loop_run_with_timeout (2000);
+	g_assert_cmpint (cnt, ==, 3);
+	app = as_store_get_app_by_id (store, "baz.desktop");
+	g_assert (app == NULL);
+	app = as_store_get_app_by_id (store, "test.desktop");
+	g_assert (app == NULL);
+}
+
+/* get an application from the store ignoring the prefix */
+static void
+as_test_store_prefix_func (void)
+{
+	g_autoptr (AsStore) store = as_store_new ();
+	g_autoptr (AsApp) app = as_app_new ();
+	g_autoptr (GPtrArray) apps = NULL;
+	AsApp *app_tmp;
+
+	/* add app */
+	as_app_set_id (app, "flatpak-user:org.gnome.Software.desktop");
+	as_store_add_app (store, app);
+
+	app_tmp = as_store_get_app_by_id (store, "org.gnome.Software.desktop");
+	g_assert (app_tmp == NULL);
+	app_tmp = as_store_get_app_by_id_ignore_prefix (store, "org.gnome.Software.desktop");
+	g_assert (app_tmp != NULL);
+	g_assert_cmpstr (as_app_get_id (app_tmp), ==,
+			 "flatpak-user:org.gnome.Software.desktop");
+
+	/* there might be multiple apps we want to get */
+	apps = as_store_get_apps_by_id (store, "flatpak-user:org.gnome.Software.desktop");
+	g_assert (apps != NULL);
+	g_assert_cmpint (apps->len, ==, 1);
+	app_tmp = g_ptr_array_index (apps, 0);
+	g_assert_cmpstr (as_app_get_id (app_tmp), ==,
+			 "flatpak-user:org.gnome.Software.desktop");
+
+	/* exact unique match */
+	app_tmp = as_store_get_app_by_unique_id (store, "*/*/*/*/test/*",
+						 AS_STORE_SEARCH_FLAG_NONE);
+	g_assert (app_tmp == NULL);
+	app_tmp = as_store_get_app_by_unique_id (store, "*/*/*/*/test/*",
+						 AS_STORE_SEARCH_FLAG_USE_WILDCARDS);
+	g_assert (app_tmp == NULL);
+	app_tmp = as_store_get_app_by_unique_id (store, "*/*/*/*/org.gnome.Software.desktop/*",
+						 AS_STORE_SEARCH_FLAG_NONE);
+	g_assert (app_tmp != NULL);
+	app_tmp = as_store_get_app_by_unique_id (store, "*/*/*/*/org.gnome.Software.desktop/*",
+						 AS_STORE_SEARCH_FLAG_USE_WILDCARDS);
+	g_assert (app_tmp != NULL);
+	app_tmp = as_store_get_app_by_unique_id (store, "*/*/*/*/*/*",
+						 AS_STORE_SEARCH_FLAG_USE_WILDCARDS);
+	g_assert (app_tmp != NULL);
+}
+
+static void
+as_test_store_wildcard_func (void)
+{
+	AsApp *app_tmp;
+	g_autoptr (AsApp) app1 = as_app_new ();
+	g_autoptr (AsApp) app2 = as_app_new ();
+	g_autoptr (AsStore) store = as_store_new ();
+
+	/* package from fedora */
+	as_app_set_id (app1, "gimp.desktop");
+	as_app_set_origin (app1, "fedora");
+	as_app_add_pkgname (app1, "polari");
+	_as_app_add_format_kind (app1, AS_FORMAT_KIND_DESKTOP);
+	as_store_add_app (store, app1);
+
+	/* package from updates */
+	as_app_set_id (app2, "gimp.desktop");
+	as_app_set_origin (app2, "updates");
+	as_app_add_pkgname (app2, "polari");
+	_as_app_add_format_kind (app2, AS_FORMAT_KIND_DESKTOP);
+	as_store_add_app (store, app2);
+
+	/* check negative match */
+	app_tmp = as_store_get_app_by_unique_id (store, "*/*/xxx/*/gimp.desktop/*",
+						 AS_STORE_SEARCH_FLAG_USE_WILDCARDS);
+	g_assert (app_tmp == NULL);
+	app_tmp = as_store_get_app_by_unique_id (store, "*/snap/*/*/gimp.desktop/*",
+						 AS_STORE_SEARCH_FLAG_USE_WILDCARDS);
+	g_assert (app_tmp == NULL);
+}
+
+/* load a store with a origin and scope encoded in the symlink name */
+static void
+as_test_store_flatpak_func (void)
+{
+	AsApp *app;
+	AsFormat *format;
+	GError *error = NULL;
+	GPtrArray *apps;
+	gboolean ret;
+	g_autofree gchar *filename = NULL;
+	g_autofree gchar *filename_root = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
+
+	/* make throws us under a bus, yet again */
+	g_setenv ("AS_SELF_TEST_PREFIX_DELIM", "_", TRUE);
+
+	/* load a symlinked file to the store */
+	store = as_store_new ();
+	filename_root = as_test_get_filename (".");
+	filename = g_build_filename (filename_root, "flatpak_remote-name.xml", NULL);
+	if (!g_file_test (filename, G_FILE_TEST_IS_SYMLINK)) {
+		g_debug ("not doing symlink test in distcheck as regular file");
+		return;
+	}
+	file = g_file_new_for_path (filename);
+	ret = as_store_from_file (store, file, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* test extraction of symlink data */
+	g_assert_cmpstr (as_store_get_origin (store), ==, "flatpak");
+	g_assert_cmpint (as_store_get_size (store), ==, 1);
+	apps = as_store_get_apps (store);
+	g_assert_cmpint (apps->len, ==, 1);
+	app = g_ptr_array_index (apps, 0);
+	g_assert_cmpstr (as_app_get_id (app), ==, "flatpak:test.desktop");
+	g_assert_cmpstr (as_app_get_unique_id (app), ==, "system/flatpak/remote-name/desktop/test.desktop/master");
+	g_assert_cmpstr (as_app_get_id_filename (app), ==, "test");
+	g_assert_cmpstr (as_app_get_origin (app), ==, "remote-name");
+
+	/* check format */
+	format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_APPSTREAM);
+	g_assert (format != NULL);
+	g_assert_cmpstr (as_format_get_filename (format), ==, filename);
+
+	/* back to normality */
+	g_unsetenv ("AS_SELF_TEST_PREFIX_DELIM");
 }
 
 /* demote the .desktop "application" to an addon */
@@ -2207,12 +3259,12 @@ as_test_store_demote_func (void)
 	AsApp *app;
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename1 = NULL;
-	_cleanup_free_ gchar *filename2 = NULL;
-	_cleanup_object_unref_ AsApp *app_appdata = NULL;
-	_cleanup_object_unref_ AsApp *app_desktop = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_string_free_ GString *xml = NULL;
+	g_autofree gchar *filename1 = NULL;
+	g_autofree gchar *filename2 = NULL;
+	g_autoptr(AsApp) app_appdata = NULL;
+	g_autoptr(AsApp) app_desktop = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GString) xml = NULL;
 
 	/* load example desktop file */
 	app_desktop = as_app_new ();
@@ -2221,7 +3273,7 @@ as_test_store_demote_func (void)
 				 AS_APP_PARSE_FLAG_ALLOW_VETO, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
-	g_assert_cmpint (as_app_get_id_kind (app_desktop), ==, AS_ID_KIND_DESKTOP);
+	g_assert_cmpint (as_app_get_kind (app_desktop), ==, AS_APP_KIND_DESKTOP);
 
 	/* load example appdata file */
 	app_appdata = as_app_new ();
@@ -2230,7 +3282,7 @@ as_test_store_demote_func (void)
 				 AS_APP_PARSE_FLAG_ALLOW_VETO, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
-	g_assert_cmpint (as_app_get_id_kind (app_appdata), ==, AS_ID_KIND_ADDON);
+	g_assert_cmpint (as_app_get_kind (app_appdata), ==, AS_APP_KIND_ADDON);
 
 	/* add apps */
 	store = as_store_new ();
@@ -2242,7 +3294,7 @@ as_test_store_demote_func (void)
 	g_assert_cmpint (as_store_get_size (store), ==, 1);
 	app = as_store_get_app_by_id (store, "example.desktop");
 	g_assert (app != NULL);
-	g_assert_cmpint (as_app_get_id_kind (app), ==, AS_ID_KIND_ADDON);
+	g_assert_cmpint (as_app_get_kind (app), ==, AS_APP_KIND_ADDON);
 	g_assert_cmpint (as_app_get_extends(app)->len, >, 0);
 
 	/* dump */
@@ -2256,30 +3308,32 @@ static void
 as_test_store_merges_func (void)
 {
 	AsApp *app_tmp;
-	_cleanup_object_unref_ AsApp *app_appdata = NULL;
-	_cleanup_object_unref_ AsApp *app_appinfo = NULL;
-	_cleanup_object_unref_ AsApp *app_desktop = NULL;
-	_cleanup_object_unref_ AsStore *store_all = NULL;
-	_cleanup_object_unref_ AsStore *store_desktop_appdata = NULL;
+	g_autoptr(AsApp) app_appdata = NULL;
+	g_autoptr(AsApp) app_appinfo = NULL;
+	g_autoptr(AsApp) app_desktop = NULL;
+	g_autoptr(AsStore) store_all = NULL;
+	g_autoptr(AsStore) store_desktop_appdata = NULL;
 
 	/* test desktop + appdata */
 	store_desktop_appdata = as_store_new ();
 
 	app_desktop = as_app_new ();
-	as_app_set_id (app_desktop, "gimp.desktop", -1);
-	as_app_set_source_kind (app_desktop, AS_APP_SOURCE_KIND_DESKTOP);
-	as_app_set_name (app_desktop, NULL, "GIMP", -1);
-	as_app_set_comment (app_desktop, NULL, "GNU Bla Bla", -1);
+	as_app_set_id (app_desktop, "gimp.desktop");
+	_as_app_add_format_kind (app_desktop, AS_FORMAT_KIND_DESKTOP);
+	as_app_set_name (app_desktop, NULL, "GIMP");
+	as_app_set_comment (app_desktop, NULL, "GNU Bla Bla");
 	as_app_set_priority (app_desktop, -1);
 	as_app_set_state (app_desktop, AS_APP_STATE_INSTALLED);
+	as_app_set_scope (app_desktop, AS_APP_SCOPE_SYSTEM);
 
 	app_appdata = as_app_new ();
-	as_app_set_id (app_appdata, "gimp.desktop", -1);
-	as_app_set_source_kind (app_appdata, AS_APP_SOURCE_KIND_APPDATA);
-	as_app_set_description (app_appdata, NULL, "<p>Gimp is awesome</p>", -1);
-	as_app_add_pkgname (app_appdata, "gimp", -1);
+	as_app_set_id (app_appdata, "gimp.desktop");
+	_as_app_add_format_kind (app_appdata, AS_FORMAT_KIND_APPDATA);
+	as_app_set_description (app_appdata, NULL, "<p>Gimp is awesome</p>");
+	as_app_add_pkgname (app_appdata, "gimp");
 	as_app_set_priority (app_appdata, -1);
 	as_app_set_state (app_appdata, AS_APP_STATE_INSTALLED);
+	as_app_set_scope (app_desktop, AS_APP_SCOPE_SYSTEM);
 
 	as_store_add_app (store_desktop_appdata, app_desktop);
 	as_store_add_app (store_desktop_appdata, app_appdata);
@@ -2290,19 +3344,20 @@ as_test_store_merges_func (void)
 	g_assert_cmpstr (as_app_get_comment (app_tmp, NULL), ==, "GNU Bla Bla");
 	g_assert_cmpstr (as_app_get_description (app_tmp, NULL), ==, "<p>Gimp is awesome</p>");
 	g_assert_cmpstr (as_app_get_pkgname_default (app_tmp), ==, "gimp");
-	g_assert_cmpint (as_app_get_source_kind (app_tmp), ==, AS_APP_SOURCE_KIND_APPDATA);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_DESKTOP) != NULL);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_APPDATA) != NULL);
 	g_assert_cmpint (as_app_get_state (app_tmp), ==, AS_APP_STATE_INSTALLED);
 
 	/* test desktop + appdata + appstream */
 	store_all = as_store_new ();
 
 	app_appinfo = as_app_new ();
-	as_app_set_id (app_appinfo, "gimp.desktop", -1);
-	as_app_set_source_kind (app_appinfo, AS_APP_SOURCE_KIND_APPSTREAM);
-	as_app_set_name (app_appinfo, NULL, "GIMP", -1);
-	as_app_set_comment (app_appinfo, NULL, "GNU Bla Bla", -1);
-	as_app_set_description (app_appinfo, NULL, "<p>Gimp is Distro</p>", -1);
-	as_app_add_pkgname (app_appinfo, "gimp", -1);
+	as_app_set_id (app_appinfo, "gimp.desktop");
+	_as_app_add_format_kind (app_appinfo, AS_FORMAT_KIND_APPSTREAM);
+	as_app_set_name (app_appinfo, NULL, "GIMP");
+	as_app_set_comment (app_appinfo, NULL, "GNU Bla Bla");
+	as_app_set_description (app_appinfo, NULL, "<p>Gimp is Distro</p>");
+	as_app_add_pkgname (app_appinfo, "gimp");
 	as_app_set_priority (app_appinfo, 0);
 
 	as_store_add_app (store_all, app_appinfo);
@@ -2316,7 +3371,10 @@ as_test_store_merges_func (void)
 	g_assert_cmpstr (as_app_get_comment (app_tmp, NULL), ==, "GNU Bla Bla");
 	g_assert_cmpstr (as_app_get_description (app_tmp, NULL), ==, "<p>Gimp is Distro</p>");
 	g_assert_cmpstr (as_app_get_pkgname_default (app_tmp), ==, "gimp");
-	g_assert_cmpint (as_app_get_source_kind (app_tmp), ==, AS_APP_SOURCE_KIND_APPSTREAM);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_DESKTOP) != NULL);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_APPDATA) != NULL);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_APPSTREAM) != NULL);
+	g_assert_cmpint (as_app_get_formats(app_tmp)->len, ==, 3);
 	g_assert_cmpint (as_app_get_state (app_tmp), ==, AS_APP_STATE_INSTALLED);
 }
 
@@ -2324,38 +3382,38 @@ static void
 as_test_store_merges_local_func (void)
 {
 	AsApp *app_tmp;
-	_cleanup_object_unref_ AsApp *app_appdata = NULL;
-	_cleanup_object_unref_ AsApp *app_appinfo = NULL;
-	_cleanup_object_unref_ AsApp *app_desktop = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
+	g_autoptr(AsApp) app_appdata = NULL;
+	g_autoptr(AsApp) app_appinfo = NULL;
+	g_autoptr(AsApp) app_desktop = NULL;
+	g_autoptr(AsStore) store = NULL;
 
 	/* test desktop + appdata + appstream */
 	store = as_store_new ();
 	as_store_set_add_flags (store, AS_STORE_ADD_FLAG_PREFER_LOCAL);
 
 	app_desktop = as_app_new ();
-	as_app_set_id (app_desktop, "gimp.desktop", -1);
-	as_app_set_source_kind (app_desktop, AS_APP_SOURCE_KIND_DESKTOP);
-	as_app_set_name (app_desktop, NULL, "GIMP", -1);
-	as_app_set_comment (app_desktop, NULL, "GNU Bla Bla", -1);
+	as_app_set_id (app_desktop, "gimp.desktop");
+	_as_app_add_format_kind (app_desktop, AS_FORMAT_KIND_DESKTOP);
+	as_app_set_name (app_desktop, NULL, "GIMP");
+	as_app_set_comment (app_desktop, NULL, "GNU Bla Bla");
 	as_app_set_priority (app_desktop, -1);
 	as_app_set_state (app_desktop, AS_APP_STATE_INSTALLED);
 
 	app_appdata = as_app_new ();
-	as_app_set_id (app_appdata, "gimp.desktop", -1);
-	as_app_set_source_kind (app_appdata, AS_APP_SOURCE_KIND_APPDATA);
-	as_app_set_description (app_appdata, NULL, "<p>Gimp is awesome</p>", -1);
-	as_app_add_pkgname (app_appdata, "gimp", -1);
+	as_app_set_id (app_appdata, "gimp.desktop");
+	_as_app_add_format_kind (app_appdata, AS_FORMAT_KIND_APPDATA);
+	as_app_set_description (app_appdata, NULL, "<p>Gimp is awesome</p>");
+	as_app_add_pkgname (app_appdata, "gimp");
 	as_app_set_priority (app_appdata, -1);
 	as_app_set_state (app_appdata, AS_APP_STATE_INSTALLED);
 
 	app_appinfo = as_app_new ();
-	as_app_set_id (app_appinfo, "gimp.desktop", -1);
-	as_app_set_source_kind (app_appinfo, AS_APP_SOURCE_KIND_APPSTREAM);
-	as_app_set_name (app_appinfo, NULL, "GIMP", -1);
-	as_app_set_comment (app_appinfo, NULL, "Fedora GNU Bla Bla", -1);
-	as_app_set_description (app_appinfo, NULL, "<p>Gimp is Distro</p>", -1);
-	as_app_add_pkgname (app_appinfo, "gimp", -1);
+	as_app_set_id (app_appinfo, "gimp.desktop");
+	_as_app_add_format_kind (app_appinfo, AS_FORMAT_KIND_APPSTREAM);
+	as_app_set_name (app_appinfo, NULL, "GIMP");
+	as_app_set_comment (app_appinfo, NULL, "Fedora GNU Bla Bla");
+	as_app_set_description (app_appinfo, NULL, "<p>Gimp is Distro</p>");
+	as_app_add_pkgname (app_appinfo, "gimp");
 	as_app_set_priority (app_appinfo, 0);
 
 	/* this is actually the install order we get at startup */
@@ -2370,8 +3428,83 @@ as_test_store_merges_local_func (void)
 	g_assert_cmpstr (as_app_get_comment (app_tmp, NULL), ==, "GNU Bla Bla");
 	g_assert_cmpstr (as_app_get_description (app_tmp, NULL), ==, "<p>Gimp is awesome</p>");
 	g_assert_cmpstr (as_app_get_pkgname_default (app_tmp), ==, "gimp");
-	g_assert_cmpint (as_app_get_source_kind (app_tmp), ==, AS_APP_SOURCE_KIND_APPDATA);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_DESKTOP) != NULL);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_APPDATA) != NULL);
+	g_assert (as_app_get_format_by_kind (app_tmp, AS_FORMAT_KIND_APPSTREAM) != NULL);
+	g_assert_cmpint (as_app_get_formats(app_tmp)->len, ==, 3);
 	g_assert_cmpint (as_app_get_state (app_tmp), ==, AS_APP_STATE_INSTALLED);
+}
+
+static void
+as_test_store_cab_func (void)
+{
+#ifdef HAVE_GCAB
+	gboolean ret;
+	const gchar *src;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autofree gchar *fn = NULL;
+	g_autoptr(GString) xml = NULL;
+
+	/* parse a .cab file as a store */
+	store = as_store_new ();
+	as_store_set_api_version (store, 0.9);
+	fn = as_test_get_filename ("colorhug-als-2.0.2.cab");
+	g_assert (fn != NULL);
+	file = g_file_new_for_path (fn);
+	ret = as_store_from_file (store, file, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* check output */
+	src =
+	"<components origin=\"colorhug-als-2.0.2.cab\" version=\"0.9\">\n"
+	"<component type=\"firmware\">\n"
+	"<id>com.hughski.ColorHug2.firmware</id>\n"
+	"<name>ColorHug Firmware</name>\n"
+	"<summary>Firmware for the ColorHug Colorimeter</summary>\n"
+	"<developer_name>Hughski Limited</developer_name>\n"
+	"<description><p>Updating the firmware on your ColorHug device "
+	"improves performance and adds new features.</p></description>\n"
+	"<project_license>GPL-2.0+</project_license>\n"
+	"<url type=\"homepage\">http://www.hughski.com/</url>\n"
+	"<releases>\n"
+	"<release timestamp=\"1424116753\" version=\"2.0.2\">\n"
+	"<location>http://www.hughski.com/downloads/colorhug2/firmware/colorhug-2.0.2.cab</location>\n"
+	"<checksum type=\"sha1\" filename=\"colorhug-als-2.0.2.cab\" target=\"container\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
+	"<checksum type=\"sha1\" filename=\"firmware.bin\" target=\"content\">" AS_TEST_WILDCARD_SHA1 "</checksum>\n"
+	"<description><p>This unstable release adds the following features:</p>"
+	"<ul><li>Add TakeReadingArray to enable panel latency measurements</li>"
+	"<li>Speed up the auto-scaled measurements considerably, using 256ms as"
+	" the smallest sample duration</li></ul></description>\n"
+	"<size type=\"installed\">14</size>\n"
+	"<size type=\"download\">2015</size>\n"
+	"</release>\n"
+	"</releases>\n"
+	"<provides>\n"
+	"<firmware type=\"flashed\">84f40464-9272-4ef7-9399-cd95f12da696</firmware>\n"
+	"</provides>\n"
+	"</component>\n"
+	"</components>\n";
+	xml = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str, src, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+#endif
+}
+
+static void
+as_test_store_empty_func (void)
+{
+	gboolean ret;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsStore) store = NULL;
+
+	store = as_store_new ();
+	ret = as_store_from_xml (store, "", NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 }
 
 static void
@@ -2379,54 +3512,73 @@ as_test_store_func (void)
 {
 	AsApp *app;
 	GString *xml;
-	_cleanup_object_unref_ AsStore *store = NULL;
+	gboolean ret;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GError) error = NULL;
 
 	/* create a store and add a single app */
 	store = as_store_new ();
 	g_assert_cmpfloat (as_store_get_api_version (store), <, 1.f);
 	g_assert_cmpfloat (as_store_get_api_version (store), >, 0.f);
 	app = as_app_new ();
-	as_app_set_id (app, "gnome-software.desktop", -1);
-	as_app_set_id_kind (app, AS_ID_KIND_DESKTOP);
+	as_app_set_id (app, "gnome-software.desktop");
+	as_app_set_kind (app, AS_APP_KIND_DESKTOP);
 	as_store_add_app (store, app);
 	g_object_unref (app);
 	g_assert_cmpstr (as_store_get_origin (store), ==, NULL);
 
+	/* check string output */
+	as_store_set_api_version (store, 0.6);
+	xml = as_store_to_xml (store, 0);
+	ret = as_test_compare_lines (xml->str,
+				     "<components version=\"0.6\">"
+				     "<component type=\"desktop\">"
+				     "<id>gnome-software.desktop</id>"
+				     "</component>"
+				     "</components>",
+				     &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
+
 	/* add and then remove another app */
 	app = as_app_new ();
-	as_app_set_id (app, "junk.desktop", -1);
-	as_app_set_id_kind (app, AS_ID_KIND_FONT);
+	as_app_set_id (app, "junk.desktop");
+	as_app_set_kind (app, AS_APP_KIND_FONT);
 	as_store_add_app (store, app);
 	g_object_unref (app);
 	as_store_remove_app (store, app);
 
 	/* check string output */
-	as_store_set_api_version (store, 0.4);
+	as_store_set_api_version (store, 0.6);
 	xml = as_store_to_xml (store, 0);
-	g_assert_cmpstr (xml->str, ==,
-		"<applications version=\"0.4\">"
-		"<application>"
-		"<id type=\"desktop\">gnome-software.desktop</id>"
-		"</application>"
-		"</applications>");
+	ret = as_test_compare_lines (xml->str,
+				     "<components version=\"0.6\">"
+				     "<component type=\"desktop\">"
+				     "<id>gnome-software.desktop</id>"
+				     "</component>"
+				     "</components>",
+				     &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 	g_string_free (xml, TRUE);
 
 	/* add another app and ensure it's sorted */
 	app = as_app_new ();
-	as_app_set_id (app, "aaa.desktop", -1);
-	as_app_set_id_kind (app, AS_ID_KIND_FONT);
+	as_app_set_id (app, "aaa.desktop");
+	as_app_set_kind (app, AS_APP_KIND_FONT);
 	as_store_add_app (store, app);
 	g_object_unref (app);
 	xml = as_store_to_xml (store, 0);
 	g_assert_cmpstr (xml->str, ==,
-		"<applications version=\"0.4\">"
-		"<application>"
-		"<id type=\"font\">aaa.desktop</id>"
-		"</application>"
-		"<application>"
-		"<id type=\"desktop\">gnome-software.desktop</id>"
-		"</application>"
-		"</applications>");
+		"<components version=\"0.6\">"
+		"<component type=\"font\">"
+		"<id>aaa.desktop</id>"
+		"</component>"
+		"<component type=\"desktop\">"
+		"<id>gnome-software.desktop</id>"
+		"</component>"
+		"</components>");
 	g_string_free (xml, TRUE);
 
 	/* empty the store */
@@ -2436,8 +3588,105 @@ as_test_store_func (void)
 	g_assert (as_store_get_app_by_id (store, "gnome-software.desktop") == NULL);
 	xml = as_store_to_xml (store, 0);
 	g_assert_cmpstr (xml->str, ==,
-		"<applications version=\"0.4\"/>");
+		"<components version=\"0.6\"/>");
 	g_string_free (xml, TRUE);
+}
+
+static void
+as_test_store_unique_func (void)
+{
+	AsApp *app;
+	GPtrArray *apps;
+	g_autoptr(AsApp) app1 = NULL;
+	g_autoptr(AsApp) app2 = NULL;
+	g_autoptr(AsApp) app3 = NULL;
+	g_autoptr(AsBundle) bundle2 = NULL;
+	g_autoptr(AsBundle) bundle3 = NULL;
+	g_autoptr(AsStore) store = NULL;
+
+	/* create a store and add a single app */
+	store = as_store_new ();
+	as_store_set_add_flags (store, AS_STORE_ADD_FLAG_USE_UNIQUE_ID);
+	app1 = as_app_new ();
+	as_app_set_id (app1, "org.gnome.Software.desktop");
+	as_app_set_kind (app1, AS_APP_KIND_DESKTOP);
+	as_app_add_pkgname (app1, "gnome-software");
+	as_store_add_app (store, app1);
+
+	/* add a stable bundle */
+	app2 = as_app_new ();
+	bundle2 = as_bundle_new ();
+	as_bundle_set_kind (bundle2, AS_BUNDLE_KIND_FLATPAK);
+	as_bundle_set_id (bundle2, "app/org.gnome.Software/i386/3-18");
+	as_app_set_id (app2, "org.gnome.Software.desktop");
+	as_app_set_kind (app2, AS_APP_KIND_DESKTOP);
+	as_app_add_bundle (app2, bundle2);
+	as_store_add_app (store, app2);
+
+	/* add a master bundle */
+	app3 = as_app_new ();
+	bundle3 = as_bundle_new ();
+	as_bundle_set_kind (bundle3, AS_BUNDLE_KIND_FLATPAK);
+	as_bundle_set_id (bundle3, "app/org.gnome.Software/i386/master");
+	as_app_set_id (app3, "org.gnome.Software.desktop");
+	as_app_set_kind (app3, AS_APP_KIND_DESKTOP);
+	as_app_add_bundle (app3, bundle3);
+	as_store_add_app (store, app3);
+
+	g_assert_cmpint (as_store_get_size (store), ==, 3);
+	apps = as_store_get_apps_by_id (store, "org.gnome.Software.desktop");
+	g_assert_cmpint (apps->len, ==, 3);
+	app = g_ptr_array_index (apps, 0);
+	g_assert_cmpstr (as_app_get_unique_id (app), ==,
+			 "*/package/*/desktop/org.gnome.Software.desktop/*");
+	app = g_ptr_array_index (apps, 1);
+	g_assert_cmpstr (as_app_get_unique_id (app), ==,
+			 "*/flatpak/*/desktop/org.gnome.Software.desktop/3-18");
+	app = g_ptr_array_index (apps, 2);
+	g_assert_cmpstr (as_app_get_unique_id (app), ==,
+			 "*/flatpak/*/desktop/org.gnome.Software.desktop/master");
+	app = as_store_get_app_by_unique_id (store,
+					     "*/flatpak/*/desktop/"
+					     "org.gnome.Software.desktop/master",
+					     AS_STORE_SEARCH_FLAG_NONE);
+	g_assert (app != NULL);
+}
+
+static void
+as_test_store_provides_func (void)
+{
+	AsApp *app;
+	gboolean ret;
+	g_autoptr(GError) error = NULL;
+	g_autoptr(AsStore) store = NULL;
+
+	/* create a store and add a single app */
+	store = as_store_new ();
+	ret = as_store_from_xml (store,
+		"<components version=\"0.6\">"
+		"<component type=\"desktop\">"
+		"<id>test.desktop</id>"
+		"<provides>"
+		"<firmware type=\"flashed\">deadbeef</firmware>"
+		"</provides>"
+		"</component>"
+		"</components>", NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* get an appication by the provide value */
+	app = as_store_get_app_by_provide (store,
+					   AS_PROVIDE_KIND_FIRMWARE_FLASHED,
+					   "deadbeef");
+	g_assert_cmpstr (as_app_get_id (app), ==, "test.desktop");
+	app = as_store_get_app_by_provide (store,
+					   AS_PROVIDE_KIND_FIRMWARE_RUNTIME,
+					   "deadbeef");
+	g_assert (app == NULL);
+	app = as_store_get_app_by_provide (store,
+					   AS_PROVIDE_KIND_FIRMWARE_FLASHED,
+					   "beefdead");
+	g_assert (app == NULL);
 }
 
 static void
@@ -2447,38 +3696,11 @@ as_test_store_versions_func (void)
 	AsStore *store;
 	GError *error = NULL;
 	gboolean ret;
-	GString *str;
+	GString *xml;
 
 	/* load a file to the store */
 	store = as_store_new ();
 	ret = as_store_from_xml (store,
-		"<applications version=\"0.4\">"
-		"<application>"
-		"<id type=\"desktop\">test.desktop</id>"
-		"<description><p>Hello world</p></description>"
-		"<architectures><arch>i386</arch></architectures>"
-		"<releases>"
-		"<release version=\"0.1.2\" timestamp=\"123\">"
-		"<description><p>Hello</p></description>"
-		"</release>"
-		"</releases>"
-		"</application>"
-		"</applications>", -1, NULL, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	g_assert_cmpfloat (as_store_get_api_version (store), <, 0.4 + 0.01);
-	g_assert_cmpfloat (as_store_get_api_version (store), >, 0.4 - 0.01);
-
-	/* verify source kind */
-	app = as_store_get_app_by_id (store, "test.desktop");
-	g_assert_cmpint (as_app_get_source_kind (app), ==, AS_APP_SOURCE_KIND_APPSTREAM);
-
-	/* test with latest features */
-	as_store_set_api_version (store, 0.6);
-	g_assert_cmpfloat (as_store_get_api_version (store), <, 0.6 + 0.01);
-	g_assert_cmpfloat (as_store_get_api_version (store), >, 0.6 - 0.01);
-	str = as_store_to_xml (store, 0);
-	g_assert_cmpstr (str->str, ==,
 		"<components version=\"0.6\">"
 		"<component type=\"desktop\">"
 		"<id>test.desktop</id>"
@@ -2490,20 +3712,57 @@ as_test_store_versions_func (void)
 		"</release>"
 		"</releases>"
 		"</component>"
-		"</components>");
-	g_string_free (str, TRUE);
+		"</components>", NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_assert_cmpfloat (as_store_get_api_version (store), <, 0.6 + 0.01);
+	g_assert_cmpfloat (as_store_get_api_version (store), >, 0.6 - 0.01);
+
+	/* verify source kind */
+	app = as_store_get_app_by_id (store, "test.desktop");
+	g_assert (as_app_get_format_by_kind (app, AS_FORMAT_KIND_APPSTREAM) != NULL);
+
+	/* test with latest features */
+	as_store_set_api_version (store, 0.6);
+	g_assert_cmpfloat (as_store_get_api_version (store), <, 0.6 + 0.01);
+	g_assert_cmpfloat (as_store_get_api_version (store), >, 0.6 - 0.01);
+	xml = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
+	ret = as_test_compare_lines (xml->str,
+		"<components version=\"0.6\">\n"
+		"<component type=\"desktop\">\n"
+		"<id>test.desktop</id>\n"
+		"<description><p>Hello world</p></description>\n"
+		"<architectures>\n"
+		"<arch>i386</arch>\n"
+		"</architectures>\n"
+		"<releases>\n"
+		"<release timestamp=\"123\" version=\"0.1.2\">\n"
+		"<description><p>Hello</p></description>\n"
+		"</release>\n"
+		"</releases>\n"
+		"</component>\n"
+		"</components>\n", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_string_free (xml, TRUE);
 
 	/* test with legacy options */
-	as_store_set_api_version (store, 0.3);
-	str = as_store_to_xml (store, 0);
-	g_assert_cmpstr (str->str, ==,
-		"<applications version=\"0.3\">"
-		"<application>"
-		"<id type=\"desktop\">test.desktop</id>"
-		"<description>Hello world</description>"
-		"</application>"
-		"</applications>");
-	g_string_free (str, TRUE);
+	as_store_set_api_version (store, 0.6);
+	xml = as_store_to_xml (store, 0);
+	g_assert_cmpstr (xml->str, ==,
+		"<components version=\"0.6\">"
+		"<component type=\"desktop\">"
+		"<id>test.desktop</id>"
+		"<description><p>Hello world</p></description>"
+		"<architectures><arch>i386</arch></architectures>"
+		"<releases>"
+		"<release timestamp=\"123\" version=\"0.1.2\">"
+		"<description><p>Hello</p></description>"
+		"</release>"
+		"</releases>"
+		"</component>"
+		"</components>");
+	g_string_free (xml, TRUE);
 
 	g_object_unref (store);
 
@@ -2514,19 +3773,19 @@ as_test_store_versions_func (void)
 		"<component type=\"desktop\">"
 		"<id>test.desktop</id>"
 		"</component>"
-		"</components>", -1, NULL, &error);
+		"</components>", NULL, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
 	/* test latest spec version */
-	str = as_store_to_xml (store, 0);
-	g_assert_cmpstr (str->str, ==,
+	xml = as_store_to_xml (store, 0);
+	g_assert_cmpstr (xml->str, ==,
 		"<components version=\"0.6\">"
 		"<component type=\"desktop\">"
 		"<id>test.desktop</id>"
 		"</component>"
 		"</components>");
-	g_string_free (str, TRUE);
+	g_string_free (xml, TRUE);
 
 	g_object_unref (store);
 }
@@ -2551,12 +3810,12 @@ as_test_store_addons_func (void)
 		"<id>eclipse.desktop</id>"
 		"</component>"
 		"</components>";
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_string_free_ GString *str = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GString) str = NULL;
 
 	/* load a file to the store */
 	store = as_store_new ();
-	ret = as_store_from_xml (store, xml, -1, NULL, &error);
+	ret = as_store_from_xml (store, xml, NULL, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
@@ -2576,12 +3835,13 @@ as_test_store_addons_func (void)
 
 	/* check we can search for token from the addon */
 	g_assert_cmpint (as_app_search_matches (app, "xtest"), >, 0);
+	g_assert_cmpint (as_app_search_matches (app, "eclipse-php"), >, 0);
 
 	/* check it marshals back to the same XML */
 	str = as_store_to_xml (store, 0);
-	if (g_strcmp0 (str->str, xml) != 0)
-		g_warning ("Expected:\n%s\nGot:\n%s", xml, str->str);
-	g_assert_cmpstr (str->str, ==, xml);
+	ret = as_test_compare_lines (str->str, xml, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 }
 
 /*
@@ -2591,25 +3851,25 @@ static void
 as_test_node_no_dup_c_func (void)
 {
 	GError *error = NULL;
-	GNode *n;
-	GNode *root;
+	AsNode *n;
+	AsNode *root;
 	GString *xml;
 	gboolean ret;
 	const gchar *src =
-		"<application>"
-		"<id type=\"desktop\">test.desktop</id>"
+		"<component type=\"desktop\">"
+		"<id>test.desktop</id>"
 		"<name>Krita</name>"
 		"<name xml:lang=\"pl\">Krita</name>"
-		"</application>";
-	_cleanup_free_ AsNodeContext *ctx = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
+		"</component>";
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(AsNodeContext) ctx = NULL;
 
 	/* to object */
 	app = as_app_new ();
-	root = as_node_from_xml (src, -1, 0, &error);
+	root = as_node_from_xml (src, 0, &error);
 	g_assert_no_error (error);
 	g_assert (root != NULL);
-	n = as_node_find (root, "application");
+	n = as_node_find (root, "component");
 	g_assert (n != NULL);
 	ctx = as_node_context_new ();
 	ret = as_app_node_parse (app, n, ctx, &error);
@@ -2627,10 +3887,10 @@ as_test_node_no_dup_c_func (void)
 	n = as_app_node_insert (app, root, ctx);
 	xml = as_node_to_xml (n, AS_NODE_TO_XML_FLAG_NONE);
 	g_assert_cmpstr (xml->str, ==,
-		"<application>"
-		"<id type=\"desktop\">test.desktop</id>"
+		"<component type=\"desktop\">"
+		"<id>test.desktop</id>"
 		"<name>Krita</name>"
-		"</application>");
+		"</component>");
 	g_string_free (xml, TRUE);
 	as_node_unref (root);
 }
@@ -2639,11 +3899,12 @@ static void
 as_test_store_origin_func (void)
 {
 	AsApp *app;
+	AsFormat *format;
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
 
 	/* load a file to the store */
 	store = as_store_new ();
@@ -2658,9 +3919,14 @@ as_test_store_origin_func (void)
 	g_assert_cmpint (as_store_get_size (store), ==, 1);
 	app = as_store_get_app_by_id (store, "test.desktop");
 	g_assert (app != NULL);
-	g_assert_cmpstr (as_app_get_icon_path (app), ==,
-		"/usr/share/app-info/icons/fedora-21");
+	g_assert_cmpstr (as_app_get_icon_path (app), !=, NULL);
+	g_assert (g_str_has_suffix (as_app_get_icon_path (app), "icons"));
 	g_assert_cmpstr (as_app_get_origin (app), ==, "fedora-21");
+
+	/* check format */
+	format = as_app_get_format_by_kind (app, AS_FORMAT_KIND_APPSTREAM);
+	g_assert (format != NULL);
+	g_assert_cmpstr (as_format_get_filename (format), ==, filename);
 }
 
 static void
@@ -2670,16 +3936,17 @@ as_test_store_speed_appstream_func (void)
 	gboolean ret;
 	guint i;
 	guint loops = 10;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_timer_destroy_ GTimer *timer = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GTimer) timer = NULL;
 
 	filename = as_test_get_filename ("example-v04.xml.gz");
 	file = g_file_new_for_path (filename);
 	timer = g_timer_new ();
 	for (i = 0; i < loops; i++) {
-		_cleanup_object_unref_ AsStore *store = NULL;
+		g_autoptr(AsStore) store = NULL;
 		store = as_store_new ();
+		as_store_set_add_flags (store, AS_STORE_ADD_FLAG_ONLY_NATIVE_LANGS);
 		ret = as_store_from_file (store, file, NULL, NULL, &error);
 		g_assert_no_error (error);
 		g_assert (ret);
@@ -2691,19 +3958,62 @@ as_test_store_speed_appstream_func (void)
 }
 
 static void
+as_test_store_speed_search_func (void)
+{
+	AsApp *app;
+	GPtrArray *apps;
+	GError *error = NULL;
+	gboolean ret;
+	guint i;
+	guint j;
+	guint loops = 1000;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GTimer) timer = NULL;
+	g_autoptr(AsStore) store = NULL;
+
+	/* run creating a store and tokenizing */
+	filename = as_test_get_filename ("example-v04.xml.gz");
+	file = g_file_new_for_path (filename);
+	store = as_store_new ();
+	ret = as_store_from_file (store, file, NULL, NULL, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+
+	/* tokenize and search */
+	timer = g_timer_new ();
+	apps = as_store_get_apps (store);
+	for (j = 0; j < apps->len; j++) {
+		app = g_ptr_array_index (apps, j);
+		as_app_search_matches (app, "xxx");
+	}
+	g_print ("cold=%.0fms: ", g_timer_elapsed (timer, NULL) * 1000);
+
+	/* search again */
+	g_timer_reset (timer);
+	for (i = 0; i < loops; i++) {
+		for (j = 0; j < apps->len; j++) {
+			app = g_ptr_array_index (apps, j);
+			as_app_search_matches (app, "xxx");
+		}
+	}
+	g_print ("hot=%.2f ms: ", (g_timer_elapsed (timer, NULL) * 1000) / (gdouble) loops);
+}
+
+static void
 as_test_store_speed_appdata_func (void)
 {
 	GError *error = NULL;
 	gboolean ret;
 	guint i;
 	guint loops = 10;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_timer_destroy_ GTimer *timer = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GTimer) timer = NULL;
 
 	filename = as_test_get_filename (".");
 	timer = g_timer_new ();
 	for (i = 0; i < loops; i++) {
-		_cleanup_object_unref_ AsStore *store = NULL;
+		g_autoptr(AsStore) store = NULL;
 		store = as_store_new ();
 		as_store_set_destdir (store, filename);
 		g_test_expect_message (G_LOG_DOMAIN,
@@ -2724,13 +4034,13 @@ as_test_store_speed_desktop_func (void)
 	gboolean ret;
 	guint i;
 	guint loops = 10;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_timer_destroy_ GTimer *timer = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GTimer) timer = NULL;
 
 	filename = as_test_get_filename (".");
 	timer = g_timer_new ();
 	for (i = 0; i < loops; i++) {
-		_cleanup_object_unref_ AsStore *store = NULL;
+		g_autoptr(AsStore) store = NULL;
 		store = as_store_new ();
 		as_store_set_destdir (store, filename);
 		ret = as_store_load (store, AS_STORE_LOAD_FLAG_DESKTOP, NULL, &error);
@@ -2742,45 +4052,36 @@ as_test_store_speed_desktop_func (void)
 }
 
 static void
-as_test_utils_overlap_func (void)
+as_test_utils_appstream_id_func (void)
 {
-	gchar *tmp;
+	g_autofree gchar *id = NULL;
+	g_assert (as_utils_appstream_id_valid ("org.gnome.Software"));
+	g_assert (!as_utils_appstream_id_valid ("xml:gravatar@jr.rlabs.io"));
+	id = as_utils_appstream_id_build ("gravatar@jr.rlabs.io");
+	g_assert_cmpstr (id, ==, "gravatar_jr.rlabs.io");
+}
 
-	/* same */
-	tmp = as_utils_get_string_overlap ("dave.ttf", "dave.ttf");
-	g_assert_cmpstr (tmp, ==, "dave.ttf");
-	g_free (tmp);
+static void
+as_test_utils_guid_func (void)
+{
+	g_autofree gchar *guid1 = NULL;
+	g_autofree gchar *guid2 = NULL;
 
-	/* only prefix */
-	tmp = as_utils_get_string_overlap ("dave.ttf", "daniel.doc");
-	g_assert_cmpstr (tmp, ==, "da");
-	g_free (tmp);
+	/* invalid */
+	g_assert (!as_utils_guid_is_valid (NULL));
+	g_assert (!as_utils_guid_is_valid (""));
+	g_assert (!as_utils_guid_is_valid ("1ff60ab2-3905-06a1-b476"));
+	g_assert (!as_utils_guid_is_valid ("1ff60ab2-XXXX-XXXX-XXXX-0371f00c9e9b"));
+	g_assert (!as_utils_guid_is_valid (" 1ff60ab2-3905-06a1-b476-0371f00c9e9b"));
 
-	/* only suffix */
-	tmp = as_utils_get_string_overlap ("dave.ttf", "sara.ttf");
-	g_assert_cmpstr (tmp, ==, ".ttf");
-	g_free (tmp);
+	/* valid */
+	g_assert (as_utils_guid_is_valid ("1ff60ab2-3905-06a1-b476-0371f00c9e9b"));
 
-	/* different */
-	tmp = as_utils_get_string_overlap ("dave.ttf", "bob.doc");
-	g_assert_cmpstr (tmp, ==, NULL);
-	g_free (tmp);
-
-	/* long left */
-	tmp = as_utils_get_string_overlap ("aaabbbccc.ttf", "bbbccc.ttf");
-	g_assert_cmpstr (tmp, ==, "bbbccc.ttf");
-	g_free (tmp);
-
-	/* long right */
-	tmp = as_utils_get_string_overlap ("bbbccc.ttf", "aaabbbccc.ttf");
-	g_assert_cmpstr (tmp, ==, "bbbccc.ttf");
-	g_free (tmp);
-
-	/* extra dots */
-	tmp = as_utils_get_string_overlap ("org.gnome.Music.Player.desktop",
-					   "org.gnome.Music.Record.desktop");
-	g_assert_cmpstr (tmp, ==, "org.gnome.Music.desktop");
-	g_free (tmp);
+	/* make valid */
+	guid1 = as_utils_guid_from_string ("python.org");
+	g_assert_cmpstr (guid1, ==, "886313e1-3b8a-5372-9b90-0c9aee199e5d");
+	guid2 = as_utils_guid_from_string ("8086:0406");
+	g_assert_cmpstr (guid2, ==, "1fbd1f2c-80f4-5d7c-a6ad-35c7b9bd5486");
 }
 
 static void
@@ -2788,7 +4089,7 @@ as_test_utils_icons_func (void)
 {
 	gchar *tmp;
 	GError *error = NULL;
-	_cleanup_free_ gchar *destdir = NULL;
+	g_autofree gchar *destdir = NULL;
 
 	destdir = as_test_get_filename (".");
 
@@ -2865,6 +4166,10 @@ as_test_utils_spdx_token_func (void)
 	g_strfreev (tok);
 	g_free (tmp);
 
+	/* invalid */
+	tok = as_utils_spdx_license_tokenize (NULL);
+	g_assert (tok == NULL);
+
 	/* random */
 	tok = as_utils_spdx_license_tokenize ("Public Domain");
 	tmp = g_strjoinv ("  ", tok);
@@ -2900,12 +4205,26 @@ as_test_utils_spdx_token_func (void)
 	g_strfreev (tok);
 	g_free (tmp);
 
+	/* "+" operator */
+	tok = as_utils_spdx_license_tokenize ("CC-BY-SA-3.0+ AND Zlib");
+	tmp = g_strjoinv ("  ", tok);
+	g_assert_cmpstr (tmp, ==, "@CC-BY-SA-3.0  +  &  @Zlib");
+	g_free (tmp);
+	tmp = as_utils_spdx_license_detokenize (tok);
+	g_assert_cmpstr (tmp, ==, "CC-BY-SA-3.0+ AND Zlib");
+	g_strfreev (tok);
+	g_free (tmp);
+
 	/* detokenisation literals */
 	tok = as_utils_spdx_license_tokenize ("Public Domain");
 	tmp = as_utils_spdx_license_detokenize (tok);
 	g_assert_cmpstr (tmp, ==, "Public Domain");
 	g_strfreev (tok);
 	g_free (tmp);
+
+	/* invalid tokens */
+	tmp = as_utils_spdx_license_detokenize (NULL);
+	g_assert (tmp == NULL);
 
 	/* leading brackets */
 	tok = as_utils_spdx_license_tokenize ("(MPLv1.1 or LGPLv3+) and LGPLv3");
@@ -2930,9 +4249,45 @@ as_test_utils_spdx_token_func (void)
 
 	/* SPDX strings */
 	g_assert (as_utils_is_spdx_license ("CC0"));
+	g_assert (as_utils_is_spdx_license ("LicenseRef-proprietary"));
 	g_assert (as_utils_is_spdx_license ("CC0 and GFDL-1.3"));
 	g_assert (as_utils_is_spdx_license ("CC0 AND GFDL-1.3"));
+	g_assert (as_utils_is_spdx_license ("CC-BY-SA-3.0+"));
+	g_assert (as_utils_is_spdx_license ("CC-BY-SA-3.0+ AND Zlib"));
+	g_assert (as_utils_is_spdx_license ("NOASSERTION"));
 	g_assert (!as_utils_is_spdx_license ("CC0 dave"));
+	g_assert (!as_utils_is_spdx_license (""));
+	g_assert (!as_utils_is_spdx_license (NULL));
+
+	/* importing non-SPDX formats */
+	tmp = as_utils_license_to_spdx ("CC0 and (Public Domain and GPLv3+ with exceptions)");
+	g_assert_cmpstr (tmp, ==, "CC0-1.0 AND (LicenseRef-public-domain AND GPL-3.0+)");
+	g_free (tmp);
+}
+
+static void
+as_test_utils_markup_import_func (void)
+{
+	guint i;
+	struct {
+		const gchar *old;
+		const gchar *new;
+	} table[] = {
+		{ "",			NULL },
+		{ "dave",		"<p>dave</p>" },
+		{ "dave!\ndave?",	"<p>dave! dave?</p>" },
+		{ "dave!\n\ndave?",	"<p>dave!</p><p>dave?</p>" },
+		{ NULL,			NULL }
+	};
+	for (i = 0; table[i].old != NULL; i++) {
+		g_autofree gchar *new = NULL;
+		g_autoptr(GError) error = NULL;
+		new = as_markup_import (table[i].old,
+					AS_MARKUP_CONVERT_FORMAT_SIMPLE,
+					&error);
+		g_assert_no_error (error);
+		g_assert_cmpstr (new, ==, table[i].new);
+	}
 }
 
 static void
@@ -2942,17 +4297,6 @@ as_test_utils_func (void)
 	gchar *tmp;
 	gchar **tokens;
 	GError *error = NULL;
-
-	/* as_strndup */
-	tmp = as_strndup ("dave", 2);
-	g_assert_cmpstr (tmp, ==, "da");
-	g_free (tmp);
-	tmp = as_strndup ("dave", 4);
-	g_assert_cmpstr (tmp, ==, "dave");
-	g_free (tmp);
-	tmp = as_strndup ("dave", -1);
-	g_assert_cmpstr (tmp, ==, "dave");
-	g_free (tmp);
 
 	/* as_utils_is_stock_icon_name */
 	g_assert (!as_utils_is_stock_icon_name (NULL));
@@ -2970,19 +4314,14 @@ as_test_utils_func (void)
 	g_assert (as_utils_is_category_id ("AudioVideoEditing"));
 	g_assert (!as_utils_is_category_id ("SpellEditing"));
 
-	/* blacklist */
-	g_assert (as_utils_is_blacklisted_id ("gnome-system-monitor-kde.desktop"));
-	g_assert (as_utils_is_blacklisted_id ("doom-*-demo.desktop"));
-	g_assert (!as_utils_is_blacklisted_id ("gimp.desktop"));
-
 	/* valid description markup */
-	tmp = as_markup_convert_simple ("<p>Hello world!</p>", -1, &error);
+	tmp = as_markup_convert_simple ("<p>Hello world!</p>", &error);
 	g_assert_no_error (error);
 	g_assert_cmpstr (tmp, ==, "Hello world!");
 	g_free (tmp);
-	tmp = as_markup_convert_simple ("<p>Hello world</p>"
+	tmp = as_markup_convert_simple ("<p>Hello world</p><p></p>"
 					"<ul><li>Item</li></ul>",
-					-1, &error);
+					&error);
 	g_assert_no_error (error);
 	g_assert_cmpstr (tmp, ==, "Hello world\n • Item");
 	g_free (tmp);
@@ -2996,7 +4335,7 @@ as_test_utils_func (void)
 				 " broken into multiple lines that only has one"
 				 " initial bullet point."
 				 "</li></ul>",
-				 -1, AS_MARKUP_CONVERT_FORMAT_MARKDOWN, &error);
+				 AS_MARKUP_CONVERT_FORMAT_MARKDOWN, &error);
 	g_assert_no_error (error);
 	g_assert_cmpstr (tmp, ==,
 			 "Hello world with a very long line that probably"
@@ -3008,37 +4347,52 @@ as_test_utils_func (void)
 	g_free (tmp);
 
 	/* valid description markup */
-	tmp = as_markup_convert_simple ("bare text", -1, &error);
+	tmp = as_markup_convert_simple ("bare text", &error);
 	g_assert_no_error (error);
 	g_assert_cmpstr (tmp, ==, "bare text");
 	g_free (tmp);
 
 	/* invalid XML */
-	tmp = as_markup_convert_simple ("<p>Hello world</dave>",
-					-1, &error);
+	tmp = as_markup_convert_simple ("<p>Hello world</dave>", &error);
 	g_assert_error (error, AS_NODE_ERROR, AS_NODE_ERROR_FAILED);
 	g_assert_cmpstr (tmp, ==, NULL);
 	g_clear_error (&error);
 
-	/* invalid URLs */
-	ret = as_utils_check_url_exists ("hello dave", 1, &error);
+	/* validate */
+	ret = as_markup_validate ("<p>hello</p>", &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	ret = as_markup_validate ("<ol><li>hello</ol>", &error);
+	g_assert_error (error, AS_NODE_ERROR, AS_NODE_ERROR_FAILED);
 	g_assert (!ret);
-	g_assert (error != NULL);
-	g_clear_error (&error);
-	ret = as_utils_check_url_exists ("http://www.bbc.co.uk/notgoingtoexist", 1, &error);
-	g_assert (!ret);
-	g_assert (error != NULL);
 	g_clear_error (&error);
 
-	/* valid URLs */
-	//ret = as_utils_check_url_exists ("http://www.bbc.co.uk/", &error);
-	//g_assert (ret);
-	//g_assert_no_error (error);
+	/* passthrough */
+	tmp = as_markup_convert ("<p>pa&amp;ra</p><ul><li>one</li><li>two</li></ul>",
+				 AS_MARKUP_CONVERT_FORMAT_APPSTREAM,
+				 &error);
+	g_assert_no_error (error);
+	g_assert_cmpstr (tmp, ==, "<p>pa&amp;ra</p><ul><li>one</li><li>two</li></ul>");
+	g_free (tmp);
+
+	/* ignore errors */
+	tmp = as_markup_convert_full ("<p>para</p><ol><li>one</li></ol><li>two</li>",
+				      AS_MARKUP_CONVERT_FORMAT_APPSTREAM,
+				      AS_MARKUP_CONVERT_FLAG_IGNORE_ERRORS,
+				      &error);
+	g_assert_no_error (error);
+	g_assert_cmpstr (tmp, ==, "<p>para</p><ul><li>one</li></ul>");
+	g_free (tmp);
+	tmp = as_markup_convert_full ("<p>para</p><ul><li>one</li><li>two</ul>",
+				      AS_MARKUP_CONVERT_FORMAT_APPSTREAM,
+				      AS_MARKUP_CONVERT_FLAG_IGNORE_ERRORS,
+				      &error);
+	g_assert_no_error (error);
+	g_assert_cmpstr (tmp, ==, "<p>para</p>");
+	g_free (tmp);
 
 	/* valid tokens */
 	g_assert (as_utils_search_token_valid ("battery"));
-	g_assert (!as_utils_search_token_valid ("and"));
-	g_assert (!as_utils_search_token_valid ("is"));
 	g_assert (!as_utils_search_token_valid ("<b>"));
 
 	/* check tokenisation */
@@ -3046,25 +4400,61 @@ as_test_utils_func (void)
 	g_assert (tokens == NULL);
 	tokens = as_utils_search_tokenize ("batteries are (really) stupid");
 	g_assert_cmpstr (tokens[0], ==, "batteries");
-	g_assert_cmpstr (tokens[1], ==, "stupid");
-	g_assert_cmpstr (tokens[2], ==, NULL);
+	g_assert_cmpstr (tokens[1], ==, "are");
+	g_assert_cmpstr (tokens[2], ==, "stupid");
+	g_assert_cmpstr (tokens[3], ==, NULL);
 	g_strfreev (tokens);
 }
 
 static void
-as_test_store_app_install_func (void)
+as_test_utils_version_func (void)
 {
-	GError *error = NULL;
-	gboolean ret;
-	_cleanup_object_unref_ AsStore *store = NULL;
+	guint i;
+	struct {
+		guint32 val;
+		const gchar *ver;
+		AsVersionParseFlag flags;
+	} version_from_uint32[] = {
+		{ 0x0,		"0.0.0.0",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0xff,		"0.0.0.255",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0xff01,	"0.0.255.1",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0xff0001,	"0.255.0.1",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0xff000100,	"255.0.1.0",	AS_VERSION_PARSE_FLAG_NONE },
+		{ 0x0,		"0.0.0",	AS_VERSION_PARSE_FLAG_USE_TRIPLET },
+		{ 0xff,		"0.0.255",	AS_VERSION_PARSE_FLAG_USE_TRIPLET },
+		{ 0xff01,	"0.0.65281",	AS_VERSION_PARSE_FLAG_USE_TRIPLET },
+		{ 0xff0001,	"0.255.1",	AS_VERSION_PARSE_FLAG_USE_TRIPLET },
+		{ 0xff000100,	"255.0.256",	AS_VERSION_PARSE_FLAG_USE_TRIPLET },
+		{ 0,		NULL }
+	};
+	struct {
+		const gchar *old;
+		const gchar *new;
+	} version_parse[] = {
+		{ "0",		"0" },
+		{ "257",	"0.0.257" },
+		{ "1.2.3",	"1.2.3" },
+		{ "0xff0001",	"0.255.1" },
+		{ "16711681",	"0.255.1" },
+		{ "20150915",	"20150915" },
+		{ "dave",	"dave" },
+		{ NULL,		NULL }
+	};
 
-	store = as_store_new ();
-	ret = as_store_load (store,
-			     AS_STORE_LOAD_FLAG_APP_INSTALL,
-			     NULL,
-			     &error);
-	g_assert_no_error (error);
-	g_assert (ret);
+	/* check version conversion */
+	for (i = 0; version_from_uint32[i].ver != NULL; i++) {
+		g_autofree gchar *ver = NULL;
+		ver = as_utils_version_from_uint32 (version_from_uint32[i].val,
+						    version_from_uint32[i].flags);
+		g_assert_cmpstr (ver, ==, version_from_uint32[i].ver);
+	}
+
+	/* check version parsing */
+	for (i = 0; version_parse[i].old != NULL; i++) {
+		g_autofree gchar *ver = NULL;
+		ver = as_utils_version_parse (version_parse[i].old);
+		g_assert_cmpstr (ver, ==, version_parse[i].new);
+	}
 }
 
 static void
@@ -3074,24 +4464,24 @@ as_test_store_metadata_func (void)
 	GPtrArray *apps;
 	gboolean ret;
 	const gchar *xml =
-		"<applications version=\"0.3\">"
-		"<application>"
-		"<id type=\"desktop\">test.desktop</id>"
+		"<components version=\"0.6\">"
+		"<component type=\"desktop\">"
+		"<id>test.desktop</id>"
 		"<metadata>"
 		"<value key=\"foo\">bar</value>"
 		"</metadata>"
-		"</application>"
-		"<application>"
-		"<id type=\"desktop\">tested.desktop</id>"
+		"</component>"
+		"<component type=\"desktop\">"
+		"<id>tested.desktop</id>"
 		"<metadata>"
 		"<value key=\"foo\">bar</value>"
 		"</metadata>"
-		"</application>"
-		"</applications>";
-	_cleanup_object_unref_ AsStore *store = NULL;
+		"</component>"
+		"</components>";
+	g_autoptr(AsStore) store = NULL;
 
 	store = as_store_new ();
-	ret = as_store_from_xml (store, xml, -1, NULL, &error);
+	ret = as_store_from_xml (store, xml, NULL, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
@@ -3106,18 +4496,18 @@ as_test_store_metadata_index_func (void)
 	GPtrArray *apps;
 	const guint repeats = 10000;
 	guint i;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_timer_destroy_ GTimer *timer = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GTimer) timer = NULL;
 
 	/* create lots of applications in the store */
 	store = as_store_new ();
 	as_store_add_metadata_index (store, "X-CacheID");
 	for (i = 0; i < repeats; i++) {
-		_cleanup_free_ gchar *id = g_strdup_printf ("app-%05i", i);
-		_cleanup_object_unref_ AsApp *app = as_app_new ();
-		as_app_set_id (app, id, -1);
-		as_app_add_metadata (app, "X-CacheID", "dave.i386", -1);
-		as_app_add_metadata (app, "baz", "dave", -1);
+		g_autofree gchar *id = g_strdup_printf ("app-%05u", i);
+		g_autoptr(AsApp) app = as_app_new ();
+		as_app_set_id (app, id);
+		as_app_add_metadata (app, "X-CacheID", "dave.i386");
+		as_app_add_metadata (app, "baz", "dave");
 		as_store_add_app (store, app);
 	}
 
@@ -3136,21 +4526,54 @@ as_test_store_metadata_index_func (void)
 }
 
 static void
+as_test_yaml_broken_func (void)
+{
+#ifdef AS_BUILD_DEP11
+	g_autoptr(AsYaml) node = NULL;
+	g_autoptr(GError) error1 = NULL;
+	g_autoptr(GError) error2 = NULL;
+	node = as_yaml_from_data ("s---\n"
+				  "File: DEP-11\n",
+				  -1,
+				  AS_YAML_FROM_FLAG_NONE,
+				  &error1);
+	g_assert_error (error1, AS_NODE_ERROR, AS_NODE_ERROR_INVALID_MARKUP);
+	g_assert (node == NULL);
+	node = as_yaml_from_data ("---\n"
+				  "%File: DEP-11\n",
+				  -1,
+				  AS_YAML_FROM_FLAG_NONE,
+				  &error2);
+	g_assert_error (error2, AS_NODE_ERROR, AS_NODE_ERROR_INVALID_MARKUP);
+	g_assert_cmpstr (error2->message, ==,
+			 "scanner error: while scanning a directive at ln:2 col:1, "
+			 "found unexpected non-alphabetical character at ln:2 col:6");
+	g_assert (node == NULL);
+#else
+	g_test_skip ("Compiled without YAML (DEP-11) support");
+#endif
+}
+
+static void
 as_test_yaml_func (void)
 {
-	GNode *node;
+#ifdef AS_BUILD_DEP11
+	AsYaml *node;
 	GError *error = NULL;
 	GString *str;
 	const gchar *expected;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GFile) file = NULL;
+	gboolean ret;
 
 	/* simple header */
 	node = as_yaml_from_data (
 		"File: DEP-11\n"
 		"Origin: aequorea\n"
 		"Version: '0.6'\n",
-		-1, &error);
+		-1,
+		AS_YAML_FROM_FLAG_NONE,
+		&error);
 	g_assert_no_error (error);
 	g_assert (node != NULL);
 	str = as_yaml_to_string (node);
@@ -3167,6 +4590,7 @@ as_test_yaml_func (void)
 
 	/* simple list */
 	node = as_yaml_from_data (
+		"---\n"
 		"Mimetypes:\n"
 		"  - text/html\n"
 		"  - text/xml\n"
@@ -3175,7 +4599,9 @@ as_test_yaml_func (void)
 		"  - AppMenu\n"
 		"  - SearchProvider\n"
 		"  - Notifications\n",
-		-1, &error);
+		-1,
+		AS_YAML_FROM_FLAG_NONE,
+		&error);
 	g_assert_no_error (error);
 	g_assert (node != NULL);
 	str = as_yaml_to_string (node);
@@ -3196,10 +4622,10 @@ as_test_yaml_func (void)
 	as_yaml_unref (node);
 
 	/* dummy application */
-	filename = as_test_get_filename ("example.yml");
+	filename = as_test_get_filename ("usr/share/app-info/yaml/aequorea.yml");
 	g_assert (filename != NULL);
 	file = g_file_new_for_path (filename);
-	node = as_yaml_from_file (file, NULL, &error);
+	node = as_yaml_from_file (file, AS_YAML_FROM_FLAG_NONE, NULL, &error);
 	g_assert_no_error (error);
 	g_assert (node != NULL);
 	str = as_yaml_to_string (node);
@@ -3213,10 +4639,13 @@ as_test_yaml_func (void)
 		" [KVL]ID=iceweasel.desktop\n"
 		" [MAP]Name\n"
 		"  [KVL]C=Iceweasel\n"
-		" [SEQ]Packages\n"
-		"  [KEY]iceweasel\n"
+		" [KVL]Package=iceweasel\n"
 		" [MAP]Icon\n"
-		"  [KVL]cached=iceweasel.png\n"
+		"  [SEQ]cached\n"
+		"   [MAP]{\n"
+		"    [KVL]name=iceweasel.png\n"
+		"    [KVL]width=64\n"
+		"    [KVL]height=64\n"
 		" [MAP]Keywords\n"
 		"  [SEQ]C\n"
 		"   [KEY]browser\n"
@@ -3237,27 +4666,29 @@ as_test_yaml_func (void)
 		" [KVL]ID=dave.desktop\n"
 		" [MAP]Name\n"
 		"  [KVL]C=dave\n";
-	if (g_strcmp0 (str->str, expected) != 0)
-		g_warning ("Expected:\n%s\nGot:\n%s", expected, str->str);
-	g_assert_cmpstr (str->str, ==, expected);
+	ret = as_test_compare_lines (str->str, expected, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 	g_string_free (str, TRUE);
 	as_yaml_unref (node);
-
+#else
+	g_test_skip ("Compiled without YAML (DEP-11) support");
+#endif
 }
 
 static void
 as_test_store_yaml_func (void)
 {
+#ifdef AS_BUILD_DEP11
 	AsApp *app;
 	GError *error = NULL;
 	gboolean ret;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_free_ gchar *icon_root = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_string_free_ GString *str = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GString) str = NULL;
 	const gchar *xml =
-		"<components version=\"0.6\" origin=\"aequorea\">\n"
+		"<components origin=\"aequorea\" version=\"0.6\">\n"
 		"<component type=\"desktop\">\n"
 		"<id>dave.desktop</id>\n"
 		"<name>dave</name>\n"
@@ -3281,18 +4712,18 @@ as_test_store_yaml_func (void)
 
 	/* load store */
 	store = as_store_new ();
-	filename = as_test_get_filename ("example.yml");
-	icon_root = as_test_get_filename ("usr/share/app-install/icons");
+	filename = as_test_get_filename ("usr/share/app-info/yaml/aequorea.yml");
+	g_assert (filename != NULL);
 	file = g_file_new_for_path (filename);
-	ret = as_store_from_file (store, file, icon_root, NULL, &error);
+	ret = as_store_from_file (store, file, NULL, NULL, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 
 	/* test it matches expected XML */
 	str = as_store_to_xml (store, AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE);
-	if (g_strcmp0 (str->str, xml) != 0)
-		g_warning ("Expected:\n%s\nGot:\n%s", xml, str->str);
-	g_assert_cmpstr (str->str, ==, xml);
+	ret = as_test_compare_lines (str->str, xml, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
 
 	/* test store properties */
 	g_assert_cmpstr (as_store_get_origin (store), ==, "aequorea");
@@ -3304,29 +4735,33 @@ as_test_store_yaml_func (void)
 
 	/* test application properties */
 	app = as_store_get_app_by_id (store, "iceweasel.desktop");
-	g_assert_cmpint (as_app_get_id_kind (app), ==, AS_ID_KIND_DESKTOP);
+	g_assert_cmpint (as_app_get_kind (app), ==, AS_APP_KIND_DESKTOP);
 	g_assert_cmpstr (as_app_get_pkgname_default (app), ==, "iceweasel");
 	g_assert_cmpstr (as_app_get_name (app, "C"), ==, "Iceweasel");
 	g_assert_cmpstr (as_app_get_origin (app), ==, "aequorea");
+#else
+	g_test_skip ("Compiled without YAML (DEP-11) support");
+#endif
 }
 
 static void
 as_test_store_speed_yaml_func (void)
 {
+#ifdef AS_BUILD_DEP11
 	GError *error = NULL;
 	gboolean ret;
 	guint i;
 	guint loops = 10;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-	_cleanup_timer_destroy_ GTimer *timer = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GFile) file = NULL;
+	g_autoptr(GTimer) timer = NULL;
 
 	filename = as_test_get_filename ("example-v06.yml.gz");
 	g_assert (filename != NULL);
 	file = g_file_new_for_path (filename);
 	timer = g_timer_new ();
 	for (i = 0; i < loops; i++) {
-		_cleanup_object_unref_ AsStore *store = NULL;
+		g_autoptr(AsStore) store = NULL;
 		store = as_store_new ();
 		ret = as_store_from_file (store, file, NULL, NULL, &error);
 		g_assert_no_error (error);
@@ -3340,7 +4775,9 @@ as_test_store_speed_yaml_func (void)
 		g_assert (as_store_get_app_by_id (store, "blobwars.desktop") != NULL);
 	}
 	g_print ("%.0f ms: ", g_timer_elapsed (timer, NULL) * 1000 / loops);
-
+#else
+	g_test_skip ("Compiled without YAML (DEP-11) support");
+#endif
 }
 
 static void
@@ -3348,6 +4785,10 @@ as_test_utils_vercmp_func (void)
 {
 	/* same */
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.3"), ==, 0);
+
+	/* same, not dotted decimal */
+	g_assert_cmpint (as_utils_vercmp ("1.2.3", "0x1020003"), ==, 0);
+	g_assert_cmpint (as_utils_vercmp ("0x10203", "0x10203"), ==, 0);
 
 	/* upgrade and downgrade */
 	g_assert_cmpint (as_utils_vercmp ("1.2.3", "1.2.4"), <, 0);
@@ -3369,310 +4810,14 @@ as_test_utils_vercmp_func (void)
 }
 
 static void
-as_test_inf_func (void)
-{
-	GError *error = NULL;
-	GKeyFile *kf;
-	const gchar *data;
-	gboolean ret;
-	gchar *tmp;
-	guint64 ts;
-	_cleanup_dir_close_ GDir *dir = NULL;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_free_ gchar *infs = NULL;
-
-	/* case insensitive */
-	kf = g_key_file_new ();
-	ret = as_inf_load_data (kf, "[Version]\nClass=Firmware",
-				AS_INF_LOAD_FLAG_CASE_INSENSITIVE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "version", "class", NULL);
-	g_assert_cmpstr (tmp, ==, "Firmware");
-	g_free (tmp);
-
-	/* section merging */
-	ret = as_inf_load_data (kf, "[Version]\nPnpLockdown=1", 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "version", "class", NULL);
-	g_assert_cmpstr (tmp, ==, "Firmware");
-	g_free (tmp);
-	tmp = g_key_file_get_string (kf, "Version", "PnpLockdown", NULL);
-	g_assert_cmpstr (tmp, ==, "1");
-	g_free (tmp);
-
-	/* dequoting */
-	ret = as_inf_load_data (kf, "[Version]\n"
-				    "PnpLockdown  =  \" 2 \"\n"
-				    "Empty = \"\"", 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "PnpLockdown", NULL);
-	g_assert_cmpstr (tmp, ==, " 2 ");
-	g_free (tmp);
-	tmp = g_key_file_get_string (kf, "Version", "Empty", NULL);
-	g_assert_cmpstr (tmp, ==, "");
-	g_free (tmp);
-
-	/* autovalues */
-	ret = as_inf_load_data (kf, "[RandomList]\nfilename.cap", 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "RandomList", "value000", NULL);
-	g_assert_cmpstr (tmp, ==, "filename.cap");
-	g_free (tmp);
-
-	/* autovalues with quotes */
-	ret = as_inf_load_data (kf, "[RandomList2]\n\"SomeRandomValue=1\"", 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "RandomList2", "value000", NULL);
-	g_assert_cmpstr (tmp, ==, "SomeRandomValue=1");
-	g_free (tmp);
-
-	/* Dirids */
-	ret = as_inf_load_data (kf, "[DriverServiceInst]\nServiceBinary=%12%\\service.exe", 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "DriverServiceInst", "ServiceBinary", NULL);
-	g_assert_cmpstr (tmp, ==, "/tmp/service.exe");
-	g_free (tmp);
-
-	/* comments */
-	data =	"; group priority\n"
-		"[Metadata] ; similar to [Version]\n"
-		"Vendor=Hughski ; vendor name\n"
-		"Owner=\"Richard; Ania\"\n"
-		"; device name priority\n"
-		"Device=\"ColorHug\" ; device name";
-	ret = as_inf_load_data (kf, data, 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Metadata", "Vendor", NULL);
-	g_assert_cmpstr (tmp, ==, "Hughski");
-	g_free (tmp);
-	tmp = g_key_file_get_string (kf, "Metadata", "Device", NULL);
-	g_assert_cmpstr (tmp, ==, "ColorHug");
-	g_free (tmp);
-	tmp = g_key_file_get_string (kf, "Metadata", "Owner", NULL);
-	g_assert_cmpstr (tmp, ==, "Richard; Ania");
-	g_free (tmp);
-
-	/* comment values */
-	tmp = g_key_file_get_comment (kf, "Metadata", "Vendor", NULL);
-	g_assert_cmpstr (tmp, ==, "vendor name\n");
-	g_free (tmp);
-	tmp = g_key_file_get_comment (kf, "Metadata", "Device", NULL);
-	g_assert_cmpstr (tmp, ==, "device name priority\n");
-	g_free (tmp);
-	tmp = g_key_file_get_comment (kf, "Metadata", "Owner", NULL);
-	g_assert_cmpstr (tmp, ==, NULL);
-	g_free (tmp);
-//	tmp = g_key_file_get_comment (kf, "metadata", NULL, NULL);
-//	g_assert_cmpstr (tmp, ==, "group priority");
-//	g_free (tmp);
-
-	/* strings substitution */
-	data =	"[Version]\n"
-		"Provider=Vendor was %Provider% now %Unknown% Ltd\n"
-		"[Strings]\n"
-		"Provider=Hughski\n";
-	ret = as_inf_load_data (kf, data, 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "Provider", NULL);
-	g_assert_cmpstr (tmp, ==, "Vendor was Hughski now %Unknown% Ltd");
-	g_free (tmp);
-
-	/* continued lines */
-	data =	"[Version]\n"
-		"Provider=Richard & \\\n"
-		"Ania & \\\n"
-		"Friends";
-	ret = as_inf_load_data (kf, data, 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "Provider", NULL);
-	g_assert_cmpstr (tmp, ==, "Richard & Ania & Friends");
-	g_free (tmp);
-
-	/* multiline value */
-	data =	"[Metadata]\n"
-		"UpdateDescription = \"This is a very \"long\" update \"  |\n"
-		"                    \"description designed to be shown \" |\n"
-		"                    \"to the end user.\"";
-	ret = as_inf_load_data (kf, data, 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Metadata", "UpdateDescription", NULL);
-	g_assert_cmpstr (tmp, ==, "This is a very \"long\" update description "
-				  "designed to be shown to the end user.");
-	g_free (tmp);
-
-	/* substitution as the key name */
-	data =	"[Version]\n"
-		"%Manufacturer.Foo% = \"Devices\"\n"
-		"[Strings]\n"
-		"Manufacturer.Foo = \"Hughski\"\n";
-	ret = as_inf_load_data (kf, data, 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "Hughski", NULL);
-	g_assert_cmpstr (tmp, ==, "Devices");
-	g_free (tmp);
-
-	/* key names with double quotes */
-	ret = as_inf_load_data (kf, "[\"Firmware\"]\nFoo=Bar\n", 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Firmware", "Foo", NULL);
-	g_assert_cmpstr (tmp, ==, "Bar");
-	g_free (tmp);
-
-	/* unbalanced quotes */
-	ret = as_inf_load_data (kf, "[Version]\nProvider = \"Hughski\n",
-			        AS_INF_LOAD_FLAG_STRICT, &error);
-	g_assert_error (error, AS_INF_ERROR, AS_INF_ERROR_FAILED);
-	g_assert (!ret);
-	g_clear_error (&error);
-	ret = as_inf_load_data (kf, "[Version]\nProvider = \"Hughski\n",
-			        AS_INF_LOAD_FLAG_NONE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "Provider", NULL);
-	g_assert_cmpstr (tmp, ==, "Hughski");
-	g_free (tmp);
-
-	/* missing string replacement */
-	ret = as_inf_load_data (kf, "[Version]\nProvider = \"%MISSING%\"\n",
-			        AS_INF_LOAD_FLAG_STRICT, &error);
-	g_assert_error (error, AS_INF_ERROR, AS_INF_ERROR_FAILED);
-	g_assert (!ret);
-	g_clear_error (&error);
-	ret = as_inf_load_data (kf, "[Version]\nProvider = \"%MISSING%\"\n",
-			        AS_INF_LOAD_FLAG_NONE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "Provider", NULL);
-	g_assert_cmpstr (tmp, ==, "%MISSING%");
-	g_free (tmp);
-
-	/* invalid UTF-8 */
-	ret = as_inf_load_data (kf, "[Version]\nProvider = Hughski \x99\n",
-			        AS_INF_LOAD_FLAG_STRICT, &error);
-	g_assert_error (error, AS_INF_ERROR, AS_INF_ERROR_FAILED);
-	g_assert (!ret);
-	g_clear_error (&error);
-	ret = as_inf_load_data (kf, "[Version]\nProvider = Hughski \x99\n",
-			        AS_INF_LOAD_FLAG_NONE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = g_key_file_get_string (kf, "Version", "Provider", NULL);
-	g_assert_cmpstr (tmp, ==, "Hughski ?");
-	g_free (tmp);
-
-	g_key_file_unref (kf);
-
-	/* parse file */
-	kf = g_key_file_new ();
-	filename = as_test_get_filename ("example.inf");
-	ret = as_inf_load_file (kf, filename, 0, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-
-	/* simple */
-	tmp = g_key_file_get_string (kf, "Version", "Class", NULL);
-	g_assert_cmpstr (tmp, ==, "Firmware");
-	g_free (tmp);
-
-	/* key replacement */
-	tmp = g_key_file_get_string (kf, "Firmware_CopyFiles", "value000", NULL);
-	g_assert_cmpstr (tmp, ==, "firmware.bin");
-	g_free (tmp);
-
-	/* double quotes swallowing */
-	tmp = g_key_file_get_string (kf, "Strings", "FirmwareDesc", NULL);
-	g_assert_cmpstr (tmp, ==, "ColorHug Firmware");
-	g_free (tmp);
-
-	/* string replacement */
-	tmp = g_key_file_get_string (kf, "Version", "Provider", NULL);
-	g_assert_cmpstr (tmp, ==, "Hughski");
-	g_free (tmp);
-
-	/* valid DriverVer */
-	ret = as_inf_load_data (kf, "[Version]\n"
-				    "DriverVer = \"03/01/2015,2.0.0\"\n",
-				AS_INF_LOAD_FLAG_NONE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = as_inf_get_driver_version (kf, &ts, &error);
-	g_assert_no_error (error);
-	g_assert_cmpstr (tmp, ==, "2.0.0");
-	g_assert_cmpint (ts, ==, 1425168000);
-	g_free (tmp);
-
-	/* invalid DriverVer date */
-	ret = as_inf_load_data (kf, "[Version]\n"
-				    "DriverVer = \"13/01/2015,2.0.0\"\n",
-				AS_INF_LOAD_FLAG_NONE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = as_inf_get_driver_version (kf, &ts, &error);
-	g_assert_error (error, AS_INF_ERROR, AS_INF_ERROR_INVALID_TYPE);
-	g_assert_cmpstr (tmp, ==, NULL);
-	g_clear_error (&error);
-
-	/* no DriverVer date */
-	ret = as_inf_load_data (kf, "[Version]\n"
-				    "DriverVer = \"2.0.0\"\n",
-				AS_INF_LOAD_FLAG_NONE, &error);
-	g_assert_no_error (error);
-	g_assert (ret);
-	tmp = as_inf_get_driver_version (kf, &ts, &error);
-	g_assert_error (error, AS_INF_ERROR, AS_INF_ERROR_INVALID_TYPE);
-	g_assert_cmpstr (tmp, ==, NULL);
-	g_clear_error (&error);
-
-	g_key_file_unref (kf);
-
-	/* test every .inf file from my Windows XP installation disk */
-	infs = as_test_get_filename ("infs");
-	if (infs != NULL) {
-		dir = g_dir_open (infs, 0, NULL);
-		while ((data = g_dir_read_name (dir)) != NULL) {
-			_cleanup_free_ gchar *path = NULL;
-			path = g_build_filename (infs, data, NULL);
-			kf = g_key_file_new ();
-			ret = as_inf_load_file (kf, path,
-						AS_INF_LOAD_FLAG_NONE,
-						&error);
-			if (g_error_matches (error,
-					     AS_INF_ERROR,
-					     AS_INF_ERROR_INVALID_TYPE)) {
-				g_clear_error (&error);
-			} else {
-				if (error != NULL)
-					g_print ("Failed to process: %s\n",
-						 path);
-				g_assert_no_error (error);
-				g_assert (ret);
-			}
-			g_key_file_unref (kf);
-		}
-	}
-}
-
-static void
 as_test_utils_install_filename_func (void)
 {
 	gboolean ret;
 	GError *error = NULL;
-	_cleanup_free_ gchar *filename1 = NULL;
-	_cleanup_free_ gchar *filename2 = NULL;
-	_cleanup_free_ gchar *filename3 = NULL;
-	_cleanup_free_ gchar *filename4 = NULL;
+	g_autofree gchar *filename1 = NULL;
+	g_autofree gchar *filename2 = NULL;
+	g_autofree gchar *filename3 = NULL;
+	g_autofree gchar *filename4 = NULL;
 
 	/* appdata to shared */
 	filename1 = as_test_get_filename ("broken.appdata.xml");
@@ -3725,6 +4870,366 @@ as_test_utils_install_filename_func (void)
 	g_assert (g_file_test ("/tmp/destdir/usr/share/app-info/icons/origin/64x64/org.gnome.Software.png", G_FILE_TEST_EXISTS));
 }
 
+static void
+as_test_utils_string_replace_func (void)
+{
+	guint i;
+	struct {
+		const gchar *str;
+		const gchar *search;
+		const gchar *replace;
+		const gchar *result;
+	} table[] = {
+		{ "",		"",		"",		"" },
+		{ "one",	"one",		"two",		"two" },
+		{ "one",	"one",		"1",		"1" },
+		{ "one",	"one",		"onlyme",	"onlyme" },
+		{ "we few ppl",	" few ",	"",		"weppl" },
+		{ "bee&",	"&",		"&amp;",	"bee&amp;" },
+		{ NULL,		NULL,		NULL,		NULL }
+	};
+	for (i = 0; table[i].str != NULL; i++) {
+		g_autoptr(GString) str = g_string_new (table[i].str);
+		as_utils_string_replace (str,
+					 table[i].search,
+					 table[i].replace);
+		g_assert_cmpstr (str->str, ==, table[i].result);
+	}
+}
+
+static void
+as_test_utils_locale_compat_func (void)
+{
+	/* empty */
+	g_assert (as_utils_locale_is_compatible (NULL, NULL));
+
+	/* same */
+	g_assert (as_utils_locale_is_compatible ("en_GB", "en_GB"));
+
+	/* forward and reverse compatible */
+	g_assert (as_utils_locale_is_compatible ("en_GB", "en"));
+	g_assert (as_utils_locale_is_compatible ("en", "en_GB"));
+
+	/* different language and locale */
+	g_assert (!as_utils_locale_is_compatible ("en_GB", "fr_FR"));
+
+	/* politics */
+	g_assert (!as_utils_locale_is_compatible ("zh_CN", "zh_TW"));
+
+	/* never going to match system locale or language */
+	g_assert (!as_utils_locale_is_compatible ("xx_XX", NULL));
+	g_assert (!as_utils_locale_is_compatible (NULL, "xx_XX"));
+}
+
+static void
+as_test_markup_import_html (void)
+{
+	const gchar *input;
+	g_autofree gchar *out_complex = NULL;
+	g_autofree gchar *out_list = NULL;
+	g_autofree gchar *out_simple = NULL;
+	g_autoptr(GError) error = NULL;
+	guint i;
+	struct {
+		const gchar *html;
+		const gchar *markup;
+	} table[] = {
+		{ "",					"" },
+		{ "dave",				"<p>dave</p>" },
+		{ "&trade;",				"<p>™</p>" },
+		{ "<p>paul</p>",			"<p>paul</p>" },
+		{ "<p>tim</p><p>baz</p>",		"<p>tim</p>\n<p>baz</p>" },
+		{ "<ul><li>1</li></ul>",		"<ul><li>1</li></ul>" },
+		{ "<ul><li>1</li><li>2</li></ul>",	"<ul><li>1</li><li>2</li></ul>" },
+		{ "<p>foo<i>awesome</i></p>",		"<p>fooawesome</p>" },
+		{ "a<img src=\"moo.png\">b",		"<p>ab</p>" },
+		{ "<h2>title</h2>content",		"<p>content</p>" },
+		{ "para1<br><br>para2",			"<p>para1</p>\n<p>para2</p>" },
+		{ "para1<h1>ignore</h1>para2",		"<p>para1</p>\n<p>para2</p>" },
+		{ NULL,				NULL}
+	};
+	for (i = 0; table[i].html != NULL; i++) {
+		g_autofree gchar *tmp = NULL;
+		g_autoptr(GError) error_local = NULL;
+		tmp = as_markup_import (table[i].html,
+					AS_MARKUP_CONVERT_FORMAT_HTML,
+					&error_local);
+		g_assert_no_error (error_local);
+		g_assert_cmpstr (tmp, ==, table[i].markup);
+	}
+
+	/* simple, from meta */
+	input = "This game is simply awesome&trade; in every way!";
+	out_simple = as_markup_import (input, AS_MARKUP_CONVERT_FORMAT_HTML, &error);
+	g_assert_no_error (error);
+	g_assert_cmpstr (out_simple, ==, "<p>This game is simply awesome™ in every way!</p>");
+
+	/* complex non-compliant HTML, from div */
+	input = "  <h1>header</h1>"
+		"  <p>First line of the <i>description</i> is okay...</p>"
+		"  <img src=\"moo.png\">"
+		"  <img src=\"png\">"
+		"  <p>Second <strong>line</strong> is <a href=\"#moo\">even</a> better!</p>";
+	out_complex = as_markup_import (input, AS_MARKUP_CONVERT_FORMAT_HTML, &error);
+	g_assert_no_error (error);
+	g_assert_cmpstr (out_complex, ==, "<p>First line of the description is okay...</p>\n"
+					  "<p>Second line is even better!</p>");
+
+	/* complex list */
+	input = "  <ul>"
+		"  <li>First line of the list</li>"
+		"  <li>Second line of the list</li>"
+		"  </ul>";
+	out_list = as_markup_import (input, AS_MARKUP_CONVERT_FORMAT_HTML, &error);
+	g_assert_no_error (error);
+	g_assert_cmpstr (out_list, ==, "<ul><li>First line of the list</li><li>Second line of the list</li></ul>");
+}
+
+static void
+as_test_utils_unique_id_func (void)
+{
+	const guint loops = 100000;
+	guint i;
+	gdouble duration_ns;
+	g_autoptr(GTimer) timer = g_timer_new ();
+
+	/* pathological cases */
+	g_assert (!as_utils_unique_id_equal ("foo", "bar"));
+	g_assert (!as_utils_unique_id_equal ("foo/bar/baz", "foo/bar"));
+
+	for (i = 0; i < loops; i++) {
+		g_assert (as_utils_unique_id_equal ("aa/bb/cc/dd/ee/ff",
+						    "aa/bb/cc/dd/ee/ff"));
+		g_assert (as_utils_unique_id_equal ("aa/bb/cc/dd/ee/ff",
+						    "aa/*/cc/dd/ee/ff"));
+		g_assert (as_utils_unique_id_equal ("user/flatpak/utopia/desktop/gimp.desktop/master",
+						    "*/*/*/*/*/*"));
+		g_assert (!as_utils_unique_id_equal ("zz/zz/zz/zz/zz/zz",
+						     "aa/bb/cc/dd/ee/ff"));
+		g_assert (!as_utils_unique_id_equal ("user/*/*/shell-extension/gmail_notify@jablona123.pl.shell-extension/*",
+						     "*/*/*/desktop/org.gnome.accerciser.desktop/*"));
+	}
+	duration_ns = g_timer_elapsed (timer, NULL) * 1000000000.f;
+	g_print ("%.0f ns: ", duration_ns / (loops * 4));
+}
+
+static void
+as_test_store_merge_func (void)
+{
+	g_autoptr (AsApp) app1 = NULL;
+	g_autoptr (AsApp) app2 = NULL;
+	g_autoptr (AsApp) app_merge = NULL;
+	g_autoptr (AsStore) store = NULL;
+	g_autoptr (AsFormat) format = NULL;
+
+	store = as_store_new ();
+	as_store_set_add_flags (store,
+				AS_STORE_ADD_FLAG_USE_UNIQUE_ID |
+				AS_STORE_ADD_FLAG_USE_MERGE_HEURISTIC);
+
+	/* add app */
+	app1 = as_app_new ();
+	as_app_set_id (app1, "org.gnome.Software.desktop");
+	as_app_set_branch (app1, "master");
+	_as_app_add_format_kind (app1, AS_FORMAT_KIND_APPDATA);
+	as_app_add_pkgname (app1, "gnome-software");
+	g_assert_cmpstr (as_app_get_unique_id (app1), ==,
+			 "*/package/*/*/org.gnome.Software.desktop/master");
+	as_store_add_app (store, app1);
+
+	/* add merge component */
+	app_merge = as_app_new ();
+	as_app_set_kind (app_merge, AS_APP_KIND_DESKTOP);
+	as_app_set_id (app_merge, "org.gnome.Software.desktop");
+	_as_app_add_format_kind (app_merge, AS_FORMAT_KIND_APPSTREAM);
+	as_app_set_origin (app_merge, "utopia");
+	as_app_set_scope (app_merge, AS_APP_SCOPE_USER);
+	as_app_add_category (app_merge, "special");
+	format = as_format_new ();
+	as_format_set_filename (format, "DO-NOT-SUBSUME.xml");
+	as_app_add_format (app_merge, format);
+	as_store_add_app (store, app_merge);
+	g_assert_cmpstr (as_app_get_unique_id (app_merge), ==,
+			 "*/*/*/desktop/org.gnome.Software.desktop/*");
+
+	/* add app */
+	app2 = as_app_new ();
+	as_app_set_id (app2, "org.gnome.Software.desktop");
+	as_app_set_branch (app2, "stable");
+	_as_app_add_format_kind (app2, AS_FORMAT_KIND_APPSTREAM);
+	as_app_add_pkgname (app2, "gnome-software");
+	g_assert_cmpstr (as_app_get_unique_id (app2), ==,
+			 "*/package/*/*/org.gnome.Software.desktop/stable");
+	as_store_add_app (store, app2);
+
+	/* verify that both apps have the category */
+	g_assert (as_app_has_category (app1, "special"));
+	g_assert (as_app_has_category (app2, "special"));
+
+	/* verify we didn't inherit the private bits */
+	g_assert (as_app_get_format_by_kind (app1, AS_FORMAT_KIND_UNKNOWN) == NULL);
+	g_assert (as_app_get_format_by_kind (app2, AS_FORMAT_KIND_UNKNOWN) == NULL);
+}
+
+static void
+as_test_store_merge_replace_func (void)
+{
+	g_autoptr (AsApp) app1 = NULL;
+	g_autoptr (AsApp) app2 = NULL;
+	g_autoptr (AsApp) app_merge = NULL;
+	g_autoptr (AsStore) store = NULL;
+
+	store = as_store_new ();
+	as_store_set_add_flags (store, AS_STORE_ADD_FLAG_USE_UNIQUE_ID);
+
+	/* add app */
+	app1 = as_app_new ();
+	as_app_set_id (app1, "org.gnome.Software.desktop");
+	as_app_set_branch (app1, "master");
+	_as_app_add_format_kind (app1, AS_FORMAT_KIND_APPDATA);
+	as_app_add_pkgname (app1, "gnome-software");
+	as_app_add_category (app1, "Family");
+	as_store_add_app (store, app1);
+
+	/* add merge component */
+	app_merge = as_app_new ();
+	as_app_set_kind (app_merge, AS_APP_KIND_DESKTOP);
+	as_app_set_id (app_merge, "org.gnome.Software.desktop");
+	_as_app_add_format_kind (app_merge, AS_FORMAT_KIND_APPSTREAM);
+	as_app_set_origin (app_merge, "utopia");
+	as_app_set_scope (app_merge, AS_APP_SCOPE_USER);
+	as_app_set_merge_kind (app_merge, AS_APP_MERGE_KIND_REPLACE);
+	as_app_add_category (app_merge, "Horror");
+	as_store_add_app (store, app_merge);
+	g_assert_cmpstr (as_app_get_unique_id (app_merge), ==,
+			 "*/*/*/desktop/org.gnome.Software.desktop/*");
+
+	/* add app */
+	app2 = as_app_new ();
+	as_app_set_id (app2, "org.gnome.Software.desktop");
+	as_app_set_branch (app2, "stable");
+	_as_app_add_format_kind (app2, AS_FORMAT_KIND_APPSTREAM);
+	as_app_add_pkgname (app2, "gnome-software");
+	as_app_add_category (app2, "Family");
+	as_store_add_app (store, app2);
+
+	/* verify that both apps have the category */
+	g_assert (as_app_has_category (app1, "Horror"));
+	g_assert (as_app_has_category (app2, "Horror"));
+
+	/* verify we replaced rather than appended */
+	g_assert (!as_app_has_category (app1, "Family"));
+	g_assert (!as_app_has_category (app2, "Family"));
+}
+
+/* shows the unique-id globbing functions at work */
+static void
+as_test_utils_unique_id_hash_func (void)
+{
+	AsApp *found;
+	g_autoptr(AsApp) app1 = NULL;
+	g_autoptr(AsApp) app2 = NULL;
+	g_autoptr(GHashTable) hash = NULL;
+
+	/* create new couple of apps */
+	app1 = as_app_new ();
+	as_app_set_id (app1, "org.gnome.Software.desktop");
+	as_app_set_branch (app1, "master");
+	g_assert_cmpstr (as_app_get_unique_id (app1), ==,
+			 "*/*/*/*/org.gnome.Software.desktop/master");
+	app2 = as_app_new ();
+	as_app_set_id (app2, "org.gnome.Software.desktop");
+	as_app_set_branch (app2, "stable");
+	g_assert_cmpstr (as_app_get_unique_id (app2), ==,
+			 "*/*/*/*/org.gnome.Software.desktop/stable");
+
+	/* add to hash table using the unique ID as a key */
+	hash = g_hash_table_new ((GHashFunc) as_utils_unique_id_hash,
+				 (GEqualFunc) as_utils_unique_id_equal);
+	g_hash_table_insert (hash, (gpointer) as_app_get_unique_id (app1), app1);
+	g_hash_table_insert (hash, (gpointer) as_app_get_unique_id (app2), app2);
+
+	/* get with exact key */
+	found = g_hash_table_lookup (hash, "*/*/*/*/org.gnome.Software.desktop/master");
+	g_assert (found != NULL);
+	found = g_hash_table_lookup (hash, "*/*/*/*/org.gnome.Software.desktop/stable");
+	g_assert (found != NULL);
+
+	/* get with more details specified */
+	found = g_hash_table_lookup (hash, "system/*/*/*/org.gnome.Software.desktop/master");
+	g_assert (found != NULL);
+	found = g_hash_table_lookup (hash, "system/*/*/*/org.gnome.Software.desktop/stable");
+	g_assert (found != NULL);
+
+	/* get with less details specified */
+	found = g_hash_table_lookup (hash, "*/*/*/*/org.gnome.Software.desktop/*");
+	g_assert (found != NULL);
+
+	/* different key */
+	found = g_hash_table_lookup (hash, "*/*/*/*/gimp.desktop/*");
+	g_assert (found == NULL);
+
+	/* different branch */
+	found = g_hash_table_lookup (hash, "*/*/*/*/org.gnome.Software.desktop/obsolete");
+	g_assert (found == NULL);
+
+	/* check hash function */
+	g_assert_cmpint (as_utils_unique_id_hash ("*/*/*/*/gimp.desktop/master"), ==,
+			 as_utils_unique_id_hash ("system/*/*/*/gimp.desktop/stable"));
+}
+
+/* shows the as_utils_unique_id_*_safe functions are safe with bare text */
+static void
+as_test_utils_unique_id_hash_safe_func (void)
+{
+	AsApp *found;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GHashTable) hash = NULL;
+
+	/* create new app */
+	app = as_app_new ();
+	as_app_set_id (app, "org.gnome.Software.desktop");
+
+	/* add to hash table using the unique ID as a key */
+	hash = g_hash_table_new ((GHashFunc) as_utils_unique_id_hash,
+				 (GEqualFunc) as_utils_unique_id_equal);
+	g_hash_table_insert (hash, "dave", app);
+
+	/* get with exact key */
+	found = g_hash_table_lookup (hash, "dave");
+	g_assert (found != NULL);
+
+	/* different key */
+	found = g_hash_table_lookup (hash, "frank");
+	g_assert (found == NULL);
+}
+
+static void
+as_test_ref_string_func (void)
+{
+	const gchar *tmp;
+	AsRefString *rstr;
+	AsRefString *rstr2;
+
+	/* basic refcounting */
+	rstr = as_ref_string_new ("test");
+	g_assert (rstr != NULL);
+	g_assert_cmpstr (rstr, ==, "test");
+	g_assert (as_ref_string_ref (rstr) != NULL);
+	g_assert (as_ref_string_unref (rstr) != NULL);
+	g_assert (as_ref_string_unref (rstr) == NULL);
+
+	/* adopting const string */
+	tmp = "test";
+	rstr = as_ref_string_new (tmp);
+	g_assert_cmpstr (rstr, ==, tmp);
+	rstr2 = as_ref_string_new (rstr);
+	g_assert_cmpstr (rstr2, ==, tmp);
+	g_assert (rstr == rstr2);
+	g_assert (as_ref_string_unref (rstr) != NULL);
+	g_assert (as_ref_string_unref (rstr2) == NULL);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -3734,19 +5239,35 @@ main (int argc, char **argv)
 	g_log_set_fatal_mask (NULL, G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
 	/* tests go here */
+	g_test_add_func ("/AppStream/ref-string", as_test_ref_string_func);
+	g_test_add_func ("/AppStream/utils{unique_id-hash}", as_test_utils_unique_id_hash_func);
+	g_test_add_func ("/AppStream/utils{unique_id-hash2}", as_test_utils_unique_id_hash_safe_func);
+	g_test_add_func ("/AppStream/utils{unique_id}", as_test_utils_unique_id_func);
+	g_test_add_func ("/AppStream/utils{locale-compat}", as_test_utils_locale_compat_func);
+	g_test_add_func ("/AppStream/utils{string-replace}", as_test_utils_string_replace_func);
 	g_test_add_func ("/AppStream/tag", as_test_tag_func);
 	g_test_add_func ("/AppStream/provide", as_test_provide_func);
+	g_test_add_func ("/AppStream/require", as_test_require_func);
+	g_test_add_func ("/AppStream/checksum", as_test_checksum_func);
+	g_test_add_func ("/AppStream/content_rating", as_test_content_rating_func);
 	g_test_add_func ("/AppStream/release", as_test_release_func);
+	g_test_add_func ("/AppStream/release{date}", as_test_release_date_func);
 	g_test_add_func ("/AppStream/release{appdata}", as_test_release_appdata_func);
 	g_test_add_func ("/AppStream/release{appstream}", as_test_release_appstream_func);
 	g_test_add_func ("/AppStream/icon", as_test_icon_func);
 	g_test_add_func ("/AppStream/icon{embedded}", as_test_icon_embedded_func);
 	g_test_add_func ("/AppStream/bundle", as_test_bundle_func);
+	g_test_add_func ("/AppStream/review", as_test_review_func);
+	g_test_add_func ("/AppStream/translation", as_test_translation_func);
+	g_test_add_func ("/AppStream/suggest", as_test_suggest_func);
 	g_test_add_func ("/AppStream/image", as_test_image_func);
 	g_test_add_func ("/AppStream/image{resize}", as_test_image_resize_func);
 	g_test_add_func ("/AppStream/image{alpha}", as_test_image_alpha_func);
 	g_test_add_func ("/AppStream/screenshot", as_test_screenshot_func);
 	g_test_add_func ("/AppStream/app", as_test_app_func);
+	g_test_add_func ("/AppStream/app{builder:gettext}", as_test_app_builder_gettext_func);
+	g_test_add_func ("/AppStream/app{builder:gettext-nodomain}", as_test_app_builder_gettext_nodomain_func);
+	g_test_add_func ("/AppStream/app{builder:qt}", as_test_app_builder_qt_func);
 	g_test_add_func ("/AppStream/app{translated}", as_test_app_translated_func);
 	g_test_add_func ("/AppStream/app{validate-style}", as_test_app_validate_style_func);
 	g_test_add_func ("/AppStream/app{validate-appdata-good}", as_test_app_validate_appdata_good_func);
@@ -3755,11 +5276,10 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/app{validate-meta-bad}", as_test_app_validate_meta_bad_func);
 	g_test_add_func ("/AppStream/app{validate-intltool}", as_test_app_validate_intltool_func);
 	g_test_add_func ("/AppStream/app{parse-file:desktop}", as_test_app_parse_file_desktop_func);
-	g_test_add_func ("/AppStream/app{parse-file:inf}", as_test_app_parse_file_inf_func);
 	g_test_add_func ("/AppStream/app{no-markup}", as_test_app_no_markup_func);
 	g_test_add_func ("/AppStream/app{subsume}", as_test_app_subsume_func);
 	g_test_add_func ("/AppStream/app{search}", as_test_app_search_func);
-	g_test_add_func ("/AppStream/inf", as_test_inf_func);
+	g_test_add_func ("/AppStream/markup{import-html}", as_test_markup_import_html);
 	g_test_add_func ("/AppStream/node", as_test_node_func);
 	g_test_add_func ("/AppStream/node{reflow}", as_test_node_reflow_text_func);
 	g_test_add_func ("/AppStream/node{xml}", as_test_node_xml_func);
@@ -3771,28 +5291,48 @@ main (int argc, char **argv)
 	g_test_add_func ("/AppStream/node{intltool}", as_test_node_intltool_func);
 	g_test_add_func ("/AppStream/node{sort}", as_test_node_sort_func);
 	g_test_add_func ("/AppStream/utils", as_test_utils_func);
-	g_test_add_func ("/AppStream/utils{overlap}", as_test_utils_overlap_func);
+	g_test_add_func ("/AppStream/utils{markup-import}", as_test_utils_markup_import_func);
+	g_test_add_func ("/AppStream/utils{version}", as_test_utils_version_func);
+	g_test_add_func ("/AppStream/utils{guid}", as_test_utils_guid_func);
+	g_test_add_func ("/AppStream/utils{appstream-id}", as_test_utils_appstream_id_func);
 	g_test_add_func ("/AppStream/utils{icons}", as_test_utils_icons_func);
 	g_test_add_func ("/AppStream/utils{spdx-token}", as_test_utils_spdx_token_func);
 	g_test_add_func ("/AppStream/utils{install-filename}", as_test_utils_install_filename_func);
 	g_test_add_func ("/AppStream/utils{vercmp}", as_test_utils_vercmp_func);
+	if (g_test_slow ()) {
+		g_test_add_func ("/AppStream/monitor{dir}", as_test_monitor_dir_func);
+		g_test_add_func ("/AppStream/monitor{file}", as_test_monitor_file_func);
+	}
 	g_test_add_func ("/AppStream/yaml", as_test_yaml_func);
+	g_test_add_func ("/AppStream/yaml{broken}", as_test_yaml_broken_func);
 	g_test_add_func ("/AppStream/store", as_test_store_func);
+	g_test_add_func ("/AppStream/store{unique}", as_test_store_unique_func);
+	g_test_add_func ("/AppStream/store{merge}", as_test_store_merge_func);
+	g_test_add_func ("/AppStream/store{merge-replace}", as_test_store_merge_replace_func);
+	g_test_add_func ("/AppStream/store{empty}", as_test_store_empty_func);
+	if (g_test_slow ()) {
+		g_test_add_func ("/AppStream/store{auto-reload-dir}", as_test_store_auto_reload_dir_func);
+		g_test_add_func ("/AppStream/store{auto-reload-file}", as_test_store_auto_reload_file_func);
+	}
+	g_test_add_func ("/AppStream/store{flatpak}", as_test_store_flatpak_func);
+	g_test_add_func ("/AppStream/store{prefix}", as_test_store_prefix_func);
+	g_test_add_func ("/AppStream/store{wildcard}", as_test_store_wildcard_func);
 	g_test_add_func ("/AppStream/store{demote}", as_test_store_demote_func);
+	g_test_add_func ("/AppStream/store{cab}", as_test_store_cab_func);
 	g_test_add_func ("/AppStream/store{merges}", as_test_store_merges_func);
 	g_test_add_func ("/AppStream/store{merges-local}", as_test_store_merges_local_func);
 	g_test_add_func ("/AppStream/store{addons}", as_test_store_addons_func);
 	g_test_add_func ("/AppStream/store{versions}", as_test_store_versions_func);
 	g_test_add_func ("/AppStream/store{origin}", as_test_store_origin_func);
-	g_test_add_func ("/AppStream/store{app-install}", as_test_store_app_install_func);
 	g_test_add_func ("/AppStream/store{yaml}", as_test_store_yaml_func);
 	g_test_add_func ("/AppStream/store{metadata}", as_test_store_metadata_func);
 	g_test_add_func ("/AppStream/store{metadata-index}", as_test_store_metadata_index_func);
 	g_test_add_func ("/AppStream/store{validate}", as_test_store_validate_func);
 	g_test_add_func ("/AppStream/store{embedded}", as_test_store_embedded_func);
-	g_test_add_func ("/AppStream/store{local-app-install}", as_test_store_local_app_install_func);
+	g_test_add_func ("/AppStream/store{provides}", as_test_store_provides_func);
 	g_test_add_func ("/AppStream/store{local-appdata}", as_test_store_local_appdata_func);
 	g_test_add_func ("/AppStream/store{speed-appstream}", as_test_store_speed_appstream_func);
+	g_test_add_func ("/AppStream/store{speed-search}", as_test_store_speed_search_func);
 	g_test_add_func ("/AppStream/store{speed-appdata}", as_test_store_speed_appdata_func);
 	g_test_add_func ("/AppStream/store{speed-desktop}", as_test_store_speed_desktop_func);
 	g_test_add_func ("/AppStream/store{speed-yaml}", as_test_store_speed_yaml_func);

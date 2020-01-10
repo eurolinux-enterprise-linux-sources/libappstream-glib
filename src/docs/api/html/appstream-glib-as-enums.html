@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>AppStream-glib Reference Manual: as-enums</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>as-enums: AppStream-glib Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="AppStream-glib Reference Manual">
 <link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
 <link rel="prev" href="AsProblem.html" title="AsProblem">
 <link rel="next" href="appstream-glib-as-node.html" title="as-node">
-<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -43,29 +43,44 @@ justifications.
 </div>
 <div class="refsect1">
 <a name="appstream-glib-as-enums.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
 </colgroup>
 <tbody>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
-<a class="link" href="appstream-glib-as-enums.html#as-id-kind-to-string" title="as_id_kind_to_string ()">as_id_kind_to_string</a> <span class="c_punctuation">()</span>
+<a class="link" href="appstream-glib-as-enums.html#as-size-kind-to-string" title="as_size_kind_to_string ()">as_size_kind_to_string</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
 <td class="function_type">
-<a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="returnvalue">AsIdKind</span></a>
+<a class="link" href="appstream-glib-as-enums.html#AsSizeKind" title="enum AsSizeKind"><span class="returnvalue">AsSizeKind</span></a>
 </td>
 <td class="function_name">
-<a class="link" href="appstream-glib-as-enums.html#as-id-kind-from-string" title="as_id_kind_from_string ()">as_id_kind_from_string</a> <span class="c_punctuation">()</span>
+<a class="link" href="appstream-glib-as-enums.html#as-size-kind-from-string" title="as_size_kind_from_string ()">as_size_kind_from_string</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-enums.html#as-urgency-kind-to-string" title="as_urgency_kind_to_string ()">as_urgency_kind_to_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="appstream-glib-as-enums.html#AsUrgencyKind" title="enum AsUrgencyKind"><span class="returnvalue">AsUrgencyKind</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-enums.html#as-urgency-kind-from-string" title="as_urgency_kind_from_string ()">as_urgency_kind_from_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="appstream-glib-as-enums.html#as-url-kind-to-string" title="as_url_kind_to_string ()">as_url_kind_to_string</a> <span class="c_punctuation">()</span>
@@ -80,7 +95,7 @@ justifications.
 </td>
 </tr>
 <tr>
-<td class="function_type">const <span class="returnvalue">gchar</span> *
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="appstream-glib-as-enums.html#as-kudo-kind-to-string" title="as_kudo_kind_to_string ()">as_kudo_kind_to_string</a> <span class="c_punctuation">()</span>
@@ -94,12 +109,27 @@ justifications.
 <a class="link" href="appstream-glib-as-enums.html#as-kudo-kind-from-string" title="as_kudo_kind_from_string ()">as_kudo_kind_from_string</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
+<tr>
+<td class="function_type">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-enums.html#as-id-kind-to-string" title="as_id_kind_to_string ()">as_id_kind_to_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">AsIdKind</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-enums.html#as-id-kind-from-string" title="as_id_kind_from_string ()">as_id_kind_from_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect1">
 <a name="appstream-glib-as-enums.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
@@ -107,15 +137,19 @@ justifications.
 <tbody>
 <tr>
 <td class="datatype_keyword">enum</td>
-<td class="function_name"><a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind">AsIdKind</a></td>
-</tr>
-<tr>
-<td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="appstream-glib-as-enums.html#AsUrlKind" title="enum AsUrlKind">AsUrlKind</a></td>
 </tr>
 <tr>
 <td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="appstream-glib-as-enums.html#AsKudoKind" title="enum AsKudoKind">AsKudoKind</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-enums.html#AsUrgencyKind" title="enum AsUrgencyKind">AsUrgencyKind</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-enums.html#AsSizeKind" title="enum AsSizeKind">AsSizeKind</a></td>
 </tr>
 </tbody>
 </table></div>
@@ -132,70 +166,123 @@ justifications.
 <div class="refsect1">
 <a name="appstream-glib-as-enums.functions_details"></a><h2>Functions</h2>
 <div class="refsect2">
-<a name="as-id-kind-to-string"></a><h3>as_id_kind_to_string ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
-as_id_kind_to_string (<em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a> id_kind</code></em>);</pre>
+<a name="as-size-kind-to-string"></a><h3>as_size_kind_to_string ()</h3>
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_size_kind_to_string (<em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsSizeKind" title="enum AsSizeKind"><span class="type">AsSizeKind</span></a> size_kind</code></em>);</pre>
 <p>Converts the enumerated value to an text representation.</p>
 <div class="refsect3">
-<a name="id-1.2.11.8.2.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-size-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
 <tbody><tr>
-<td class="parameter_name"><p>id_kind</p></td>
-<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a>.</p></td>
+<td class="parameter_name"><p>size_kind</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-enums.html#AsSizeKind" title="enum AsSizeKind"><span class="type">AsSizeKind</span></a>.</p></td>
 <td class="parameter_annotations"> </td>
 </tr></tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.11.8.2.6"></a><h4>Returns</h4>
-<p> string version of <em class="parameter"><code>id_kind</code></em>
+<a name="as-size-kind-to-string.returns"></a><h4>Returns</h4>
+<p> string version of <em class="parameter"><code>size_kind</code></em>
 </p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.5.2</p>
 </div>
 <hr>
 <div class="refsect2">
-<a name="as-id-kind-from-string"></a><h3>as_id_kind_from_string ()</h3>
-<pre class="programlisting"><a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="returnvalue">AsIdKind</span></a>
-as_id_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *id_kind</code></em>);</pre>
+<a name="as-size-kind-from-string"></a><h3>as_size_kind_from_string ()</h3>
+<pre class="programlisting"><a class="link" href="appstream-glib-as-enums.html#AsSizeKind" title="enum AsSizeKind"><span class="returnvalue">AsSizeKind</span></a>
+as_size_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *size_kind</code></em>);</pre>
 <p>Converts the text representation to an enumerated value.</p>
 <div class="refsect3">
-<a name="id-1.2.11.8.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-size-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
 <tbody><tr>
-<td class="parameter_name"><p>id_kind</p></td>
+<td class="parameter_name"><p>size_kind</p></td>
 <td class="parameter_description"><p>the string.</p></td>
 <td class="parameter_annotations"> </td>
 </tr></tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.11.8.3.6"></a><h4>Returns</h4>
-<p> a <a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a> or <a class="link" href="appstream-glib-as-enums.html#AS-ID-KIND-UNKNOWN:CAPS"><code class="literal">AS_ID_KIND_UNKNOWN</code></a> for unknown</p>
-<p></p>
+<a name="as-size-kind-from-string.returns"></a><h4>Returns</h4>
+<p> a <a class="link" href="appstream-glib-as-enums.html#AsSizeKind" title="enum AsSizeKind"><span class="type">AsSizeKind</span></a> or <a class="link" href="appstream-glib-as-enums.html#AS-SIZE-KIND-UNKNOWN:CAPS"><code class="literal">AS_SIZE_KIND_UNKNOWN</code></a> for unknown</p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.5.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-urgency-kind-to-string"></a><h3>as_urgency_kind_to_string ()</h3>
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_urgency_kind_to_string (<em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsUrgencyKind" title="enum AsUrgencyKind"><span class="type">AsUrgencyKind</span></a> urgency_kind</code></em>);</pre>
+<p>Converts the enumerated value to an text representation.</p>
+<div class="refsect3">
+<a name="as-urgency-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>urgency_kind</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-enums.html#AsUrgencyKind" title="enum AsUrgencyKind"><span class="type">AsUrgencyKind</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-urgency-kind-to-string.returns"></a><h4>Returns</h4>
+<p> string version of <em class="parameter"><code>urgency_kind</code></em>
+</p>
+</div>
+<p class="since">Since: 0.5.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-urgency-kind-from-string"></a><h3>as_urgency_kind_from_string ()</h3>
+<pre class="programlisting"><a class="link" href="appstream-glib-as-enums.html#AsUrgencyKind" title="enum AsUrgencyKind"><span class="returnvalue">AsUrgencyKind</span></a>
+as_urgency_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *urgency_kind</code></em>);</pre>
+<p>Converts the text representation to an enumerated value.</p>
+<div class="refsect3">
+<a name="as-urgency-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>urgency_kind</p></td>
+<td class="parameter_description"><p>the string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-urgency-kind-from-string.returns"></a><h4>Returns</h4>
+<p> a <a class="link" href="appstream-glib-as-enums.html#AsUrgencyKind" title="enum AsUrgencyKind"><span class="type">AsUrgencyKind</span></a> or <a class="link" href="appstream-glib-as-enums.html#AS-URGENCY-KIND-UNKNOWN:CAPS"><code class="literal">AS_URGENCY_KIND_UNKNOWN</code></a> for unknown</p>
+</div>
+<p class="since">Since: 0.5.1</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-url-kind-to-string"></a><h3>as_url_kind_to_string ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_url_kind_to_string (<em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsUrlKind" title="enum AsUrlKind"><span class="type">AsUrlKind</span></a> url_kind</code></em>);</pre>
 <p>Converts the enumerated value to an text representation.</p>
 <div class="refsect3">
-<a name="id-1.2.11.8.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-url-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -210,22 +297,21 @@ as_url_kind_to_string (<em class="parameter"><code><a class="link" href="appstre
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.11.8.4.6"></a><h4>Returns</h4>
+<a name="as-url-kind-to-string.returns"></a><h4>Returns</h4>
 <p> string version of <em class="parameter"><code>url_kind</code></em>
 </p>
-<p></p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-url-kind-from-string"></a><h3>as_url_kind_from_string ()</h3>
 <pre class="programlisting"><a class="link" href="appstream-glib-as-enums.html#AsUrlKind" title="enum AsUrlKind"><span class="returnvalue">AsUrlKind</span></a>
-as_url_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *url_kind</code></em>);</pre>
+as_url_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *url_kind</code></em>);</pre>
 <p>Converts the text representation to an enumerated value.</p>
 <div class="refsect3">
-<a name="id-1.2.11.8.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-url-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -239,21 +325,20 @@ as_url_kind_from_string (<em class="parameter"><code>const <span class="type">gc
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.11.8.5.6"></a><h4>Returns</h4>
-<p> a <a class="link" href="appstream-glib-as-enums.html#AsUrlKind" title="enum AsUrlKind"><span class="type">AsUrlKind</span></a> or <a class="link" href="appstream-glib-as-enums.html#AS-URL-KIND-UNKNOWN:CAPS"><code class="literal">AS_URL_KIND_UNKNOWN</code></a> for unknown</p>
-<p></p>
+<a name="as-url-kind-from-string.returns"></a><h4>Returns</h4>
+<p> a <a class="link" href="appstream-glib-as-enums.html#AsUrlKind" title="enum AsUrlKind"><span class="type">AsUrlKind</span></a> or <code class="literal">AS_URL_KIND_UNKNOWN</code> for unknown</p>
 </div>
-<p class="since">Since 0.1.0</p>
+<p class="since">Since: 0.1.0</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-kudo-kind-to-string"></a><h3>as_kudo_kind_to_string ()</h3>
-<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 as_kudo_kind_to_string (<em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsKudoKind" title="enum AsKudoKind"><span class="type">AsKudoKind</span></a> kudo_kind</code></em>);</pre>
 <p>Converts the enumerated value to an text representation.</p>
 <div class="refsect3">
-<a name="id-1.2.11.8.6.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-kudo-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -268,22 +353,21 @@ as_kudo_kind_to_string (<em class="parameter"><code><a class="link" href="appstr
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.11.8.6.6"></a><h4>Returns</h4>
+<a name="as-kudo-kind-to-string.returns"></a><h4>Returns</h4>
 <p> string version of <em class="parameter"><code>kudo_kind</code></em>
 </p>
-<p></p>
 </div>
-<p class="since">Since 0.2.2</p>
+<p class="since">Since: 0.2.2</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="as-kudo-kind-from-string"></a><h3>as_kudo_kind_from_string ()</h3>
 <pre class="programlisting"><a class="link" href="appstream-glib-as-enums.html#AsKudoKind" title="enum AsKudoKind"><span class="returnvalue">AsKudoKind</span></a>
-as_kudo_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *kudo_kind</code></em>);</pre>
+as_kudo_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *kudo_kind</code></em>);</pre>
 <p>Converts the text representation to an enumerated value.</p>
 <div class="refsect3">
-<a name="id-1.2.11.8.7.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="as-kudo-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -297,21 +381,77 @@ as_kudo_kind_from_string (<em class="parameter"><code>const <span class="type">g
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.11.8.7.6"></a><h4>Returns</h4>
+<a name="as-kudo-kind-from-string.returns"></a><h4>Returns</h4>
 <p> a <a class="link" href="appstream-glib-as-enums.html#AsKudoKind" title="enum AsKudoKind"><span class="type">AsKudoKind</span></a> or <a class="link" href="appstream-glib-as-enums.html#AS-KUDO-KIND-UNKNOWN:CAPS"><code class="literal">AS_KUDO_KIND_UNKNOWN</code></a> for unknown</p>
-<p></p>
 </div>
-<p class="since">Since 0.2.2</p>
+<p class="since">Since: 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-id-kind-to-string"></a><h3>as_id_kind_to_string ()</h3>
+<pre class="programlisting">const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+as_id_kind_to_string (<em class="parameter"><code><span class="type">AsIdKind</span> id_kind</code></em>);</pre>
+<div class="warning"><p><code class="literal">as_id_kind_to_string</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Converts the enumerated value to an text representation.</p>
+<div class="refsect3">
+<a name="as-id-kind-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>id_kind</p></td>
+<td class="parameter_description"><p>the <span class="type">AsIdKind</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-id-kind-to-string.returns"></a><h4>Returns</h4>
+<p> string version of <em class="parameter"><code>id_kind</code></em>
+</p>
+</div>
+<p class="since">Since: 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-id-kind-from-string"></a><h3>as_id_kind_from_string ()</h3>
+<pre class="programlisting"><span class="returnvalue">AsIdKind</span>
+as_id_kind_from_string (<em class="parameter"><code>const <a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *id_kind</code></em>);</pre>
+<div class="warning"><p><code class="literal">as_id_kind_from_string</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Converts the text representation to an enumerated value.</p>
+<div class="refsect3">
+<a name="as-id-kind-from-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>id_kind</p></td>
+<td class="parameter_description"><p>the string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="as-id-kind-from-string.returns"></a><h4>Returns</h4>
+<p> a <span class="type">AsIdKind</span> or <a class="link" href="appstream-glib-as-enums.html#AS-ID-KIND-UNKNOWN:CAPS"><code class="literal">AS_ID_KIND_UNKNOWN</code></a> for unknown</p>
+</div>
+<p class="since">Since: 0.1.0</p>
 </div>
 </div>
 <div class="refsect1">
 <a name="appstream-glib-as-enums.other_details"></a><h2>Types and Values</h2>
 <div class="refsect2">
-<a name="AsIdKind"></a><h3>enum AsIdKind</h3>
-<p>The ID type.</p>
+<a name="AsUrlKind"></a><h3>enum AsUrlKind</h3>
+<p>The URL type.</p>
 <div class="refsect3">
-<a name="id-1.2.11.9.2.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsUrlKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -320,132 +460,58 @@ as_kudo_kind_from_string (<em class="parameter"><code>const <span class="type">g
 <tbody>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-UNKNOWN:CAPS"></a>AS_ID_KIND_UNKNOWN</p></td>
-<td class="enum_member_description">
-<p>Type invalid or not known</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-DESKTOP:CAPS"></a>AS_ID_KIND_DESKTOP</p></td>
-<td class="enum_member_description">
-<p>A desktop application</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-FONT:CAPS"></a>AS_ID_KIND_FONT</p></td>
-<td class="enum_member_description">
-<p>A font add-on</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-CODEC:CAPS"></a>AS_ID_KIND_CODEC</p></td>
-<td class="enum_member_description">
-<p>A codec add-on</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-INPUT-METHOD:CAPS"></a>AS_ID_KIND_INPUT_METHOD</p></td>
-<td class="enum_member_description">
-<p>A input method add-on</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-WEB-APP:CAPS"></a>AS_ID_KIND_WEB_APP</p></td>
-<td class="enum_member_description">
-<p>A web appication</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-SOURCE:CAPS"></a>AS_ID_KIND_SOURCE</p></td>
-<td class="enum_member_description">
-<p>A software source</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-ADDON:CAPS"></a>AS_ID_KIND_ADDON</p></td>
-<td class="enum_member_description">
-<p>An addon, e.g. a plugin</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="AS-ID-KIND-FIRMWARE:CAPS"></a>AS_ID_KIND_FIRMWARE</p></td>
-<td class="enum_member_description">
-<p>A firmware update</p>
-</td>
-<td class="enum_member_annotations"> </td>
-</tr>
-</tbody>
-</table></div>
-</div>
-</div>
-<hr>
-<div class="refsect2">
-<a name="AsUrlKind"></a><h3>enum AsUrlKind</h3>
-<p>The URL type.</p>
-<div class="refsect3">
-<a name="id-1.2.11.9.3.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
-<colgroup>
-<col width="300px" class="enum_members_name">
-<col class="enum_members_description">
-<col width="200px" class="enum_members_annotations">
-</colgroup>
-<tbody>
-<tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-UNKNOWN:CAPS"></a>AS_URL_KIND_UNKNOWN</p></td>
-<td class="enum_member_description">
-<p>Type invalid or not known</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-HOMEPAGE:CAPS"></a>AS_URL_KIND_HOMEPAGE</p></td>
-<td class="enum_member_description">
-<p>Application project homepage</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td class="enum_member_name"><p><a name="AS-ID-KIND-RUNTIME:CAPS"></a>AS_ID_KIND_RUNTIME</p></td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-BUGTRACKER:CAPS"></a>AS_URL_KIND_BUGTRACKER</p></td>
-<td class="enum_member_description">
-<p>Application bugtracker</p>
-</td>
-<td class="enum_member_annotations"> </td>
-</tr>
-<tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-FAQ:CAPS"></a>AS_URL_KIND_FAQ</p></td>
-<td class="enum_member_description">
-<p>Application FAQ page</p>
-</td>
-<td class="enum_member_annotations"> </td>
-</tr>
-<tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-DONATION:CAPS"></a>AS_URL_KIND_DONATION</p></td>
-<td class="enum_member_description">
-<p>Application donation page</p>
-</td>
-<td class="enum_member_annotations"> </td>
-</tr>
-<tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-HELP:CAPS"></a>AS_URL_KIND_HELP</p></td>
-<td class="enum_member_description">
-<p>Application help manual</p>
-</td>
-<td class="enum_member_annotations"> </td>
-</tr>
-<tr>
-<td class="enum_member_name"><p><a name="AS-URL-KIND-MISSING:CAPS"></a>AS_URL_KIND_MISSING</p></td>
-<td class="enum_member_description">
-<p>The package is available, but missing</p>
-</td>
-<td class="enum_member_annotations"> </td>
+<td class="enum_member_name"><p><a name="AS-ID-KIND-GENERIC:CAPS"></a>AS_ID_KIND_GENERIC</p></td>
+<td> </td>
+<td> </td>
 </tr>
 </tbody>
 </table></div>
@@ -456,8 +522,8 @@ as_kudo_kind_from_string (<em class="parameter"><code>const <span class="type">g
 <a name="AsKudoKind"></a><h3>enum AsKudoKind</h3>
 <p>The kudo type.</p>
 <div class="refsect3">
-<a name="id-1.2.11.9.4.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="AsKudoKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -524,10 +590,99 @@ as_kudo_kind_from_string (<em class="parameter"><code>const <span class="type">g
 </table></div>
 </div>
 </div>
+<hr>
+<div class="refsect2">
+<a name="AsUrgencyKind"></a><h3>enum AsUrgencyKind</h3>
+<p>The urgency of a release.</p>
+<div class="refsect3">
+<a name="AsUrgencyKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-URGENCY-KIND-UNKNOWN:CAPS"></a>AS_URGENCY_KIND_UNKNOWN</p></td>
+<td class="enum_member_description">
+<p>Urgency invalid or not known</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-URGENCY-KIND-LOW:CAPS"></a>AS_URGENCY_KIND_LOW</p></td>
+<td class="enum_member_description">
+<p>Low urgency release</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-URGENCY-KIND-MEDIUM:CAPS"></a>AS_URGENCY_KIND_MEDIUM</p></td>
+<td class="enum_member_description">
+<p>Medium urgency release</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-URGENCY-KIND-HIGH:CAPS"></a>AS_URGENCY_KIND_HIGH</p></td>
+<td class="enum_member_description">
+<p>High urgency release</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-URGENCY-KIND-CRITICAL:CAPS"></a>AS_URGENCY_KIND_CRITICAL</p></td>
+<td class="enum_member_description">
+<p>Critically urgent release</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsSizeKind"></a><h3>enum AsSizeKind</h3>
+<p>The release size kind.</p>
+<div class="refsect3">
+<a name="AsSizeKind.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-SIZE-KIND-UNKNOWN:CAPS"></a>AS_SIZE_KIND_UNKNOWN</p></td>
+<td class="enum_member_description">
+<p>Not known</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-SIZE-KIND-INSTALLED:CAPS"></a>AS_SIZE_KIND_INSTALLED</p></td>
+<td class="enum_member_description">
+<p>Installed size</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-SIZE-KIND-DOWNLOAD:CAPS"></a>AS_SIZE_KIND_DOWNLOAD</p></td>
+<td class="enum_member_description">
+<p>Download size</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>

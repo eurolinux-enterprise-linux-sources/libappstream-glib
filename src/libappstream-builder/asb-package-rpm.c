@@ -36,23 +36,18 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 
-#include "as-cleanup.h"
 #include "asb-package-rpm.h"
 #include "asb-plugin.h"
 
-typedef struct _AsbPackageRpmPrivate	AsbPackageRpmPrivate;
-struct _AsbPackageRpmPrivate
+typedef struct
 {
 	Header		 h;
-};
+} AsbPackageRpmPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsbPackageRpm, asb_package_rpm, ASB_TYPE_PACKAGE)
 
 #define GET_PRIVATE(o) (asb_package_rpm_get_instance_private (o))
 
-/**
- * asb_package_rpm_finalize:
- **/
 static void
 asb_package_rpm_finalize (GObject *object)
 {
@@ -65,85 +60,17 @@ asb_package_rpm_finalize (GObject *object)
 	G_OBJECT_CLASS (asb_package_rpm_parent_class)->finalize (object);
 }
 
-/**
- * asb_package_rpm_init:
- **/
 static void
 asb_package_rpm_init (AsbPackageRpm *pkg)
 {
 }
 
-/**
- * asb_package_rpm_set_license:
- **/
 static void
 asb_package_rpm_set_license (AsbPackage *pkg, const gchar *license)
 {
 	guint i;
-	guint j;
-	_cleanup_free_ gchar *new = NULL;
-	_cleanup_strv_free_ gchar **tokens = NULL;
-	struct {
-		const gchar	*fedora;
-		const gchar	*spdx;
-	} convert[] =  {
-		{ "AGPLv3",			"AGPL-3.0" },
-		{ "AGPLv3+",			"AGPL-3.0" },
-		{ "AGPLv3 with exceptions",	"AGPL-3.0" },
-		{ "AGPLv3+ with exceptions",	"AGPL-3.0" },
-		{ "Artistic 2.0",		"Artistic-2.0" },
-		{ "Artistic",			"Artistic-1.0" },
-		{ "Artistic clarified",		"Artistic-2.0" },
-		{ "ASL 1.1",			"Apache-1.1" },
-		{ "ASL 2.0",			"Apache-2.0" },
-		{ "Boost",			"BSL-1.0" },
-		{ "BSD",			"BSD-3-Clause" },
-		{ "BSD with advertising",	"BSD-3-Clause" },
-		{ "CC0",			"CC0-1.0" },
-		{ "CC-BY",			"CC-BY-3.0" },
-		{ "CC-BY-SA",			"CC-BY-SA-3.0" },
-		{ "CDDL",			"CDDL-1.0" },
-		{ "CeCILL-C",			"CECILL-C" },
-		{ "CeCILL",			"CECILL-2.0" },
-		{ "EPL",			"EPL-1.0" },
-		{ "Free Art",			"ClArtistic" },
-		{ "GFDL",			"GFDL-1.3" },
-		{ "GPL+",			"GPL-1.0+" },
-		{ "GPLv2",			"GPL-2.0" },
-		{ "GPLv2+",			"GPL-2.0+" },
-		{ "GPLV2",			"GPL-2.0" },
-		{ "GPLv2 with exceptions",	"GPL-2.0-with-font-exception" },
-		{ "GPLv2+ with exceptions",	"GPL-2.0-with-font-exception" },
-		{ "GPLv3",			"GPL-3.0" },
-		{ "GPLv3+",			"GPL-3.0+" },
-		{ "GPLV3+",			"GPL-3.0+" },
-		{ "GPLv3+ with exceptions",	"GPL-3.0+" },
-		{ "GPLv3 with exceptions",	"GPL-3.0-with-GCC-exception" },
-		{ "GPL+ with exceptions",	"GPL-2.0-with-font-exception" },
-		{ "IBM",			"IPL-1.0" },
-		{ "LGPL+",			"LGPL-2.1+" },
-		{ "LGPLv2.1",			"LGPL-2.1" },
-		{ "LGPLv2",			"LGPL-2.1" },
-		{ "LGPLv2+",			"LGPL-2.1+" },
-		{ "LGPLv2 with exceptions",	"LGPL-2.0" },
-		{ "LGPLv2+ with exceptions",	"LGPL-2.0+" },
-		{ "LGPLv3",			"LGPL-3.0" },
-		{ "LGPLv3+",			"LGPL-3.0+" },
-		{ "LPPL",			"LPPL-1.3c" },
-		{ "MIT with advertising",	"MIT" },
-		{ "MPLv1.0",			"MPL-1.0" },
-		{ "MPLv1.1",			"MPL-1.1" },
-		{ "MPLv2.0",			"MPL-2.0" },
-		{ "Netscape",			"NPL-1.1" },
-		{ "OFL",			"OFL-1.1" },
-		{ "Python",			"Python-2.0" },
-		{ "QPL",			"QPL-1.0" },
-		{ "QPL with exceptions",	"QPL-1.0" },
-		{ "SPL",			"SPL-1.0" },
-		{ "zlib",			"Zlib" },
-		{ "ZPLv2.0",			"ZPL-2.0" },
-		{ "Unlicense",			"CC0-1.0" },
-		{ NULL, NULL } };
+	g_autofree gchar *new = NULL;
+	g_auto(GStrv) tokens = NULL;
 
 	/* this isn't supposed to happen */
 	if (license == NULL) {
@@ -152,9 +79,9 @@ asb_package_rpm_set_license (AsbPackage *pkg, const gchar *license)
 		return;
 	}
 
-	/* tokenize the license string and try to convert the Fedora license
-	 * string to a SPDX license the best we can */
-	tokens = as_utils_spdx_license_tokenize (license);
+	/* tokenize the license string and log non SPDX licenses */
+	new = as_utils_license_to_spdx (license);
+	tokens = as_utils_spdx_license_tokenize (new);
 	for (i = 0; tokens[i] != NULL; i++) {
 
 		/* ignore */
@@ -168,41 +95,20 @@ asb_package_rpm_set_license (AsbPackage *pkg, const gchar *license)
 		if (tokens[i][0] == '@')
 			continue;
 
-		/* convert */
-		for (j = 0; convert[j].fedora != NULL; j++) {
-			if (g_strcmp0 (tokens[i], convert[j].fedora) == 0) {
-				g_free (tokens[i]);
-				tokens[i] = g_strdup_printf ("@%s", convert[j].spdx);
-				asb_package_log (pkg,
-						 ASB_PACKAGE_LOG_LEVEL_DEBUG,
-						 "Converting Fedora license "
-						 "'%s' to SPDX '%s'",
-						 convert[j].fedora,
-						 convert[j].spdx);
-				break;
-			}
-		}
-		if (convert[j].fedora != NULL)
-			continue;
-
 		/* no matching SPDX entry */
 		asb_package_log (pkg,
 				 ASB_PACKAGE_LOG_LEVEL_WARNING,
 				 "Unable to currently map Fedora "
 				 "license '%s' to SPDX", tokens[i]);
 	}
-	new = as_utils_spdx_license_detokenize (tokens);
 	asb_package_set_license (pkg, new);
 }
 
-/**
- * asb_package_rpm_set_source:
- **/
 static void
 asb_package_rpm_set_source (AsbPackage *pkg, const gchar *source)
 {
 	gchar *tmp;
-	_cleanup_free_ gchar *srcrpm = NULL;
+	g_autofree gchar *srcrpm = NULL;
 
 	/* this isn't supposed to happen */
 	if (source == NULL) {
@@ -226,9 +132,6 @@ asb_package_rpm_set_source (AsbPackage *pkg, const gchar *source)
 	asb_package_set_source_pkgname (pkg, srcrpm);
 }
 
-/**
- * asb_package_rpm_ensure_nevra:
- **/
 static gboolean
 asb_package_rpm_ensure_nevra (AsbPackage *pkg, GError **error)
 {
@@ -246,14 +149,11 @@ asb_package_rpm_ensure_nevra (AsbPackage *pkg, GError **error)
 	headerGet (priv->h, RPMTAG_ARCH, td, HEADERGET_MINMEM);
 	asb_package_set_arch (pkg, rpmtdGetString (td));
 	headerGet (priv->h, RPMTAG_EPOCH, td, HEADERGET_MINMEM);
-	asb_package_set_epoch (pkg, rpmtdGetNumber (td));
+	asb_package_set_epoch (pkg, (guint) rpmtdGetNumber (td));
 	rpmtdFree (td);
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_ensure_source:
- **/
 static gboolean
 asb_package_rpm_ensure_source (AsbPackage *pkg, GError **error)
 {
@@ -268,9 +168,6 @@ asb_package_rpm_ensure_source (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_ensure_url:
- **/
 static gboolean
 asb_package_rpm_ensure_url (AsbPackage *pkg, GError **error)
 {
@@ -285,9 +182,6 @@ asb_package_rpm_ensure_url (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_ensure_vcs:
- **/
 static gboolean
 asb_package_rpm_ensure_vcs (AsbPackage *pkg, GError **error)
 {
@@ -302,9 +196,6 @@ asb_package_rpm_ensure_vcs (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_ensure_license:
- **/
 static gboolean
 asb_package_rpm_ensure_license (AsbPackage *pkg, GError **error)
 {
@@ -319,9 +210,6 @@ asb_package_rpm_ensure_license (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_add_release:
- **/
 static void
 asb_package_rpm_add_release (AsbPackage *pkg,
 			     guint64 timestamp,
@@ -332,7 +220,7 @@ asb_package_rpm_add_release (AsbPackage *pkg,
 	const gchar *version;
 	gchar *tmp;
 	gchar *vr;
-	_cleanup_free_ gchar *name_dup = NULL;
+	g_autofree gchar *name_dup = NULL;
 
 	/* get last string chunk */
 	name_dup = g_strchomp (g_strdup (name));
@@ -359,6 +247,10 @@ asb_package_rpm_add_release (AsbPackage *pkg,
 	if (tmp != NULL)
 		version = tmp + 1;
 
+	/* remove any version prefix */
+	if (version != NULL && version[0] == '-')
+		version = version + 1;
+
 	/* is version already in the database */
 	release = asb_package_get_release (pkg, version);
 	if (release != NULL) {
@@ -368,16 +260,13 @@ asb_package_rpm_add_release (AsbPackage *pkg,
 			as_release_set_timestamp (release, timestamp);
 	} else {
 		release = as_release_new ();
-		as_release_set_version (release, version, -1);
+		as_release_set_version (release, version);
 		as_release_set_timestamp (release, timestamp);
 		asb_package_add_release (pkg, version, release);
 		g_object_unref (release);
 	}
 }
 
-/**
- * asb_package_rpm_ensure_releases:
- **/
 static gboolean
 asb_package_rpm_ensure_releases (AsbPackage *pkg, GError **error)
 {
@@ -408,9 +297,6 @@ asb_package_rpm_ensure_releases (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_ensure_deps:
- **/
 static gboolean
 asb_package_rpm_ensure_deps (AsbPackage *pkg, GError **error)
 {
@@ -435,7 +321,7 @@ asb_package_rpm_ensure_deps (AsbPackage *pkg, GError **error)
 		goto out;
 	}
 	while (rpmtdNext (td) != -1) {
-		_cleanup_free_ gchar *dep_no_qual = NULL;
+		g_autofree gchar *dep_no_qual = NULL;
 		dep = rpmtdGetString (td);
 		if (g_str_has_prefix (dep, "rpmlib"))
 			continue;
@@ -447,15 +333,16 @@ asb_package_rpm_ensure_deps (AsbPackage *pkg, GError **error)
 			*tmp = '\0';
 		asb_package_add_dep (pkg, dep_no_qual);
 	}
+        /* Add the corresponding -lang package as a dependency */
+        tmp = g_strconcat (asb_package_get_name (pkg), "-lang", NULL);
+        asb_package_add_dep (pkg, tmp);
+        g_free (tmp);
 out:
 	rpmtdFreeData (td);
 	rpmtdFree (td);
 	return ret;
 }
 
-/**
- * asb_package_rpm_ensure_filelists:
- **/
 static gboolean
 asb_package_rpm_ensure_filelists (AsbPackage *pkg, GError **error)
 {
@@ -465,9 +352,9 @@ asb_package_rpm_ensure_filelists (AsbPackage *pkg, GError **error)
 	gint rc;
 	guint i;
 	rpmtd td[3] = { NULL, NULL, NULL };
-	_cleanup_free_ const gchar **dirnames = NULL;
-	_cleanup_free_ gint32 *dirindex = NULL;
-	_cleanup_strv_free_ gchar **filelist = NULL;
+	g_autofree const gchar **dirnames = NULL;
+	g_autofree gint32 *dirindex = NULL;
+	g_auto(GStrv) filelist = NULL;
 
 	/* is a virtual package with no files */
 	if (!headerIsEntry (priv->h, RPMTAG_DIRINDEXES))
@@ -497,7 +384,7 @@ asb_package_rpm_ensure_filelists (AsbPackage *pkg, GError **error)
 	i = 0;
 	dirindex = g_new0 (gint32, rpmtdCount (td[2]) + 1);
 	while (rpmtdNext (td[2]) != -1)
-		dirindex[i++] = rpmtdGetNumber (td[2]);
+		dirindex[i++] = (gint32) rpmtdGetNumber (td[2]);
 	i = 0;
 	filelist = g_new0 (gchar *, rpmtdCount (td[1]) + 1);
 	while (rpmtdNext (td[1]) != -1) {
@@ -515,9 +402,6 @@ out:
 	return ret;
 }
 
-/**
- * asb_package_rpm_strerror:
- **/
 static const gchar *
 asb_package_rpm_strerror (rpmRC rc)
 {
@@ -545,9 +429,6 @@ asb_package_rpm_strerror (rpmRC rc)
 	return str;
 }
 
-/**
- * asb_package_rpm_close:
- **/
 static gboolean
 asb_package_rpm_close (AsbPackage *pkg, GError **error)
 {
@@ -559,9 +440,6 @@ asb_package_rpm_close (AsbPackage *pkg, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_open:
- **/
 static gboolean
 asb_package_rpm_open (AsbPackage *pkg, const gchar *filename, GError **error)
 {
@@ -576,7 +454,7 @@ asb_package_rpm_open (AsbPackage *pkg, const gchar *filename, GError **error)
 	ts = rpmtsCreate ();
 	rpmtsSetVSFlags (ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
 	fd = Fopen (filename, "r");
-	if (fd <= 0) {
+	if (fd == NULL) {
 		ret = FALSE;
 		g_set_error (error,
 			     ASB_PLUGIN_ERROR,
@@ -607,9 +485,6 @@ out:
 	return ret;
 }
 
-/**
- * asb_package_rpm_ensure:
- **/
 static gboolean
 asb_package_rpm_ensure (AsbPackage *pkg,
 			AsbPackageEnsureFlags flags,
@@ -650,9 +525,6 @@ asb_package_rpm_ensure (AsbPackage *pkg,
 	return TRUE;
 }
 
-/**
- * asb_package_rpm_compare:
- **/
 static gint
 asb_package_rpm_compare (AsbPackage *pkg1, AsbPackage *pkg2)
 {
@@ -660,9 +532,6 @@ asb_package_rpm_compare (AsbPackage *pkg1, AsbPackage *pkg2)
 			  asb_package_get_evr (pkg2));
 }
 
-/**
- * asb_package_rpm_class_init:
- **/
 static void
 asb_package_rpm_class_init (AsbPackageRpmClass *klass)
 {
@@ -676,9 +545,6 @@ asb_package_rpm_class_init (AsbPackageRpmClass *klass)
 	package_class->compare = asb_package_rpm_compare;
 }
 
-/**
- * asb_package_rpm_init_cb:
- **/
 static gpointer
 asb_package_rpm_init_cb (gpointer user_data)
 {

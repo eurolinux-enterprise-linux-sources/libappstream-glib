@@ -31,12 +31,10 @@
 
 #include <limits.h>
 
-#include "as-cleanup.h"
 #include "asb-package.h"
 #include "asb-plugin.h"
 
-typedef struct _AsbPackagePrivate	AsbPackagePrivate;
-struct _AsbPackagePrivate
+typedef struct
 {
 	AsbPackageKind	 kind;
 	gboolean	 enabled;
@@ -68,15 +66,12 @@ struct _AsbPackagePrivate
 	GPtrArray	*releases;
 	GHashTable	*releases_hash;
 	GMutex		 mutex_log;
-};
+} AsbPackagePrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsbPackage, asb_package, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) (asb_package_get_instance_private (o))
 
-/**
- * asb_package_finalize:
- **/
 static void
 asb_package_finalize (GObject *object)
 {
@@ -109,9 +104,6 @@ asb_package_finalize (GObject *object)
 	G_OBJECT_CLASS (asb_package_parent_class)->finalize (object);
 }
 
-/**
- * asb_package_init:
- **/
 static void
 asb_package_init (AsbPackage *pkg)
 {
@@ -195,7 +187,7 @@ asb_package_log (AsbPackage *pkg,
 	AsbPackagePrivate *priv = GET_PRIVATE (pkg);
 	va_list args;
 	gdouble now;
-	_cleanup_free_ gchar *tmp = NULL;
+	g_autofree gchar *tmp = NULL;
 
 	g_mutex_lock (&priv->mutex_log);
 
@@ -216,8 +208,7 @@ asb_package_log (AsbPackage *pkg,
 		break;
 	case ASB_PACKAGE_LOG_LEVEL_DEBUG:
 		g_debug ("DEBUG:   %s", tmp);
-		if (g_getenv ("ASB_PROFILE") != NULL)
-			g_string_append_printf (priv->log, "DEBUG:   %s\n", tmp);
+		g_string_append_printf (priv->log, "DEBUG:   %s\n", tmp);
 		break;
 	case ASB_PACKAGE_LOG_LEVEL_WARNING:
 		g_debug ("WARNING: %s", tmp);
@@ -246,8 +237,8 @@ gboolean
 asb_package_log_flush (AsbPackage *pkg, GError **error)
 {
 	AsbPackagePrivate *priv = GET_PRIVATE (pkg);
-	_cleanup_free_ gchar *logfile = NULL;
-	_cleanup_free_ gchar *logdir_char = NULL;
+	g_autofree gchar *logfile = NULL;
+	g_autofree gchar *logdir_char = NULL;
 
 	/* needs no update */
 	if (priv->log_written_len == priv->log->len)
@@ -303,6 +294,23 @@ asb_package_get_kind (AsbPackage *pkg)
 }
 
 /**
+ * asb_package_get_epoch:
+ * @pkg: A #AsbPackage
+ *
+ * Gets the epoch of the package.
+ *
+ * Returns: a #AsbPackageKind
+ *
+ * Since: 0.5.6
+ **/
+guint
+asb_package_get_epoch (AsbPackage *pkg)
+{
+	AsbPackagePrivate *priv = GET_PRIVATE (pkg);
+	return priv->epoch;
+}
+
+/**
  * asb_package_get_basename:
  * @pkg: A #AsbPackage
  *
@@ -351,6 +359,23 @@ asb_package_get_version (AsbPackage *pkg)
 {
 	AsbPackagePrivate *priv = GET_PRIVATE (pkg);
 	return priv->version;
+}
+
+/**
+ * asb_package_get_release_str:
+ * @pkg: A #AsbPackage
+ *
+ * Gets the package release string
+ *
+ * Returns: utf8 string
+ *
+ * Since: 0.5.6
+ **/
+const gchar *
+asb_package_get_release_str (AsbPackage *pkg)
+{
+	AsbPackagePrivate *priv = GET_PRIVATE (pkg);
+	return priv->release;
 }
 
 /**
@@ -730,7 +755,7 @@ asb_package_get_nevr (AsbPackage *pkg)
 						      priv->version,
 						      priv->release);
 		} else {
-			priv->nevr = g_strdup_printf ("%s-%i:%s-%s",
+			priv->nevr = g_strdup_printf ("%s-%u:%s-%s",
 						      priv->name,
 						      priv->epoch,
 						      priv->version,
@@ -762,7 +787,7 @@ asb_package_get_nevra (AsbPackage *pkg)
 						       priv->release,
 						       priv->arch);
 		} else {
-			priv->nevra = g_strdup_printf ("%s-%i:%s-%s.%s",
+			priv->nevra = g_strdup_printf ("%s-%u:%s-%s.%s",
 						       priv->name,
 						       priv->epoch,
 						       priv->version,
@@ -793,7 +818,7 @@ asb_package_get_evr (AsbPackage *pkg)
 						     priv->version,
 						     priv->release);
 		} else {
-			priv->evr = g_strdup_printf ("%i:%s-%s",
+			priv->evr = g_strdup_printf ("%u:%s-%s",
 						     priv->epoch,
 						     priv->version,
 						     priv->release);
@@ -802,9 +827,6 @@ asb_package_get_evr (AsbPackage *pkg)
 	return priv->evr;
 }
 
-/**
- * asb_package_class_init:
- **/
 static void
 asb_package_class_init (AsbPackageClass *klass)
 {
@@ -812,14 +834,11 @@ asb_package_class_init (AsbPackageClass *klass)
 	object_class->finalize = asb_package_finalize;
 }
 
-/**
- * asb_package_guess_from_filename:
- **/
 static void
 asb_package_guess_from_filename (AsbPackage *pkg)
 {
 	AsbPackagePrivate *priv = GET_PRIVATE (pkg);
-	_cleanup_free_ gchar *tmp = NULL;
+	g_autofree gchar *tmp = NULL;
 	gchar *at;
 
 	/* remove .rpm extension */
@@ -1114,17 +1133,45 @@ asb_package_get_releases (AsbPackage *pkg)
  *
  * Compares one package with another.
  *
- * Returns: -1 for <, 0 for the same and +1 for >
+ * Returns: +1 for @pkg1 newer, 0 for the same and -1 if @pkg2 is newer
  *
  * Since: 0.1.0
  **/
 gint
 asb_package_compare (AsbPackage *pkg1, AsbPackage *pkg2)
 {
+	AsbPackagePrivate *priv1 = GET_PRIVATE (pkg1);
+	AsbPackagePrivate *priv2 = GET_PRIVATE (pkg2);
 	AsbPackageClass *klass = ASB_PACKAGE_GET_CLASS (pkg1);
+	gint rc;
+
+	/* class-specific compare method */
 	if (klass->compare != NULL)
 		return klass->compare (pkg1, pkg2);
-	return 0;
+
+	/* check name */
+	rc = g_strcmp0 (priv1->name, priv2->name);
+	if (rc != 0)
+		return rc;
+
+	/* check epoch */
+	if (priv1->epoch < priv2->epoch)
+		return -1;
+	if (priv1->epoch > priv2->epoch)
+		return 1;
+
+	/* check version */
+	rc = as_utils_vercmp (priv1->version, priv2->version);
+	if (rc != 0)
+		return rc;
+
+	/* check release */
+	rc = as_utils_vercmp (priv1->release, priv2->release);
+	if (rc != 0)
+		return rc;
+
+	/* check arch */
+	return g_strcmp0 (priv1->arch, priv2->arch);
 }
 
 /**

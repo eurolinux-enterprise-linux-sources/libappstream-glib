@@ -1,3 +1,589 @@
+Version 0.6.10
+~~~~~~~~~~~~~~
+Released: 2017-03-06
+
+Bugfixes:
+ - Add <developer_name> to translation list (Piotr Drąg)
+ - Fix small unintentional ABI break (Iain Lane)
+ - Ignore <p></p> in AppStream markup (Richard Hughes)
+
+Version 0.6.9
+~~~~~~~~~~~~~
+Released: 2017-02-27
+
+New Features:
+ - Add AsFormat object and deprecate app_set_source_file() (Richard Hughes)
+
+Bugfixes:
+ - Do not set the AsApp state using the AsRelease state (Richard Hughes)
+ - Fail to validate if any release is in the future (Richard Hughes)
+ - Fail to validate if the release children are in the wrong order (Richard Hughes)
+
+Version 0.6.8
+~~~~~~~~~~~~~
+Released: 2017-02-01
+
+New Features:
+ - Make gperf a hard dep (Kalev Lember)
+ - Read and write the <custom> tag (Richard Hughes)
+ - Support AppData components with no desktop files (Alexander Larsson)
+
+Bugfixes:
+ - Add a destructor for AsRefString (Kalev Lember)
+ - Add a dummy update_contact to appdata-from-desktop (Kalev Lember)
+ - Do not ignore type=replace merge components (Richard Hughes)
+ - Fix the build with gperf 3.1 (Kalev Lember)
+ - Fix use after free with hash table keys (Kalev Lember)
+ - Hold a ref in the store to avoid use-after-free (Simon McVittie)
+ - Ignore -Wconversion and -Wsign-conversion warnings from generated file (Kalev Lember)
+ - Require name and summary for validate-relax (Kalev Lember)
+ - Support reading metainfo.xml files when using appstream-compose (Richard Hughes)
+ - Tighten a rule that classifies apps as web-apps (Kalev Lember)
+
+Version 0.6.7
+~~~~~~~~~~~~~
+Released: 2017-01-12
+
+New Features:
+ - Add AsRequire as a way to store runtime requirements (Richard Hughes)
+ - Add support for "+" at the end of SPDX license identifiers (Kalev Lember)
+ - Scan /usr/share/metainfo as well when building appstream-data (Kalev Lember)
+
+Bugfixes:
+ - Allow loading application XPM icons (Richard Hughes)
+ - Enable C99 support in configure.ac (Philip Withnall)
+ - Fix a crash when using as_release_get_location_default() (Richard Hughes)
+ - Fix dep extraction when multiple versions are available (Kalev Lember)
+ - Only fail to validate <icon> in AppData desktop components (Richard Hughes)
+ - Recursively add subpackage deps into the main package (Kalev Lember)
+ - Resolve relative symlinks when extracting archives (Kalev Lember)
+ - Update the SPDX licence list to v2.5 (Kalev Lember)
+
+Version 0.6.6
+~~~~~~~~~~~~~
+Released: 2016-12-15
+
+New Features:
+ - Add a refcounted overloaded C string object and use in most objects (Richard Hughes)
+ - Add AS_APP_QUIRK_IS_PROXY (Richard Hughes)
+ - Add as_release_state_to_string() (Richard Hughes)
+ - Add Geary to the app id fallbacks (Niels De Graef)
+ - Add support for ONLY_NATIVE_LANGS when parsing yaml files (Richard Hughes)
+
+Bugfixes:
+ - Deduplicate the AsNode attribute key and value using a hash table (Richard Hughes)
+ - Detect invalid files in the libyaml read handler (Richard Hughes)
+ - Do not absorb core addons into the main application (Richard Hughes)
+ - Do not add <kudos>, <languages>, <provides> or <releases> for addons (Richard Hughes)
+ - Do not save the attributes if the node or parent node is ignored (Richard Hughes)
+ - Lazy load more structures in libappstream-glib (Richard Hughes)
+ - Set a better icon for codecs (Kalev Lember)
+
+Version 0.6.5
+~~~~~~~~~~~~~
+Released: 2016-11-07
+
+New Features:
+ - Add app-removed, app-added and app-changed signals to AsStore (Richard Hughes)
+ - Add as_store_load_search_cache() (Richard Hughes)
+ - Add a 'watch' command to appstream-util (Richard Hughes)
+ - Allow only loading native languages when parsing AppStream (Richard Hughes)
+ - Allow the client to control what search fields are indexed (Richard Hughes)
+
+Bugfixes:
+ - Always copy the state when replacing AppData with AppStream (Richard Hughes)
+ - Do not sent a REMOVED signal when deleting a transient temp file (Richard Hughes)
+ - Ensure the component scope is set when loading yaml files (Richard Hughes)
+ - Handle files being moved into monitored AppStream directories (Richard Hughes)
+ - Load the search token blacklist into a hash table (Richard Hughes)
+ - Monitor missing AppStream directories (Richard Hughes)
+ - Only transliterate when the locale requires it (Richard Hughes)
+ - Process file changes when an attribute changes (Joaquim Rocha)
+
+Version 0.6.4
+~~~~~~~~~~~~~
+Released: 2016-10-12
+
+New Features:
+ - Add as_content_rating_get_value() (Richard Hughes)
+ - Add as_profile_prune() for limiting the profiling output (Richard Hughes)
+ - Add as_store_add_apps() (Richard Hughes)
+ - Add flag to only load uncompressed files into a store (Richard Hughes)
+ - Add functions to build and validate an AppStream ID (Richard Hughes)
+ - Add support for AppImage bundles (Richard Hughes)
+ - Allow filtering applications based on merge type (Richard Hughes)
+
+Bugfixes:
+ - Don't show a critical warning on invalid yaml file (Richard Hughes)
+ - Fix a small memory leak when parsing yaml files (Richard Hughes)
+ - Fix building metadata on repos with mixed architecture content (Richard Hughes)
+ - Fix setting the origin for Flatpak user repos (Joaquim Rocha)
+ - Fix the CSM rating age calculation (Richard Hughes)
+ - Never inhierit Name and Comment when using appstream-compose (Richard Hughes)
+
+Version 0.6.3
+~~~~~~~~~~~~~
+Released: 2016-09-06
+
+New Features:
+ - Add a component kind of 'driver' (Richard Hughes)
+ - Add an easy way to add a language to an existing file (Richard Hughes)
+ - Add an easy way to add a modalias to an existing file (Richard Hughes)
+ - Support components with merge=replace rules (Richard Hughes)
+
+Bugfixes:
+ - Add -lang as a dep in order to detect translations (Dominique Leuenberger)
+ - Convert the built unknown icons to the correct kind (Richard Hughes)
+
+Version 0.6.2
+~~~~~~~~~~~~~
+Released: 2016-10-29
+
+New Features:
+ - Add a hash function specifically designed for unique-ids (Richard Hughes)
+ - Add AS_BUNDLE_KIND_CABINET (Richard Hughes)
+ - Remove the inf parsing from appstream-glib (Richard Hughes)
+
+Bugfixes:
+ - Check if icon name is unset before checking the prefix (Justin J. Kim)
+ - Do not merge all LangPack entries (Richard Hughes)
+ - Do not require an icon from LOCALIZATION kind (Richard Hughes)
+ - Do not use the deprecated GNOME_COMPILE_WARNINGS (Richard Hughes)
+ - Do not use the prefix check when parsing YAML (Richard Hughes)
+ - Fix gcc shift warnings on 32 bit platforms (Kalev Lember)
+ - Ignore system datadirs that are actually per-user (Richard Hughes)
+ - Invalidate the unique-id if any of the parts are changed (Richard Hughes)
+ - Make upgrade check for SPDX license string (Kai Willadsen)
+ - Pay attention to errors from libyaml (#129) (Anders Kaseorg, Richard Hughes)
+
+Version 0.6.1
+~~~~~~~~~~~~~~
+Released: 2016-10-12
+
+New Features:
+ - Add as_app_set_branch() (Richard Hughes)
+ - Add as_review_new() (Richard Hughes)
+ - Add as_utils_unique_id_equal() to compare IDs for equality (Richard Hughes)
+ - Add support for application suggestions (Richard Hughes)
+ - Add support for AppStream merge components (Richard Hughes)
+ - Add support for Google .PAK files (Richard Hughes)
+ - Add the TRANSLATE URL kind (Richard Hughes)
+ - Allow multiple components with the same ID in the AsStore (Richard Hughes)
+ - Allow subsuming each property individually (Richard Hughes)
+
+Bugfixes:
+ - Add some more validation checks for keywords (Richard Hughes)
+ - Add Sugar as a valid desktop environment (#118) (Sam)
+ - Add SUSE-Public-Domain to License map (#126) (Dominique Leuenberger)
+ - Add two new GCC warnings and fix up signed/unsigned issues (Richard Hughes)
+ - Avoid dependency when built without libgcab (#122) (Simon McVittie)
+ - Convert all current component-type names (Matthias Klumpp)
+ - Correct minor issue in transifex link (Jean-Baptiste)
+ - Do not save the 'X-' prefixed keys to the AppStream metadata (Richard Hughes)
+ - Do not split up the main AudioVideo category (Richard Hughes)
+ - Don't change ABI when built with/without gperf (#123) (Simon McVittie)
+ - Don't redundantly monitor files (Simon McVittie)
+ - Ensure predictable output order of XML attributes (Richard Hughes)
+ - No validation failure for lots of releases (Richard Hughes)
+ - Port away from intltool (Richard Hughes)
+ - Print max caption length when validating (Richard Hughes)
+ - Remove specific support for flatpak (Richard Hughes)
+ - Restrict addons to the same scope and bundle kind (Richard Hughes)
+ - Skip DEP-11 tests when DEP-11 is not enabled (Simon McVittie)
+
+Version 0.5.17
+~~~~~~~~~~~~~~
+Released: 2016-07-13
+
+New Features:
+ - Add AS_STATE_PURCHASABLE and AS_STATE_PURCHASING constants (Robert Ancell)
+ - Add external (X-*) keys of an app's desktop file as metadata AsApp (Joaquim Rocha)
+
+Bugfixes:
+ - Correct disabling of timestamps for gzip (StefanBruens)
+ - Do not add multiple categories for apps with AudioVideo (Richard Hughes)
+ - Do not emit a warning when flatpak user directory doesn't exist (Kalev Lember)
+ - Fall back to the country code in as_app_get_language() (Richard Hughes)
+ - Fix gtk-doc build when builddir != srcdir (lantw44)
+ - Optionally use libstemmer for keyword stemming (Richard Hughes)
+ - Use non-deprecated glib API for monitoring renames (Kalev Lember)
+
+Version 0.5.16
+~~~~~~~~~~~~~~
+Released: 2016-06-13
+
+New Features:
+ - Add elementary to list of project groups (Fabio Valentini)
+ - Allow setting the id prefix and origin using a symlink name (Richard Hughes)
+
+Bugfixes:
+ - Add yast2-branding-openSUSE if an app depends on yast2 (Dominique Leuenberger)
+ - Correctly detect new AppStream apps in new directories (Richard Hughes)
+ - Do not rename a category ID in AsApp (Richard Hughes)
+ - Fix g_ptr_array_sort use (Kalev Lember)
+ - Load metainfo files if present (Richard Hughes)
+ - Never allow NULL to be added to AsApp string array (Richard Hughes)
+
+Version 0.5.15
+~~~~~~~~~~~~~~
+Released: 2016-05-23
+
+New Features:
+ - Add AS_APP_QUIRK_HAS_SHORTCUT (Joaquim Rocha)
+ - Add AS_APP_QUIRK_NOT_LAUNCHABLE (Richard Hughes)
+ - Rename the xdg-app support to the new name: Flatpak (Richard Hughes)
+
+Bugfixes:
+ - Add all applications for all architectures when loading Flatpak (Richard Hughes)
+ - Add note in README.md for glob usage (Mingcong Bai)
+ - Allow addons to have duplicate names (Dominique Leuenberger)
+ - Correctly set the architecture on newly discovered applications (Richard Hughes)
+ - Ignore files with invalid suffixes when building installed stores (Richard Hughes)
+ - Make yaml icon parser spec compliant (Matthias Klumpp)
+ - Omit timestamp from gzip compressed files (Stefan Brüns)
+ - Save the ID prefix in more places (Richard Hughes)
+ - Show the app name when complaining about missing description (Dominique Leuenberger)
+ - Sort archive contents by name for repeatable results (Stefan Brüns)
+
+Version 0.5.14
+~~~~~~~~~~~~~~
+Released: 2016-04-20
+
+New Features:
+ - Add AS_APP_QUIRK_NEEDS_REBOOT (Richard Hughes)
+ - Add AS_APP_QUIRK_NOT_REVIEWABLE (Richard Hughes)
+ - Add as_screenshot_get_image_for_locale() (Richard Hughes)
+ - Add search-pkgname to appstream-cmd (Richard Hughes)
+
+Bugfixes:
+ - Add the Audio+Video categories from AppStream XML too (Richard Hughes)
+ - Fall back to searching in as_store_get_app_by_pkgname() (Richard Hughes)
+ - Ignore desktop files with X-AppStream-Ignore (Richard Hughes)
+ - Search /usr/share/metainfo for local files (Richard Hughes)
+
+Version 0.5.13
+~~~~~~~~~~~~~~
+Released: 2016-04-01
+
+New Features:
+ - Add as_store_remove_apps_with_veto() (Richard Hughes)
+ - Enforce the requirement of AppData for 'Categories=DesktopSettings' (Richard Hughes)
+
+Bugfixes:
+ - Also filter YAML apps before adding to the store (Richard Hughes)
+ - Always veto anything with X-Unity-Settings-Panel (Richard Hughes)
+ - Do not hardcode x86_64 when searching for xdg-app metadata (Richard Hughes)
+ - Support more DEP11 YAML markup (Richard Hughes)
+
+Version 0.5.12
+~~~~~~~~~~~~~~
+Released: 2016-03-29
+
+New Features:
+ - Add a merge-appstream command to appstream-util (Richard Hughes)
+ - Add as_app_get_id_no_prefix() (Richard Hughes)
+ - Add as_app_has_compulsory_for_desktop() (Richard Hughes)
+ - Add AS_APP_QUIRK_MATCH_ANY_PREFIX (Richard Hughes)
+ - Add as_store_get_app_by_id_ignore_prefix() (Richard Hughes)
+ - Add as_store_get_apps_by_id() (Richard Hughes)
+ - Add support for content ratings (Richard Hughes)
+
+Bugfixes:
+ - Split up AudioVideo into two categories (Richard Hughes)
+
+Version 0.5.11
+~~~~~~~~~~~~~~
+Released: 2016-03-08
+
+New Features:
+ - Add AS_APP_KIND_LOCALIZATION (Richard Hughes)
+ - Add a 'markup-import' command to appstream-util for testing text import (Richard Hughes)
+ - Add as_markup_import() (Richard Hughes)
+ - Add as_utils_string_replace() (Richard Hughes)
+ - Add support for GNOME Shell extensions (Richard Hughes)
+ - Support importing HTML text using as_markup_import() (Richard Hughes)
+
+Bugfixes:
+ - Do not mark all subsumed applications as installed (Richard Hughes)
+ - Do not tokenize the application ID or package name (Richard Hughes)
+ - Fix crash when validating files containing invalid remote URIs (Richard Hughes)
+ - Fix ordering of parameters to as_store_search_app_info (Robert Ancell)
+ - Implement DEP-11 MediaBaseUrl support (Robert Ancell)
+ - Tokenize names like 'half-life' into two tokens for searching (Richard Hughes)
+
+Version 0.5.10
+~~~~~~~~~~~~~~
+Released: 2016-02-26
+
+New Features:
+ - Add AS_APP_KIND_OS_UPGRADE and AS_APP_KIND_OS_UPDATE (Richard Hughes)
+ - Add AS_APP_KIND_SHELL_EXTENSION (Richard Hughes)
+ - Add AsAppQuirk (Richard Hughes)
+ - Add a 'split-appstream' command to appstream-util (Richard Hughes)
+ - Add support for getting the SDK and runtime from the bundle (Richard Hughes)
+ - Support loading XML files using as_store_from_bytes() (Richard Hughes)
+
+Bugfixes:
+ - Add an application prefix to the ID for certain install scopes (Richard Hughes)
+ - Add a warning when validating in strict mode with invalid tags (Richard Hughes)
+ - Do not tokenize mimetypes (Richard Hughes)
+ - Improve the application search tokenizing and filtering (Richard Hughes)
+ - Load AppStream stores in a predictable order (Richard Hughes)
+ - Look in the correct icon directory for yaml files (Richard Hughes)
+ - Properly validate AppStream files with local or remote icons (Richard Hughes)
+ - Return results from 'appstream-util search' in relevance order (Richard Hughes)
+
+Version 0.5.9
+~~~~~~~~~~~~~
+Released: 2016-02-12
+
+Bugfixes:
+ - Accept FSFAP as a valid metadata license (Richard Hughes)
+ - Add missing G_BEGIN_DECLS in libappstream-glib/as-tag.h (Andrea Azzarone)
+ - Fix a validation error for metainfo files with descriptions (Richard Hughes)
+ - Fix dates in NEWS - It's 2016! (Robert Ancell)
+ - Pick up newly added appinfo dirs for xdg-app remotes (Alexander Larsson)
+ - Update the SPDX license list (Richard Hughes)
+
+Version 0.5.8
+~~~~~~~~~~~~~
+Released: 2016-02-02
+
+New Features:
+ - Add a flag for skipping invalid AppStream files (Richard Hughes)
+ - Add a modify command to appstream-util (Richard Hughes)
+ - Add support for per-user and system-wide xdg-app installed stores (Richard Hughes)
+ - Add support for the GENERIC component kind (Richard Hughes)
+ - Allow setting state on AsRelease objects (Richard Hughes)
+ - Support <translation> tags in AppData files (Richard Hughes)
+
+Bugfixes:
+ - Escape data before writing to an HTML file (Richard Hughes)
+ - Ignore temp and hidden files in AsMonitor (Richard Hughes)
+ - Move the kudo and provides autodetection to libappstream-glib (Richard Hughes)
+ - Only load supported icon kinds when using appstream-compose (Richard Hughes)
+ - Reject an invalid project group when parsing (Richard Hughes)
+ - Remove support for Ubuntu app-install data (Richard Hughes)
+ - Show the source of the 'appstream-util check-root' failure (Richard Hughes)
+ - Support multi-line copyright statements (Richard Hughes)
+ - Support stock dep11 icons (Matthias Klumpp)
+ - Support the QT translation system (Richard Hughes)
+ - Use predictable sorting when outputting <provides> (Richard Hughes)
+ - Use the project_group heuristics when parsing AppData files (Richard Hughes)
+
+Version 0.5.7
+~~~~~~~~~~~~~
+Released: 2016-01-22
+
+Notes:
+ - We've removed the ostree support and added a new appstream-compose command
+   to generate the AppStream metadata at xdg-app application build time.
+
+New Features:
+ - Add appstream-compose command line tool (Alexander Larsson)
+ - Add as_image_load_filename_full() (Richard Hughes)
+ - Move the blacklisted application list to the front-end client (Richard Hughes)
+ - Move the gettext parsing to libappstream-glib (Richard Hughes)
+ - Support date=iso8601 attributes in <release> markup (Richard Hughes)
+
+Bugfixes:
+ - Allow disabling font support with --disable-fonts (Richard Hughes)
+ - Detect web-apps which are added as .desktop files (Richard Hughes)
+ - Make the check for screenshot equality more robust (Richard Hughes)
+ - Only build the test firmware files when using --enable-firmware (Richard Hughes)
+ - Remove all traces of ostree (Alexander Larsson)
+ - Remove the GIR, GStreamer, GResource, nm and KDE-specific plugins (Richard Hughes)
+
+Version 0.5.6
+~~~~~~~~~~~~~
+Released: 2016-01-15
+
+New Features:
+ - Add the runtime ID kind (Richard Hughes)
+ - Allow dumping inf files using appstream-util (Richard Hughes)
+ - Check name uniqueness when validating AppStream data (Richard Hughes)
+ - Install gettext ITS rules (Daiki Ueno)
+
+Bugfixes:
+ - Accept various 'or later' metadata content licenses (Richard Hughes)
+ - Allow specifying a particular ostree arch only (Alexander Larsson)
+ - Always blacklist desktop files for uninstalling software (Richard Hughes)
+ - Assume a release value of '0' when unset (Richard Hughes)
+ - Automatically add missing .inf types as required (Richard Hughes)
+ - Check the project_group when validating (Richard Hughes)
+ - Cull the application blacklist now we depend on AppData files (Richard Hughes)
+ - Fix AppStream generation when using duplicate .deb packages (Richard Hughes)
+ - Fix things up for xdg-app use (Alexander Larsson)
+ - Prefer stock icons when using as_app_get_icon_default() (Richard Hughes)
+ - Set a validation failure for files using <updatecontact> (Richard Hughes)
+
+Version 0.5.5
+~~~~~~~~~~~~~
+Released: 2015-12-16
+
+New Features:
+ - Add a AS_APP_STATE_UPDATABLE_LIVE constant so we can support live updates (Richard Hughes)
+ - Add as_utils_license_to_spdx() (Richard Hughes)
+
+Bugfixes:
+ - Add the package name as another application search token (Richard Hughes)
+ - Fix a crash when tokenizing a NULL string (Richard Hughes)
+ - Log when we auto-add kudos or keywords (Richard Hughes)
+ - Only use the package license when not provided by the AppData file (Richard Hughes)
+
+Version 0.5.4
+~~~~~~~~~~~~~
+Released: 2015-11-18
+
+New Features:
+ - Add as_utils_version_from_uint16() (Richard Hughes)
+
+Bugfixes:
+ - Generate GUID values according to RFC4122 (Richard Hughes)
+
+Version 0.5.3
+~~~~~~~~~~~~~
+Released: 2015-11-05
+
+Bugfixes:
+ - Return the correct error when the desktop file has no group (Richard Hughes)
+ - Strip Win32 and Linux paths when decompressing firmware (Richard Hughes)
+
+Version 0.5.2
+~~~~~~~~~~~~~
+Released: 2015-10-27
+
+New Features:
+ - Add an --enable-profile option to appstream-util (Richard Hughes)
+ - Add as_markup_validate() to check descriptions (Richard Hughes)
+ - Add support for AppStream <size> metadata (Richard Hughes)
+ - Add the ability to attach blobs of data to AsRelease objects (Richard Hughes)
+ - Add the ability to parse .cab archives as AppStream stores (Richard Hughes)
+ - Remove the long-obsolete appdata-validate tool (Richard Hughes)
+
+Bugfixes:
+ - Accept a '0x' hexidecimal prefix when parsing a version (Richard Hughes)
+ - Adapt to DEP11 spec change (Matthias Klumpp)
+ - Add AsProfile for speed profiling (Richard Hughes)
+ - Allow as_markup_convert() to ignore errors (Richard Hughes)
+ - Always escape AppStream descriptions when doing passthrough (Richard Hughes)
+ - Do not attempt to parse the version in as_release_set_version() (Richard Hughes)
+ - Do not ever store the KDE x-test locale data (Richard Hughes)
+ - Do not fail to install firmware if DriverVer is not set (Richard Hughes)
+ - Do not overwrite the AppData URL with the one from the package (Richard Hughes)
+ - Do not parse ISO dates as uint32 version numbers (Richard Hughes)
+ - Do not write a checksum 'type' for unknown checksum kinds (Richard Hughes)
+ - Fix a typo in command name (Dmitry Shachnev)
+ - Fix crash in validator when processing '<li></li>' (Richard Hughes)
+ - Monitor /usr/share/applications for apps without AppData when using watch flags (Richard Hughes)
+ - Only accept UNIX paths for files in cab files (Richard Hughes)
+ - Require AppData files to be present in the AppStream metadata (Richard Hughes)
+ - Simplify veto messages for missing <name> and <summary> (Kalev Lember)
+ - Support super-HiDPI icons like shipped in Hedgewars (Richard Hughes)
+ - Try harder to deal with icons that have extension or full path listed (Kalev Lember)
+ - Use a sensible warning when processing desktop files with NoDisplay=true (Richard Hughes)
+ - Use as_utils_vercmp() to be correctly check versions for equality (Richard Hughes)
+ - Use a wildcard in the self tests to ignore GCab-generated hash differences (Richard Hughes)
+ - Use g_set_object() to fix potential crash when adding pixbufs (Richard Hughes)
+
+Version 0.5.1
+~~~~~~~~~~~~~
+Released: 2015-09-15
+
+Notes:
+ - This raises the GLib required version to 2.45.8 and libsoup to 2.51.92
+
+New Features:
+ - Add support for release urgency (Richard Hughes)
+
+Bugfixes:
+ - Add a few applications that have changed desktop ID (Richard Hughes)
+ - Avoid using PATH_MAX (Pino Toscano)
+ - Do not blacklist the 'desktop' token (Richard Hughes)
+ - Do not fail to validate firmware in AppStream with no screenshots (Richard Hughes)
+ - Don't reallocate malloc'd memory with g_malloc (Kalev Lember)
+ - Don't show mangled version numbers as negatives (Richard Hughes)
+ - Ignore empty AppStream XML files (Richard Hughes)
+ - Support SPDX IDs with the LicenseRef prefix (Richard Hughes)
+ - Support the SPDX 'NONE' and 'NOASSERTION' keywords (Richard Hughes)
+ - Use GLib's cleanup functions instead of libgsystem's (Kalev Lember, Richard Hughes)
+ - Port to G_DECLARE_DERIVABLE_TYPE macro (Kalev Lember)
+
+Version 0.5.0
+~~~~~~~~~~~~~
+Released: 2015-08-12
+
+Notes:
+ - Remove some deprecated API which bumps soname (Richard Hughes)
+ - Drop the unused _len arguments on many functions (Richard Hughes)
+
+New Features:
+ - Add AsChecksum (Richard Hughes)
+ - Add as_release_vercmp() (Richard Hughes)
+ - Add support for the flashed firmware provide kind (Richard Hughes)
+ - Add two functions from fwupd for checking GUID strings (Richard Hughes)
+
+Bugfixes:
+ - Emit the AsStore::changed signal if files or directories change (Richard Hughes)
+ - Find the application in a store by the provide value (Richard Hughes)
+ - Make the DriverVer in the .inf file optional (Richard Hughes)
+ - Only add the HiDPI kudo for desktop applications using stock icons (Richard Hughes)
+ - Remove support for AppStream 0.8 and lower (Richard Hughes)
+ - Show a better error message when there's not enough text (Kalev Lember)
+
+Version 0.4.1
+~~~~~~~~~~~~~
+Released: 2015-07-20
+
+New Features:
+ - Add a 'compare' command to appstream-util (Richard Hughes)
+ - Add a 'mirror-local-firmware' command to appstream-util (Richard Hughes)
+ - Add a flag to relax the AppData Category=Settings requirement (Richard Hughes)
+ - Add a flag to use non-optimal data sources when building metadata (Richard Hughes)
+ - Add am 'incorporate' command to appstream-util (Richard Hughes)
+ - Add two flags to veto-ignore to relax the requirements for metadata (Richard Hughes)
+
+Bugfixes:
+ - Be less strict when loading incorrect AppData files (Richard Hughes)
+ - Do not duplicate <location> tags within a release (Richard Hughes)
+ - Do not expect the INF ClassGuid to be the ESRT GUID (Richard Hughes)
+ - Don't crash when parsing a <release> with no description (Richard Hughes)
+ - Fix a potential crash spotted by clang (Richard Hughes)
+ - Fix autogen with latest Intltool (Matthias Klumpp)
+ - Ignore the prefix when loading system-wide AppStream information (Richard Hughes)
+ - Include <pkgname> when writing the ignored metadata (Richard Hughes)
+ - Only write the release timestamp if non-zero (Richard Hughes)
+ - Remove the AppData veto when incorporating metadata (Richard Hughes)
+ - Search harder when using AS_ICON_LOAD_FLAG_SEARCH_SIZE (Richard Hughes)
+ - Sort multiple <icon> entries by name (Richard Hughes)
+ - Update the SPDX licence list to v2.0 (Richard Hughes)
+ - When building metadata with the use-fallback flag accept legacy icon names (Richard Hughes)
+
+Version 0.4.0
+~~~~~~~~~~~~~
+Released: 2015-05-26
+
+Notes:
+ - Remove extra-appstream support from the builder (Richard Hughes)
+ - Remove all networking support when building metadata (Richard Hughes)
+ - Remove the batch output option from the builder (Richard Hughes)
+ - Remove the extra screenshots and appdata options from the builder (Richard Hughes)
+
+New Features:
+ - Add a mirror-screenshots command to appstream-util (Richard Hughes)
+ - Detect recolorable symbolic icons (Richard Hughes)
+
+Bugfixes:
+ - Add text icons and sample text for some languages (Parag Nemade)
+ - Allow using unwrapped description markup (Richard Hughes)
+ - Check for duplicate screenshots when adding fonts (Richard Hughes)
+ - Do not use the cache location when using install-origin with a DESTDIR (Richard Hughes)
+ - Fix a crash for an invalid AppData file (Richard Hughes)
+ - Fix exo-web-browser blacklist entry (Kalev Lember)
+ - Link libasb_plugin_font.la with GTK3 (Dominique Leuenberger)
+ - Remove overzealous blacklisting entry (Richard Hughes)
+ - Version the builder plugin location (Richard Hughes)
+
 Version 0.3.6
 ~~~~~~~~~~~~~
 Released: 2015-03-30

@@ -33,10 +33,8 @@
 #include <stdlib.h>
 #include <appstream-glib.h>
 
-#include "as-cleanup.h"
 #include "asb-context.h"
 #include "asb-context-private.h"
-#include "asb-panel.h"
 #include "asb-plugin.h"
 #include "asb-plugin-loader.h"
 #include "asb-task.h"
@@ -51,8 +49,7 @@
 #include "asb-package-cab.h"
 #include "asb-package-deb.h"
 
-typedef struct _AsbContextPrivate	AsbContextPrivate;
-struct _AsbContextPrivate
+typedef struct
 {
 	AsStore			*store_failed;
 	AsStore			*store_ignore;
@@ -61,34 +58,25 @@ struct _AsbContextPrivate
 	GMutex			 apps_mutex;		/* for ->apps */
 	GPtrArray		*file_globs;		/* of AsbPackage */
 	GPtrArray		*packages;		/* of AsbPackage */
-	AsbPanel		*panel;
 	AsbPluginLoader		*plugin_loader;
 	AsbContextFlags		 flags;
 	guint			 max_threads;
 	guint			 min_icon_size;
 	gdouble			 api_version;
 	gchar			*old_metadata;
-	gchar			*extra_appstream;
-	gchar			*extra_appdata;
-	gchar			*extra_screenshots;
-	gchar			*screenshot_uri;
 	gchar			*log_dir;
-	gchar			*screenshot_dir;
 	gchar			*cache_dir;
 	gchar			*temp_dir;
 	gchar			*output_dir;
 	gchar			*icons_dir;
 	gchar			*basename;
 	gchar			*origin;
-};
+} AsbContextPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (AsbContext, asb_context, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) (asb_context_get_instance_private (o))
 
-/**
- * asb_context_realpath:
- **/
 static gchar *
 asb_context_realpath (const gchar *path)
 {
@@ -143,10 +131,6 @@ asb_context_set_flags (AsbContext *ctx, AsbContextFlags flags)
 		as_store_add_metadata_index (priv->store_old, "X-CacheID");
 	}
 	priv->flags = flags;
-
-	/* only enable the fancy panel if not in batch mode */
-	asb_panel_set_enabled (priv->panel,
-			       (flags & ASB_CONTEXT_FLAG_BATCH_OUTPUT) == 0);
 }
 
 /**
@@ -216,73 +200,6 @@ asb_context_set_old_metadata (AsbContext *ctx, const gchar *old_metadata)
 }
 
 /**
- * asb_context_set_extra_appstream:
- * @ctx: A #AsbContext
- * @extra_appstream: directory name, or %NULL
- *
- * Sets the location of a directory which is used for supplimental AppStream
- * files.
- *
- * Since: 0.1.0
- **/
-void
-asb_context_set_extra_appstream (AsbContext *ctx, const gchar *extra_appstream)
-{
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->extra_appstream = asb_context_realpath (extra_appstream);
-}
-
-/**
- * asb_context_set_extra_appdata:
- * @ctx: A #AsbContext
- * @extra_appdata: directory name, or %NULL
- *
- * Sets the location of a directory which is used for supplimental AppData
- * files.
- *
- * Since: 0.1.0
- **/
-void
-asb_context_set_extra_appdata (AsbContext *ctx, const gchar *extra_appdata)
-{
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->extra_appdata = asb_context_realpath (extra_appdata);
-}
-
-/**
- * asb_context_set_extra_screenshots:
- * @ctx: A #AsbContext
- * @extra_screenshots: directory name, or %NULL
- *
- * Sets the location of a directory which is used for supplimental screenshot
- * files.
- *
- * Since: 0.1.0
- **/
-void
-asb_context_set_extra_screenshots (AsbContext *ctx, const gchar *extra_screenshots)
-{
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->extra_screenshots = asb_context_realpath (extra_screenshots);
-}
-
-/**
- * asb_context_set_screenshot_uri:
- * @ctx: A #AsbContext
- * @screenshot_uri: Remote URI root, e.g. "http://www.mysite.com/screenshots/"
- *
- * Sets the remote screenshot URI for screenshots.
- *
- * Since: 0.1.0
- **/
-void
-asb_context_set_screenshot_uri (AsbContext *ctx, const gchar *screenshot_uri)
-{
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->screenshot_uri = g_strdup (screenshot_uri);
-}
-
-/**
  * asb_context_set_log_dir:
  * @ctx: A #AsbContext
  * @log_dir: directory
@@ -296,22 +213,6 @@ asb_context_set_log_dir (AsbContext *ctx, const gchar *log_dir)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	priv->log_dir = asb_context_realpath (log_dir);
-}
-
-/**
- * asb_context_set_screenshot_dir:
- * @ctx: A #AsbContext
- * @screenshot_dir: directory
- *
- * Sets the screenshot directory to use when building metadata.
- *
- * Since: 0.2.2
- **/
-void
-asb_context_set_screenshot_dir (AsbContext *ctx, const gchar *screenshot_dir)
-{
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	priv->screenshot_dir = g_strdup (screenshot_dir);
 }
 
 /**
@@ -480,6 +381,23 @@ asb_context_get_temp_dir (AsbContext *ctx)
 }
 
 /**
+ * asb_context_get_cache_dir:
+ * @ctx: A #AsbContext
+ *
+ * Gets the screenshot directory to use
+ *
+ * Returns: directory
+ *
+ * Since: 0.3.6
+ **/
+const gchar *
+asb_context_get_cache_dir (AsbContext *ctx)
+{
+	AsbContextPrivate *priv = GET_PRIVATE (ctx);
+	return priv->cache_dir;
+}
+
+/**
  * asb_context_get_plugin_loader:
  * @ctx: A #AsbContext
  *
@@ -544,7 +462,7 @@ asb_context_add_package (AsbContext *ctx, AsbPackage *pkg)
 gboolean
 asb_context_add_filename (AsbContext *ctx, const gchar *filename, GError **error)
 {
-	_cleanup_object_unref_ AsbPackage *pkg = NULL;
+	g_autoptr(AsbPackage) pkg = NULL;
 
 	/* can find in existing metadata */
 	if (asb_context_find_in_cache (ctx, filename)) {
@@ -553,11 +471,11 @@ asb_context_add_filename (AsbContext *ctx, const gchar *filename, GError **error
 	}
 
 	/* open */
-#if HAVE_RPM
+#ifdef HAVE_RPM
 	if (g_str_has_suffix (filename, ".rpm"))
 		pkg = asb_package_rpm_new ();
 #endif
-#if HAVE_ALPM
+#ifdef HAVE_ALPM
 	if (g_str_has_suffix (filename, ".pkg.tar.xz"))
 		pkg = asb_package_alpm_new ();
 #endif
@@ -605,55 +523,6 @@ asb_context_get_file_globs (AsbContext *ctx)
 }
 
 /**
- * asb_context_load_extra_screenshots:
- **/
-static gboolean
-asb_context_load_extra_screenshots (AsbContext *ctx, AsApp *app, GError **error)
-{
-	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	const gchar *tmp;
-	_cleanup_dir_close_ GDir *dir = NULL;
-	_cleanup_free_ gchar *path = NULL;
-	_cleanup_object_unref_ AsbApp *app_build = NULL;
-	_cleanup_object_unref_ AsbPackage *pkg = NULL;
-
-	/* are there any extra screenshots for this app */
-	if (priv->extra_screenshots == NULL ||
-	    priv->screenshot_uri == NULL ||
-	    priv->screenshot_dir == NULL)
-		return TRUE;
-	path = g_build_filename (priv->extra_screenshots, as_app_get_id_filename (app), NULL);
-	if (!g_file_test (path, G_FILE_TEST_EXISTS))
-		return TRUE;
-
-	/* create a virtual package */
-	pkg = asb_package_new ();
-	asb_package_set_name (pkg, as_app_get_id (app));
-	asb_package_set_config (pkg, "MirrorURI", priv->screenshot_uri);
-	asb_package_set_config (pkg, "ScreenshotDir", priv->screenshot_dir);
-
-	/* create a new AsbApp and add all the extra screenshots */
-	app_build = asb_app_new (pkg, as_app_get_id (app));
-	asb_app_set_hidpi_enabled (app_build, (priv->flags & ASB_CONTEXT_FLAG_HIDPI_ICONS) > 0);
-	as_app_subsume_full (AS_APP (app_build), app,
-			     AS_APP_SUBSUME_FLAG_NO_OVERWRITE);
-	dir = g_dir_open (path, 0, error);
-	if (dir == NULL)
-		return FALSE;
-	while ((tmp = g_dir_read_name (dir)) != NULL) {
-		_cleanup_free_ gchar *filename = NULL;
-		filename = g_build_filename (path, tmp, NULL);
-		if (!asb_app_add_screenshot_source (app_build, filename, error))
-			return FALSE;
-	}
-	as_app_subsume_full (app, AS_APP (app_build),
-			     AS_APP_SUBSUME_FLAG_NO_OVERWRITE);
-
-	/* save all the screenshots to disk */
-	return asb_app_save_resources (app_build, ASB_APP_SAVE_FLAG_SCREENSHOTS, error);
-}
-
-/**
  * asb_context_setup:
  * @ctx: A #AsbContext
  * @error: A #GError or %NULL
@@ -667,15 +536,10 @@ asb_context_load_extra_screenshots (AsbContext *ctx, AsApp *app, GError **error)
 gboolean
 asb_context_setup (AsbContext *ctx, GError **error)
 {
-	AsApp *app;
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	GList *l;
-	guint i;
-	guint sizes[] = { AS_IMAGE_NORMAL_WIDTH,    AS_IMAGE_NORMAL_HEIGHT,
-			  AS_IMAGE_THUMBNAIL_WIDTH, AS_IMAGE_THUMBNAIL_HEIGHT,
-			  AS_IMAGE_LARGE_WIDTH,     AS_IMAGE_LARGE_HEIGHT,
-			  0 };
-	_cleanup_free_ gchar *icons_dir = NULL;
+	g_autofree gchar *icons_dir = NULL;
+	g_autofree gchar *screenshot_dir1 = NULL;
+	g_autofree gchar *screenshot_dir2 = NULL;
 
 	/* required stuff set */
 	if (priv->origin == NULL) {
@@ -715,11 +579,13 @@ asb_context_setup (AsbContext *ctx, GError **error)
 	}
 
 	/* create temp space */
-	if (!asb_utils_ensure_exists_and_empty (priv->temp_dir, error))
-		return FALSE;
 	if (!asb_utils_ensure_exists (priv->output_dir, error))
 		return FALSE;
-	if (!asb_utils_ensure_exists (priv->cache_dir, error))
+	screenshot_dir1 = g_build_filename (priv->temp_dir, "screenshots", NULL);
+	if (!asb_utils_ensure_exists_and_empty (screenshot_dir1, error))
+		return FALSE;
+	screenshot_dir2 = g_build_filename (priv->cache_dir, "screenshots", NULL);
+	if (!asb_utils_ensure_exists (screenshot_dir2, error))
 		return FALSE;
 	if (priv->log_dir != NULL) {
 		if (!asb_utils_ensure_exists (priv->log_dir, error))
@@ -730,8 +596,8 @@ asb_context_setup (AsbContext *ctx, GError **error)
 	if (!asb_utils_ensure_exists (priv->icons_dir, error))
 		return FALSE;
 	if (priv->flags & ASB_CONTEXT_FLAG_HIDPI_ICONS) {
-		_cleanup_free_ gchar *icons_dir_hidpi = NULL;
-		_cleanup_free_ gchar *icons_dir_lodpi = NULL;
+		g_autofree gchar *icons_dir_hidpi = NULL;
+		g_autofree gchar *icons_dir_lodpi = NULL;
 		icons_dir_lodpi = g_build_filename (priv->icons_dir, "64x64", NULL);
 		if (!asb_utils_ensure_exists (icons_dir_lodpi, error))
 			return FALSE;
@@ -740,41 +606,9 @@ asb_context_setup (AsbContext *ctx, GError **error)
 			return FALSE;
 	}
 
-	/* create all the screenshot sizes */
-	if (priv->screenshot_dir != NULL) {
-		gboolean hidpi_enabled = (priv->flags & ASB_CONTEXT_FLAG_HIDPI_ICONS) > 0;
-		_cleanup_free_ gchar *ss_src = NULL;
-		ss_src = g_build_filename (priv->screenshot_dir,
-					   "source", NULL);
-		if (!asb_utils_ensure_exists (ss_src, error))
-			return FALSE;
-		for (i = 0; sizes[i] != 0; i += 2) {
-			_cleanup_free_ gchar *size_str = NULL;
-			_cleanup_free_ gchar *ss_dir = NULL;
-			size_str = g_strdup_printf ("%ix%i",
-						    sizes[i],
-						    sizes[i+1]);
-			ss_dir = g_build_filename (priv->screenshot_dir,
-						   size_str, NULL);
-			if (!asb_utils_ensure_exists (ss_dir, error))
-				return FALSE;
-		}
-		for (i = 0; sizes[i] != 0 && hidpi_enabled; i += 2) {
-			_cleanup_free_ gchar *size_str = NULL;
-			_cleanup_free_ gchar *ss_dir = NULL;
-			size_str = g_strdup_printf ("%ix%i",
-						    sizes[i] * 2,
-						    sizes[i+1] * 2);
-			ss_dir = g_build_filename (priv->screenshot_dir,
-						   size_str, NULL);
-			if (!asb_utils_ensure_exists (ss_dir, error))
-				return FALSE;
-		}
-	}
-
 	/* decompress the icons */
 	if (priv->old_metadata != NULL) {
-		_cleanup_free_ gchar *icons_fn = NULL;
+		g_autofree gchar *icons_fn = NULL;
 		icons_fn = g_strdup_printf ("%s/%s-icons.tar.gz",
 					    priv->old_metadata,
 					    priv->basename);
@@ -794,30 +628,15 @@ asb_context_setup (AsbContext *ctx, GError **error)
 	/* get a cache of the file globs */
 	priv->file_globs = asb_plugin_loader_get_globs (priv->plugin_loader);
 
-	/* add any extra applications and resize screenshots */
-	if (priv->extra_appstream != NULL &&
-	    g_file_test (priv->extra_appstream, G_FILE_TEST_EXISTS)) {
-		if (!asb_utils_add_apps_from_dir (&priv->apps,
-						  priv->extra_appstream,
-						  error))
-			return FALSE;
-		for (l = priv->apps; l != NULL; l = l->next) {
-			app = AS_APP (l->data);
-			if (!asb_context_load_extra_screenshots (ctx, app, error))
-				return FALSE;
-		}
-		g_print ("Added extra %i apps\n", g_list_length (priv->apps));
-	}
-
 	/* add old metadata */
 	if (priv->old_metadata != NULL) {
-		_cleanup_free_ gchar *builder_id = NULL;
-		_cleanup_free_ gchar *fn_failed = NULL;
-		_cleanup_free_ gchar *fn_ignore = NULL;
-		_cleanup_free_ gchar *fn_old = NULL;
-		_cleanup_object_unref_ GFile *file_failed = NULL;
-		_cleanup_object_unref_ GFile *file_ignore = NULL;
-		_cleanup_object_unref_ GFile *file_old = NULL;
+		g_autofree gchar *builder_id = NULL;
+		g_autofree gchar *fn_failed = NULL;
+		g_autofree gchar *fn_ignore = NULL;
+		g_autofree gchar *fn_old = NULL;
+		g_autoptr(GFile) file_failed = NULL;
+		g_autoptr(GFile) file_ignore = NULL;
+		g_autoptr(GFile) file_old = NULL;
 
 		builder_id = asb_utils_get_builder_id ();
 		fn_old = g_strdup_printf ("%s/%s.xml.gz",
@@ -876,30 +695,24 @@ asb_context_setup (AsbContext *ctx, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_task_process_func:
- **/
 static void
 asb_task_process_func (gpointer data, gpointer user_data)
 {
 	AsbTask *task = (AsbTask *) data;
-	_cleanup_error_free_ GError *error = NULL;
+	g_autoptr(GError) error = NULL;
 
 	/* just run the task */
 	if (!asb_task_process (task, &error))
 		g_warning ("Failed to run task: %s", error->message);
 }
 
-/**
- * asb_context_write_icons:
- **/
 static gboolean
 asb_context_write_icons (AsbContext *ctx,
 			 const gchar *temp_dir,
 			 GError **error)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	_cleanup_free_ gchar *filename = NULL;
+	g_autofree gchar *filename = NULL;
 
 	/* not enabled */
 	if (priv->flags & ASB_CONTEXT_FLAG_UNCOMPRESSED_ICONS)
@@ -913,41 +726,37 @@ asb_context_write_icons (AsbContext *ctx,
 	return asb_utils_write_archive_dir (filename, priv->icons_dir, error);
 }
 
-/**
- * asb_context_write_screenshots:
- **/
 static gboolean
 asb_context_write_screenshots (AsbContext *ctx,
 			       const gchar *temp_dir,
 			       GError **error)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	_cleanup_free_ gchar *filename = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autofree gchar *screenshot_dir = NULL;
 
 	/* not enabled */
 	if (priv->flags & ASB_CONTEXT_FLAG_UNCOMPRESSED_ICONS)
 		return TRUE;
 
-	if (!g_file_test (priv->screenshot_dir, G_FILE_TEST_EXISTS))
+	screenshot_dir = g_build_filename (temp_dir, "screenshots", NULL);
+	if (!g_file_test (screenshot_dir, G_FILE_TEST_EXISTS))
 		return TRUE;
 	filename = g_strdup_printf ("%s/%s-screenshots.tar",
 				    priv->output_dir, priv->basename);
 	g_print ("Writing %s...\n", filename);
-	return asb_utils_write_archive_dir (filename, priv->screenshot_dir, error);
+	return asb_utils_write_archive_dir (filename, screenshot_dir, error);
 }
 
-/**
- * asb_context_write_xml:
- **/
 static gboolean
 asb_context_write_xml (AsbContext *ctx, GError **error)
 {
 	AsApp *app;
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	GList *l;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(AsStore) store = NULL;
+	g_autoptr(GFile) file = NULL;
 
 	/* convert any vetod applications into dummy components */
 	for (l = priv->apps; l != NULL; l = l->next) {
@@ -971,7 +780,7 @@ asb_context_write_xml (AsbContext *ctx, GError **error)
 		/* remove from the ignore list if the application was useful */
 		if (ASB_IS_APP (app)) {
 			AsbPackage *pkg = asb_app_get_package (ASB_APP (app));
-			_cleanup_free_ gchar *name_arch = NULL;
+			g_autofree gchar *name_arch = NULL;
 			name_arch = g_strdup_printf ("%s.%s",
 						     asb_package_get_name (pkg),
 						     asb_package_get_arch (pkg));
@@ -988,7 +797,7 @@ asb_context_write_xml (AsbContext *ctx, GError **error)
 	as_store_set_origin (store, priv->origin);
 	as_store_set_api_version (store, priv->api_version);
 	if (priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		_cleanup_free_ gchar *builder_id = asb_utils_get_builder_id ();
+		g_autofree gchar *builder_id = asb_utils_get_builder_id ();
 		as_store_set_builder_id (store, builder_id);
 	}
 	return as_store_to_file (store,
@@ -999,9 +808,6 @@ asb_context_write_xml (AsbContext *ctx, GError **error)
 				 NULL, error);
 }
 
-/**
- * asb_context_convert_icons:
- **/
 static gboolean
 asb_context_convert_icons (AsbContext *ctx, GError **error)
 {
@@ -1024,9 +830,6 @@ asb_context_convert_icons (AsbContext *ctx, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_context_save_resources:
- **/
 static gboolean
 asb_context_save_resources (AsbContext *ctx, GError **error)
 {
@@ -1050,9 +853,6 @@ asb_context_save_resources (AsbContext *ctx, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_context_detect_pkgname_dups:
- **/
 static gboolean
 asb_context_detect_pkgname_dups (AsbContext *ctx, GError **error)
 {
@@ -1061,7 +861,7 @@ asb_context_detect_pkgname_dups (AsbContext *ctx, GError **error)
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	GList *l;
 	const gchar *pkgname;
-	_cleanup_hashtable_unref_ GHashTable *hash = NULL;
+	g_autoptr(GHashTable) hash = NULL;
 
 	hash = g_hash_table_new (g_str_hash, g_str_equal);
 	for (l = priv->apps; l != NULL; l = l->next) {
@@ -1083,9 +883,6 @@ asb_context_detect_pkgname_dups (AsbContext *ctx, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_context_write_app_xml:
- **/
 static void
 asb_context_write_app_xml (AsbContext *ctx)
 {
@@ -1095,8 +892,8 @@ asb_context_write_app_xml (AsbContext *ctx)
 
 	/* log the XML in the log file */
 	for (l = priv->apps; l != NULL; l = l->next) {
-		_cleanup_string_free_ GString *xml = NULL;
-		_cleanup_object_unref_ AsStore *store = NULL;
+		g_autoptr(GString) xml = NULL;
+		g_autoptr(AsStore) store = NULL;
 
 		/* we have an open log file? */
 		if (!ASB_IS_APP (l->data))
@@ -1115,9 +912,6 @@ asb_context_write_app_xml (AsbContext *ctx)
 	}
 }
 
-/**
- * asb_context_detect_missing_data:
- **/
 static gboolean
 asb_context_detect_missing_data (AsbContext *ctx, GError **error)
 {
@@ -1129,20 +923,25 @@ asb_context_detect_missing_data (AsbContext *ctx, GError **error)
 	for (l = priv->apps; l != NULL; l = l->next) {
 		app = AS_APP (l->data);
 		if (as_app_get_name (AS_APP (app), "C") == NULL)
-			as_app_add_veto (AS_APP (app), "No 'Name' in desktop or <name> in AppData");
+			as_app_add_veto (AS_APP (app), "No <name> in AppData");
 		if (as_app_get_comment (AS_APP (app), "C") == NULL)
-			as_app_add_veto (AS_APP (app), "No 'Comment' in desktop or <summary> in AppData");
-		if (as_app_get_id_kind (AS_APP (app)) != AS_ID_KIND_ADDON) {
+			as_app_add_veto (AS_APP (app), "No <summary> in AppData");
+		switch (as_app_get_kind (AS_APP (app))) {
+		case AS_APP_KIND_ADDON:
+		case AS_APP_KIND_FIRMWARE:
+		case AS_APP_KIND_DRIVER:
+		case AS_APP_KIND_GENERIC:
+		case AS_APP_KIND_LOCALIZATION:
+			break;
+		default:
 			if (as_app_get_icon_default (AS_APP (app)) == NULL)
 				as_app_add_veto (AS_APP (app), "Has no Icon");
+			break;
 		}
 	}
 	return TRUE;
 }
 
-/**
- * asb_context_detect_missing_parents:
- **/
 static gboolean
 asb_context_detect_missing_parents (AsbContext *ctx, GError **error)
 {
@@ -1151,7 +950,7 @@ asb_context_detect_missing_parents (AsbContext *ctx, GError **error)
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	GList *l;
 	const gchar *tmp;
-	_cleanup_hashtable_unref_ GHashTable *hash = NULL;
+	g_autoptr(GHashTable) hash = NULL;
 
 	/* add all desktop apps to the hash */
 	hash = g_hash_table_new (g_str_hash, g_str_equal);
@@ -1161,7 +960,7 @@ asb_context_detect_missing_parents (AsbContext *ctx, GError **error)
 			continue;
 		if (as_app_get_pkgname_default (app) == NULL)
 			continue;
-		if (as_app_get_id_kind (app) != AS_ID_KIND_DESKTOP)
+		if (as_app_get_kind (app) != AS_APP_KIND_DESKTOP)
 			continue;
 		g_hash_table_insert (hash,
 				     (gpointer) as_app_get_id (app),
@@ -1175,7 +974,7 @@ asb_context_detect_missing_parents (AsbContext *ctx, GError **error)
 			continue;
 		if (as_app_get_pkgname_default (app) == NULL)
 			continue;
-		if (as_app_get_id_kind (app) != AS_ID_KIND_ADDON)
+		if (as_app_get_kind (app) != AS_APP_KIND_ADDON)
 			continue;
 		if (as_app_get_extends(app)->len == 0)
 			continue;
@@ -1188,26 +987,23 @@ asb_context_detect_missing_parents (AsbContext *ctx, GError **error)
 			continue;
 
 		/* do not add the addon */
-		as_app_add_veto (app, "%s has no parent of '%s'\n",
-				  as_app_get_id (app), tmp);
+		as_app_add_veto (app, "%s has no parent of '%s'",
+				 as_app_get_id (app), tmp);
 		g_print ("WARNING: %s has no parent of '%s'\n",
 			 as_app_get_id (app), tmp);
 	}
 	return TRUE;
 }
 
-/**
- * asb_context_write_xml_fail:
- **/
 static gboolean
 asb_context_write_xml_fail (AsbContext *ctx, GError **error)
 {
 	AsApp *app;
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	GList *l;
-	_cleanup_free_ gchar *basename_failed = NULL;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
+	g_autofree gchar *basename_failed = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GFile) file = NULL;
 
 	/* no need to create */
 	if ((priv->flags & ASB_CONTEXT_FLAG_INCLUDE_FAILED) == 0)
@@ -1218,8 +1014,6 @@ asb_context_write_xml_fail (AsbContext *ctx, GError **error)
 		if (!ASB_IS_APP (app))
 			continue;
 		if (as_app_get_vetos(app)->len == 0)
-			continue;
-		if (as_app_get_metadata_item (app, "NoDisplay") != NULL)
 			continue;
 		if (as_store_get_app_by_id (priv->store_failed,
 					    as_app_get_id (app)) != NULL)
@@ -1235,7 +1029,7 @@ asb_context_write_xml_fail (AsbContext *ctx, GError **error)
 	as_store_set_origin (priv->store_failed, basename_failed);
 	as_store_set_api_version (priv->store_failed, priv->api_version);
 	if (priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		_cleanup_free_ gchar *builder_id = asb_utils_get_builder_id ();
+		g_autofree gchar *builder_id = asb_utils_get_builder_id ();
 		as_store_set_builder_id (priv->store_failed, builder_id);
 	}
 	return as_store_to_file (priv->store_failed,
@@ -1246,16 +1040,13 @@ asb_context_write_xml_fail (AsbContext *ctx, GError **error)
 				 NULL, error);
 }
 
-/**
- * asb_context_write_xml_ignore:
- **/
 static gboolean
 asb_context_write_xml_ignore (AsbContext *ctx, GError **error)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	_cleanup_free_ gchar *basename_cache = NULL;
-	_cleanup_free_ gchar *filename = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
+	g_autofree gchar *basename_cache = NULL;
+	g_autofree gchar *filename = NULL;
+	g_autoptr(GFile) file = NULL;
 
 	/* no need to create */
 	if ((priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) == 0)
@@ -1271,7 +1062,7 @@ asb_context_write_xml_ignore (AsbContext *ctx, GError **error)
 	as_store_set_origin (priv->store_ignore, basename_cache);
 	as_store_set_api_version (priv->store_ignore, priv->api_version);
 	if (priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) {
-		_cleanup_free_ gchar *builder_id = asb_utils_get_builder_id ();
+		g_autofree gchar *builder_id = asb_utils_get_builder_id ();
 		as_store_set_builder_id (priv->store_ignore, builder_id);
 	}
 	return as_store_to_file (priv->store_ignore,
@@ -1282,9 +1073,6 @@ asb_context_write_xml_ignore (AsbContext *ctx, GError **error)
 				 NULL, error);
 }
 
-/**
- * asb_context_disable_older_pkgs:
- **/
 static void
 asb_context_disable_older_pkgs (AsbContext *ctx)
 {
@@ -1293,7 +1081,7 @@ asb_context_disable_older_pkgs (AsbContext *ctx)
 	AsbPackage *pkg;
 	const gchar *key;
 	guint i;
-	_cleanup_hashtable_unref_ GHashTable *newest = NULL;
+	g_autoptr(GHashTable) newest = NULL;
 
 	newest = g_hash_table_new_full (g_str_hash, g_str_equal,
 					g_free, (GDestroyNotify) g_object_unref);
@@ -1324,41 +1112,51 @@ asb_context_disable_older_pkgs (AsbContext *ctx)
 	}
 }
 
-/**
- * asb_context_disable_multiarch_pkgs:
- **/
+/* return the first package in the repo that matches the name and arch */
+static AsbPackage *
+asb_context_get_package_by_name_arch (AsbContext *ctx,
+				      const gchar *name,
+				      const gchar *arch)
+{
+	AsbContextPrivate *priv = GET_PRIVATE (ctx);
+	guint i;
+	for (i = 0; i < priv->packages->len; i++) {
+		AsbPackage *pkg = ASB_PACKAGE (g_ptr_array_index (priv->packages, i));
+		if (g_strcmp0 (asb_package_get_name (pkg), name) == 0 &&
+		    g_strcmp0 (asb_package_get_arch (pkg), arch) == 0) {
+			return pkg;
+		}
+	}
+	return NULL;
+}
+
 static void
 asb_context_disable_multiarch_pkgs (AsbContext *ctx)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	AsbPackage *pkg;
-	const gchar *arch;
-	gboolean found_arch = FALSE;
 	guint i;
 
-	/* are there any 64-bit packages in the repo? */
+	/* are there any non 64-bit packages in the repo with 64-bit versions */
 	for (i = 0; i < priv->packages->len; i++) {
-		pkg = ASB_PACKAGE (g_ptr_array_index (priv->packages, i));
-		if (g_strcmp0 (asb_package_get_arch (pkg), "x86_64") == 0) {
-			found_arch = TRUE;
-			break;
-		}
-	}
-	if (!found_arch)
-		return;
-
-	/* disable any alternate-arch packages */
-	for (i = 0; i < priv->packages->len; i++) {
-		pkg = ASB_PACKAGE (g_ptr_array_index (priv->packages, i));
-		arch = asb_package_get_arch (pkg);
+		AsbPackage *pkg = ASB_PACKAGE (g_ptr_array_index (priv->packages, i));
+		AsbPackage *pkg64;
+		const gchar *arch = asb_package_get_arch (pkg);
+		const gchar *name = asb_package_get_name (pkg);
 		if (arch == NULL)
 			continue;
-		if (g_strcmp0 (arch, "x86_64") != 0 &&
-		    g_strcmp0 (arch, "noarch") != 0) {
-			g_debug ("disabling alternate-arch %s",
-				 asb_package_get_filename (pkg));
-			asb_package_set_enabled (pkg, FALSE);
-		}
+		if (g_strcmp0 (arch, "x86_64") == 0)
+			continue;
+		if (g_strcmp0 (arch, "noarch") == 0)
+			continue;
+		pkg64 = asb_context_get_package_by_name_arch (ctx,
+							      name,
+							      "x86_64");
+		if (pkg64 == NULL)
+			continue;
+		g_debug ("disabling alternate-arch %s as native exists %s",
+			 asb_package_get_filename (pkg),
+			 asb_package_get_filename (pkg64));
+		asb_package_set_enabled (pkg, FALSE);
 	}
 }
 
@@ -1382,7 +1180,7 @@ asb_context_process (AsbContext *ctx, GError **error)
 	GThreadPool *pool;
 	gboolean ret;
 	guint i;
-	_cleanup_ptrarray_unref_ GPtrArray *tasks = NULL;
+	g_autoptr(GPtrArray) tasks = NULL;
 
 	/* only process the newest packages */
 	asb_context_disable_multiarch_pkgs (ctx);
@@ -1391,7 +1189,7 @@ asb_context_process (AsbContext *ctx, GError **error)
 	/* create thread pool */
 	pool = g_thread_pool_new (asb_task_process_func,
 				  ctx,
-				  priv->max_threads,
+				  (gint) priv->max_threads,
 				  TRUE,
 				  error);
 	if (pool == NULL)
@@ -1399,7 +1197,6 @@ asb_context_process (AsbContext *ctx, GError **error)
 
 	/* add each package */
 	g_print ("Processing packages...\n");
-	asb_panel_set_job_total (priv->panel, priv->packages->len);
 	tasks = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	for (i = 0; i < priv->packages->len; i++) {
 		pkg = g_ptr_array_index (priv->packages, i);
@@ -1414,21 +1211,14 @@ asb_context_process (AsbContext *ctx, GError **error)
 		}
 
 		/* set locations of external resources */
-		asb_package_set_config (pkg, "AppDataExtra", priv->extra_appdata);
-		asb_package_set_config (pkg, "ScreenshotsExtra", priv->extra_screenshots);
-		asb_package_set_config (pkg, "MirrorURI", priv->screenshot_uri);
 		asb_package_set_config (pkg, "LogDir", priv->log_dir);
-		asb_package_set_config (pkg, "ScreenshotDir", priv->screenshot_dir);
-		asb_package_set_config (pkg, "CacheDir", priv->cache_dir);
 		asb_package_set_config (pkg, "TempDir", priv->temp_dir);
 		asb_package_set_config (pkg, "IconsDir", priv->icons_dir);
 		asb_package_set_config (pkg, "OutputDir", priv->output_dir);
 
 		/* create task */
 		task = asb_task_new (ctx);
-		asb_task_set_id (task, i);
 		asb_task_set_package (task, pkg);
-		asb_task_set_panel (task, priv->panel);
 		g_ptr_array_add (tasks, task);
 
 		/* run the task */
@@ -1523,10 +1313,10 @@ asb_context_find_in_cache (AsbContext *ctx, const gchar *filename)
 	AsApp *app;
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 	guint i;
-	_cleanup_free_ gchar *cache_id = NULL;
-	_cleanup_free_ gchar *builder_id = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *apps = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *apps_ignore = NULL;
+	g_autofree gchar *cache_id = NULL;
+	g_autofree gchar *builder_id = NULL;
+	g_autoptr(GPtrArray) apps = NULL;
+	g_autoptr(GPtrArray) apps_ignore = NULL;
 
 	/* the package was successfully parsed last time */
 	cache_id = asb_utils_get_cache_id_for_filename (filename);
@@ -1571,6 +1361,8 @@ asb_context_find_by_pkgname (AsbContext *ctx, const gchar *pkgname)
 
 	for (i = 0; i < priv->packages->len; i++) {
 		pkg = g_ptr_array_index (priv->packages, i);
+		if (!asb_package_get_enabled (pkg))
+			continue;
 		if (g_strcmp0 (asb_package_get_name (pkg), pkgname) == 0)
 			return pkg;
 	}
@@ -1595,17 +1387,14 @@ asb_context_add_app (AsbContext *ctx, AsbApp *app)
 	g_mutex_unlock (&priv->apps_mutex);
 }
 
-/**
- * asb_context_add_app_ignore:
- **/
 void
 asb_context_add_app_ignore (AsbContext *ctx, AsbPackage *pkg)
 {
 	AsApp *app_tmp;
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
-	_cleanup_free_ gchar *name_arch = NULL;
-	_cleanup_object_unref_ AsApp *app = NULL;
-	_cleanup_ptrarray_unref_ GPtrArray *apps = NULL;
+	g_autofree gchar *name_arch = NULL;
+	g_autoptr(AsApp) app = NULL;
+	g_autoptr(GPtrArray) apps = NULL;
 
 	/* only do this when we are using a cache-id */
 	if ((priv->flags & ASB_CONTEXT_FLAG_ADD_CACHE_ID) == 0)
@@ -1628,21 +1417,19 @@ asb_context_add_app_ignore (AsbContext *ctx, AsbPackage *pkg)
 	app_tmp = as_store_get_app_by_id (priv->store_ignore, name_arch);
 	if (app_tmp != NULL) {
 		as_app_add_metadata (AS_APP (app_tmp), "X-CacheID",
-				     asb_package_get_basename (pkg), -1);
+				     asb_package_get_basename (pkg));
 		return;
 	}
 
 	/* never encountered before, so add */
 	app = as_app_new ();
-	as_app_set_id (app, name_arch, -1);
+	as_app_set_id (app, name_arch);
+	as_app_add_pkgname (app, asb_package_get_name (pkg));
 	as_app_add_metadata (app, "X-CacheID",
-			     asb_package_get_basename (pkg), -1);
+			     asb_package_get_basename (pkg));
 	as_store_add_app (priv->store_ignore, app);
 }
 
-/**
- * asb_context_finalize:
- **/
 static void
 asb_context_finalize (GObject *object)
 {
@@ -1653,7 +1440,6 @@ asb_context_finalize (GObject *object)
 	g_object_unref (priv->store_ignore);
 	g_object_unref (priv->store_old);
 	g_object_unref (priv->plugin_loader);
-	g_object_unref (priv->panel);
 	g_ptr_array_unref (priv->packages);
 	g_list_foreach (priv->apps, (GFunc) g_object_unref, NULL);
 	g_list_free (priv->apps);
@@ -1661,12 +1447,7 @@ asb_context_finalize (GObject *object)
 		g_ptr_array_unref (priv->file_globs);
 	g_mutex_clear (&priv->apps_mutex);
 	g_free (priv->old_metadata);
-	g_free (priv->extra_appstream);
-	g_free (priv->extra_appdata);
-	g_free (priv->extra_screenshots);
-	g_free (priv->screenshot_uri);
 	g_free (priv->log_dir);
-	g_free (priv->screenshot_dir);
 	g_free (priv->cache_dir);
 	g_free (priv->temp_dir);
 	g_free (priv->output_dir);
@@ -1677,16 +1458,12 @@ asb_context_finalize (GObject *object)
 	G_OBJECT_CLASS (asb_context_parent_class)->finalize (object);
 }
 
-/**
- * asb_context_init:
- **/
 static void
 asb_context_init (AsbContext *ctx)
 {
 	AsbContextPrivate *priv = GET_PRIVATE (ctx);
 
 	priv->plugin_loader = asb_plugin_loader_new (ctx);
-	priv->panel = asb_panel_new ();
 	priv->packages = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	g_mutex_init (&priv->apps_mutex);
 	priv->store_failed = as_store_new ();
@@ -1696,9 +1473,6 @@ asb_context_init (AsbContext *ctx)
 	priv->min_icon_size = 32;
 }
 
-/**
- * asb_context_class_init:
- **/
 static void
 asb_context_class_init (AsbContextClass *klass)
 {

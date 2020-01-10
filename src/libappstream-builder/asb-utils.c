@@ -19,11 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * SECTION:asb-utils
- * @short_description: Helper functionality.
- * @stability: Unstable
- */
 
 #include "config.h"
 
@@ -33,7 +28,6 @@
 #include <archive_entry.h>
 #include <string.h>
 
-#include "as-cleanup.h"
 #include "asb-utils.h"
 #include "asb-plugin.h"
 
@@ -144,7 +138,7 @@ gboolean
 asb_utils_ensure_exists_and_empty (const gchar *directory, GError **error)
 {
 	const gchar *filename;
-	_cleanup_dir_close_ GDir *dir = NULL;
+	g_autoptr(GDir) dir = NULL;
 
 	/* does directory exist */
 	if (!asb_utils_ensure_exists (directory, error))
@@ -157,7 +151,7 @@ asb_utils_ensure_exists_and_empty (const gchar *directory, GError **error)
 
 	/* find each */
 	while ((filename = g_dir_read_name (dir))) {
-		_cleanup_free_ gchar *src = NULL;
+		g_autofree gchar *src = NULL;
 		src = g_build_filename (directory, filename, NULL);
 		if (g_file_test (src, G_FILE_TEST_IS_DIR)) {
 			if (!asb_utils_rmtree (src, error))
@@ -175,10 +169,7 @@ asb_utils_ensure_exists_and_empty (const gchar *directory, GError **error)
 	return TRUE;
 }
 
-/**
- * asb_utils_count_directories_deep:
- **/
-static const guint
+static guint
 asb_utils_count_directories_deep (const gchar *path)
 {
 	guint cnt = 0;
@@ -192,9 +183,6 @@ asb_utils_count_directories_deep (const gchar *path)
 	return cnt;
 }
 
-/**
- * asb_utils_get_back_to_root:
- **/
 static gchar *
 asb_utils_get_back_to_root (guint levels)
 {
@@ -207,11 +195,6 @@ asb_utils_get_back_to_root (guint levels)
 	return g_string_free (str, FALSE);
 }
 
-/**
- * asb_utils_sanitise_path:
- *
- * Converts various formats into an absolute path.
- **/
 static gchar *
 asb_utils_sanitise_path (const gchar *path)
 {
@@ -220,24 +203,35 @@ asb_utils_sanitise_path (const gchar *path)
 		return g_strdup (path);
 
 	/* ./usr/share/README -> /usr/share/README */
-	if (path[0] == '.')
+	if (g_str_has_prefix (path, "./"))
 		return g_strdup (path + 1);
+
+	/* ../usr/share/README -> ../usr/share/README */
+	if (g_str_has_prefix (path, "../"))
+		return g_strdup (path);
 
 	/* usr/share/README -> /usr/share/README */
 	return g_strconcat ("/", path, NULL);
 }
 
-/**
- * asb_utils_explode_file:
- **/
+static gchar *
+asb_utils_resolve_relative_symlink (const gchar *dir_path,
+                                    const gchar *relative_path)
+{
+	g_autoptr(GFile) dir = NULL;
+	g_autoptr(GFile) symlink_dest = NULL;
+
+	dir = g_file_new_for_path (dir_path);
+	symlink_dest = g_file_resolve_relative_path (dir, relative_path);
+	return g_file_get_path (symlink_dest);
+}
+
 static gboolean
 asb_utils_explode_file (struct archive_entry *entry, const gchar *dir)
 {
 	const gchar *tmp;
-	guint symlink_depth;
-	_cleanup_free_ gchar *back_up = NULL;
-	_cleanup_free_ gchar *path = NULL;
-	_cleanup_free_ gchar *buf = NULL;
+	g_autofree gchar *path = NULL;
+	g_autofree gchar *buf = NULL;
 
 	/* no output file */
 	if (archive_entry_pathname (entry) == NULL)
@@ -252,8 +246,8 @@ asb_utils_explode_file (struct archive_entry *entry, const gchar *dir)
 	/* update hardlinks */
 	tmp = archive_entry_hardlink (entry);
 	if (tmp != NULL) {
-		_cleanup_free_ gchar *buf_link = NULL;
-		_cleanup_free_ gchar *path_link = NULL;
+		g_autofree gchar *buf_link = NULL;
+		g_autofree gchar *path_link = NULL;
 		path_link = asb_utils_sanitise_path (tmp);
 		buf_link = g_build_filename (dir, path_link, NULL);
 		if (!g_file_test (buf_link, G_FILE_TEST_EXISTS)) {
@@ -266,13 +260,22 @@ asb_utils_explode_file (struct archive_entry *entry, const gchar *dir)
 	/* update symlinks */
 	tmp = archive_entry_symlink (entry);
 	if (tmp != NULL) {
-		_cleanup_free_ gchar *buf_link = NULL;
-		symlink_depth = asb_utils_count_directories_deep (path) - 1;
-		back_up = asb_utils_get_back_to_root (symlink_depth);
-		if (tmp[0] == '/')
-			tmp++;
-		buf_link = g_build_filename (back_up, tmp, NULL);
-		archive_entry_update_symlink_utf8 (entry, buf_link);
+		g_autofree gchar *path_link = NULL;
+
+		path_link = asb_utils_sanitise_path (tmp);
+		if (g_path_is_absolute (path_link)) {
+			guint symlink_depth;
+			g_autofree gchar *back_up = NULL;
+			g_autofree gchar *buf_link = NULL;
+
+			symlink_depth = asb_utils_count_directories_deep (path) - 1;
+			back_up = asb_utils_get_back_to_root (symlink_depth);
+			buf_link = g_build_filename (back_up, tmp, NULL);
+
+			archive_entry_update_symlink_utf8 (entry, buf_link);
+		} else {
+			archive_entry_update_symlink_utf8 (entry, path_link);
+		}
 	}
 	return TRUE;
 }
@@ -303,7 +306,7 @@ asb_utils_explode (const gchar *filename,
 	struct archive *arch = NULL;
 	struct archive *arch_preview = NULL;
 	struct archive_entry *entry;
-	_cleanup_hashtable_unref_ GHashTable *matches = NULL;
+	g_autoptr(GHashTable) matches = NULL;
 
 	/* populate a hash with all the files, symlinks and hardlinks that
 	 * actually need decompressing */
@@ -322,7 +325,7 @@ asb_utils_explode (const gchar *filename,
 	}
 	matches = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 	for (;;) {
-		_cleanup_free_ gchar *path = NULL;
+		g_autofree gchar *path = NULL;
 		r = archive_read_next_header (arch_preview, &entry);
 		if (r == ARCHIVE_EOF)
 			break;
@@ -358,9 +361,16 @@ asb_utils_explode (const gchar *filename,
 		/* add symlink */
 		tmp = archive_entry_symlink (entry);
 		if (tmp != NULL) {
-			g_hash_table_insert (matches,
-					     asb_utils_sanitise_path (tmp),
-					     GINT_TO_POINTER (1));
+			if (g_path_is_absolute (tmp)) {
+				g_hash_table_insert (matches,
+						     asb_utils_sanitise_path (tmp),
+						     GINT_TO_POINTER (1));
+			} else {
+				g_autofree gchar *parent_dir = g_path_get_dirname (path);
+				g_hash_table_insert (matches,
+						     asb_utils_resolve_relative_symlink (parent_dir, tmp),
+						     GINT_TO_POINTER (1));
+			}
 		}
 	}
 
@@ -379,7 +389,7 @@ asb_utils_explode (const gchar *filename,
 		goto out;
 	}
 	for (;;) {
-		_cleanup_free_ gchar *path = NULL;
+		g_autofree gchar *path = NULL;
 		r = archive_read_next_header (arch, &entry);
 		if (r == ARCHIVE_EOF)
 			break;
@@ -424,9 +434,6 @@ out:
 	return ret;
 }
 
-/**
- * asb_utils_write_archive:
- **/
 static gboolean
 asb_utils_write_archive (const gchar *filename,
 			 const gchar *path_orig,
@@ -442,8 +449,10 @@ asb_utils_write_archive (const gchar *filename,
 	struct stat st;
 
 	a = archive_write_new ();
-	if (g_str_has_suffix (filename, ".gz"))
+	if (g_str_has_suffix (filename, ".gz")) {
 		archive_write_add_filter_gzip (a);
+		archive_write_set_filter_option (a, "gzip", "timestamp", NULL);
+	}
 	if (g_str_has_suffix (filename, ".bz2"))
 		archive_write_add_filter_bzip2 (a);
 	if (g_str_has_suffix (filename, ".xz"))
@@ -451,12 +460,13 @@ asb_utils_write_archive (const gchar *filename,
 	archive_write_set_format_pax_restricted (a);
 	archive_write_open_filename (a, filename);
 	for (i = 0; i < files->len; i++) {
-		_cleanup_free_ gchar *data = NULL;
-		_cleanup_free_ gchar *filename_full = NULL;
+		g_autofree gchar *data = NULL;
+		g_autofree gchar *filename_full = NULL;
 
 		tmp = g_ptr_array_index (files, i);
 		filename_full = g_build_filename (path_orig, tmp, NULL);
-		stat (filename_full, &st);
+		if (stat (filename_full, &st) != 0)
+			continue;
 		entry = archive_entry_new ();
 		archive_entry_set_pathname (entry, tmp);
 		archive_entry_set_size (entry, st.st_size);
@@ -464,20 +474,18 @@ asb_utils_write_archive (const gchar *filename,
 		archive_entry_set_perm (entry, 0644);
 		archive_write_header (a, entry);
 		ret = g_file_get_contents (filename_full, &data, &len, error);
-		if (!ret)
-			goto out;
+		if (!ret) {
+			archive_entry_free (entry);
+			break;
+		}
 		archive_write_data (a, data, len);
 		archive_entry_free (entry);
 	}
-out:
 	archive_write_close (a);
 	archive_write_free (a);
 	return ret;
 }
 
-/**
- * asb_utils_add_files_recursive:
- **/
 static gboolean
 asb_utils_add_files_recursive (GPtrArray *files,
 			       const gchar *path_orig,
@@ -487,14 +495,14 @@ asb_utils_add_files_recursive (GPtrArray *files,
 	const gchar *path_trailing;
 	const gchar *tmp;
 	guint path_orig_len;
-	_cleanup_dir_close_ GDir *dir = NULL;
+	g_autoptr(GDir) dir = NULL;
 
 	dir = g_dir_open (path, 0, error);
 	if (dir == NULL)
 		return FALSE;
-	path_orig_len = strlen (path_orig);
+	path_orig_len = (guint) strlen (path_orig);
 	while ((tmp = g_dir_read_name (dir)) != NULL) {
-		_cleanup_free_ gchar *path_new = NULL;
+		g_autofree gchar *path_new = NULL;
 		path_new = g_build_filename (path, tmp, NULL);
 		if (g_file_test (path_new, G_FILE_TEST_IS_DIR)) {
 			if (!asb_utils_add_files_recursive (files, path_orig, path_new, error))
@@ -505,6 +513,12 @@ asb_utils_add_files_recursive (GPtrArray *files,
 		}
 	}
 	return TRUE;
+}
+
+static gint
+my_pstrcmp (const gchar **a, const gchar **b)
+{
+	return g_strcmp0 (*a, *b);
 }
 
 /**
@@ -524,7 +538,7 @@ asb_utils_write_archive_dir (const gchar *filename,
 			     const gchar *directory,
 			     GError **error)
 {
-	_cleanup_ptrarray_unref_ GPtrArray *files = NULL;
+	g_autoptr(GPtrArray) files = NULL;
 
 	/* add all files in the directory to the archive */
 	files = g_ptr_array_new_with_free_func (g_free);
@@ -533,104 +547,11 @@ asb_utils_write_archive_dir (const gchar *filename,
 	if (files->len == 0)
 		return TRUE;
 
+	/* sort by filename for deterministic results */
+	g_ptr_array_sort (files, (GCompareFunc) my_pstrcmp);
+
 	/* write tar file */
 	return asb_utils_write_archive (filename, directory, files, error);
-}
-
-/**
- * asb_utils_add_apps_from_file:
- * @apps: (element-type AsbApp): applications
- * @filename: XML file to load
- * @error: A #GError or %NULL
- *
- * Add applications from a file.
- *
- * Returns: %TRUE for success, %FALSE otherwise
- *
- * Since: 0.1.0
- **/
-gboolean
-asb_utils_add_apps_from_file (GList **apps, const gchar *filename, GError **error)
-{
-	AsApp *app;
-	GPtrArray *array;
-	guint i;
-	_cleanup_object_unref_ AsStore *store = NULL;
-	_cleanup_object_unref_ GFile *file = NULL;
-
-	/* parse file */
-	store = as_store_new ();
-	file = g_file_new_for_path (filename);
-	if (!as_store_from_file (store, file, NULL, NULL, error))
-		return FALSE;
-
-	/* copy Asapp's into AsbApp's */
-	array = as_store_get_apps (store);
-	for (i = 0; i < array->len; i++) {
-		app = g_ptr_array_index (array, i);
-		as_app_set_source_file (app, filename);
-		asb_plugin_add_app (apps, app);
-	}
-	return TRUE;
-}
-
-/**
- * asb_utils_add_apps_from_dir:
- * @apps: (element-type AsbApp): applications
- * @path: path to read
- * @error: A #GError or %NULL
- *
- * Add applications from a directory.
- *
- * Returns: %TRUE for success, %FALSE otherwise
- *
- * Since: 0.1.0
- **/
-gboolean
-asb_utils_add_apps_from_dir (GList **apps, const gchar *path, GError **error)
-{
-	const gchar *tmp;
-	_cleanup_dir_close_ GDir *dir = NULL;
-
-	dir = g_dir_open (path, 0, error);
-	if (dir == NULL)
-		return FALSE;
-	while ((tmp = g_dir_read_name (dir)) != NULL) {
-		_cleanup_free_ gchar *filename = NULL;
-		filename = g_build_filename (path, tmp, NULL);
-		if (!asb_utils_add_apps_from_file (apps, filename, error))
-			return FALSE;
-	}
-	return TRUE;
-}
-
-/**
- * asb_string_replace:
- * @string: Source string
- * @search: utf8 string to search for
- * @replace: utf8 string to replace with
- *
- * Does search/replace on a given string.
- *
- * Returns: the number of times the string was replaced
- *
- * Since: 0.1.0
- **/
-guint
-asb_string_replace (GString *string, const gchar *search, const gchar *replace)
-{
-	_cleanup_free_ gchar *tmp = NULL;
-	_cleanup_strv_free_ gchar **split = NULL;
-
-	/* quick search */
-	if (g_strstr_len (string->str, -1, search) == NULL)
-		return 0;
-
-	/* replace */
-	split = g_strsplit (string->str, search, -1);
-	tmp = g_strjoinv (replace, split);
-	g_string_assign (string, tmp);
-	return g_strv_length (split) - 1;
 }
 
 /******************************************************************************/

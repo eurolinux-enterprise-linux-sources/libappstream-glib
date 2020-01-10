@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2014 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2014-2016 Richard Hughes <richard@hughsie.com>
  *
  * Licensed under the GNU Lesser General Public License Version 2.1
  *
@@ -31,7 +31,9 @@
 #include "config.h"
 
 #include "as-enums.h"
+#include "as-app.h"
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /**
  * as_id_kind_to_string:
  * @id_kind: the #AsIdKind.
@@ -45,23 +47,7 @@
 const gchar *
 as_id_kind_to_string (AsIdKind id_kind)
 {
-	if (id_kind == AS_ID_KIND_DESKTOP)
-		return "desktop";
-	if (id_kind == AS_ID_KIND_CODEC)
-		return "codec";
-	if (id_kind == AS_ID_KIND_FONT)
-		return "font";
-	if (id_kind == AS_ID_KIND_INPUT_METHOD)
-		return "inputmethod";
-	if (id_kind == AS_ID_KIND_WEB_APP)
-		return "webapp";
-	if (id_kind == AS_ID_KIND_SOURCE)
-		return "source";
-	if (id_kind == AS_ID_KIND_ADDON)
-		return "addon";
-	if (id_kind == AS_ID_KIND_FIRMWARE)
-		return "firmware";
-	return "unknown";
+	return as_app_kind_to_string (id_kind);
 }
 
 /**
@@ -77,24 +63,9 @@ as_id_kind_to_string (AsIdKind id_kind)
 AsIdKind
 as_id_kind_from_string (const gchar *id_kind)
 {
-	if (g_strcmp0 (id_kind, "desktop") == 0)
-		return AS_ID_KIND_DESKTOP;
-	if (g_strcmp0 (id_kind, "codec") == 0)
-		return AS_ID_KIND_CODEC;
-	if (g_strcmp0 (id_kind, "font") == 0)
-		return AS_ID_KIND_FONT;
-	if (g_strcmp0 (id_kind, "inputmethod") == 0)
-		return AS_ID_KIND_INPUT_METHOD;
-	if (g_strcmp0 (id_kind, "webapp") == 0)
-		return AS_ID_KIND_WEB_APP;
-	if (g_strcmp0 (id_kind, "source") == 0)
-		return AS_ID_KIND_SOURCE;
-	if (g_strcmp0 (id_kind, "addon") == 0)
-		return AS_ID_KIND_ADDON;
-	if (g_strcmp0 (id_kind, "firmware") == 0)
-		return AS_ID_KIND_FIRMWARE;
-	return AS_ID_KIND_UNKNOWN;
+	return as_app_kind_from_string (id_kind);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * as_url_kind_to_string:
@@ -121,6 +92,8 @@ as_url_kind_to_string (AsUrlKind url_kind)
 		return "help";
 	if (url_kind == AS_URL_KIND_MISSING)
 		return "missing";
+	if (url_kind == AS_URL_KIND_TRANSLATE)
+		return "translate";
 	return "unknown";
 }
 
@@ -149,6 +122,8 @@ as_url_kind_from_string (const gchar *url_kind)
 		return AS_URL_KIND_HELP;
 	if (g_strcmp0 (url_kind, "missing") == 0)
 		return AS_URL_KIND_MISSING;
+	if (g_strcmp0 (url_kind, "translate") == 0)
+		return AS_URL_KIND_TRANSLATE;
 	return AS_URL_KIND_UNKNOWN;
 }
 
@@ -210,4 +185,92 @@ as_kudo_kind_from_string (const gchar *kudo_kind)
 	if (g_strcmp0 (kudo_kind, "HiDpiIcon") == 0)
 		return AS_KUDO_KIND_HI_DPI_ICON;
 	return AS_KUDO_KIND_UNKNOWN;
+}
+
+/**
+ * as_size_kind_to_string:
+ * @size_kind: the #AsSizeKind.
+ *
+ * Converts the enumerated value to an text representation.
+ *
+ * Returns: string version of @size_kind
+ *
+ * Since: 0.5.2
+ **/
+const gchar *
+as_size_kind_to_string (AsSizeKind size_kind)
+{
+	if (size_kind == AS_SIZE_KIND_INSTALLED)
+		return "installed";
+	if (size_kind == AS_SIZE_KIND_DOWNLOAD)
+		return "download";
+	return "unknown";
+}
+
+/**
+ * as_size_kind_from_string:
+ * @size_kind: the string.
+ *
+ * Converts the text representation to an enumerated value.
+ *
+ * Returns: a #AsSizeKind or %AS_SIZE_KIND_UNKNOWN for unknown
+ *
+ * Since: 0.5.2
+ **/
+AsSizeKind
+as_size_kind_from_string (const gchar *size_kind)
+{
+	if (g_strcmp0 (size_kind, "installed") == 0)
+		return AS_SIZE_KIND_INSTALLED;
+	if (g_strcmp0 (size_kind, "download") == 0)
+		return AS_SIZE_KIND_DOWNLOAD;
+	return AS_SIZE_KIND_UNKNOWN;
+}
+
+/**
+ * as_urgency_kind_to_string:
+ * @urgency_kind: the #AsUrgencyKind.
+ *
+ * Converts the enumerated value to an text representation.
+ *
+ * Returns: string version of @urgency_kind
+ *
+ * Since: 0.5.1
+ **/
+const gchar *
+as_urgency_kind_to_string (AsUrgencyKind urgency_kind)
+{
+	if (urgency_kind == AS_URGENCY_KIND_LOW)
+		return "low";
+	if (urgency_kind == AS_URGENCY_KIND_MEDIUM)
+		return "medium";
+	if (urgency_kind == AS_URGENCY_KIND_HIGH)
+		return "high";
+	if (urgency_kind == AS_URGENCY_KIND_CRITICAL)
+		return "critical";
+	return "unknown";
+}
+
+/**
+ * as_urgency_kind_from_string:
+ * @urgency_kind: the string.
+ *
+ * Converts the text representation to an enumerated value.
+ *
+ * Returns: a #AsUrgencyKind or %AS_URGENCY_KIND_UNKNOWN for unknown
+ *
+ * Since: 0.5.1
+ **/
+AsUrgencyKind
+as_urgency_kind_from_string (const gchar *urgency_kind)
+{
+	if (g_strcmp0 (urgency_kind, "low") == 0)
+		return AS_URGENCY_KIND_LOW;
+	if (g_strcmp0 (urgency_kind, "medium") == 0)
+		return AS_URGENCY_KIND_MEDIUM;
+	if (g_strcmp0 (urgency_kind, "high") == 0)
+		return AS_URGENCY_KIND_HIGH;
+	if (g_strcmp0 (urgency_kind, "critical") == 0)
+		return AS_URGENCY_KIND_CRITICAL;
+	return AS_URGENCY_KIND_UNKNOWN;
 }

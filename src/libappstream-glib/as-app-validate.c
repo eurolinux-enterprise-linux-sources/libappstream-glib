@@ -27,7 +27,6 @@
 #include <string.h>
 
 #include "as-app-private.h"
-#include "as-cleanup.h"
 #include "as-node-private.h"
 #include "as-problem.h"
 #include "as-utils.h"
@@ -39,13 +38,11 @@ typedef struct {
 	GPtrArray		*probs;
 	SoupSession		*session;
 	gboolean		 previous_para_was_short;
+	gchar			*previous_para_was_short_str;
 	guint			 para_chars_before_list;
 	guint			 number_paragraphs;
 } AsAppValidateHelper;
 
-/**
- * ai_app_validate_add:
- */
 G_GNUC_PRINTF (3, 4) static void
 ai_app_validate_add (AsAppValidateHelper *helper,
 		     AsProblemKind kind,
@@ -54,7 +51,7 @@ ai_app_validate_add (AsAppValidateHelper *helper,
 	AsProblem *problem;
 	guint i;
 	va_list args;
-	_cleanup_free_ gchar *str = NULL;
+	g_autofree gchar *str = NULL;
 
 	va_start (args, fmt);
 	str = g_strdup_vprintf (fmt, args);
@@ -99,15 +96,12 @@ ai_app_validate_fullstop_ending (const gchar *tmp)
 			cnt++;
 	if (cnt++ > 1)
 		return FALSE;
-	str_len = strlen (tmp);
+	str_len = (guint) strlen (tmp);
 	if (str_len == 0)
 		return FALSE;
 	return tmp[str_len - 1] == '.';
 }
 
-/**
- * as_app_validate_has_hyperlink:
- **/
 static gboolean
 as_app_validate_has_hyperlink (const gchar *text)
 {
@@ -120,9 +114,6 @@ as_app_validate_has_hyperlink (const gchar *text)
 	return FALSE;
 }
 
-/**
- * as_app_validate_has_email:
- **/
 static gboolean
 as_app_validate_has_email (const gchar *text)
 {
@@ -133,13 +124,10 @@ as_app_validate_has_email (const gchar *text)
 	return FALSE;
 }
 
-/**
- * as_app_validate_has_first_word_capital:
- **/
 static gboolean
 as_app_validate_has_first_word_capital (AsAppValidateHelper *helper, const gchar *text)
 {
-	_cleanup_free_ gchar *first_word = NULL;
+	g_autofree gchar *first_word = NULL;
 	gchar *tmp;
 	guint i;
 
@@ -169,9 +157,6 @@ as_app_validate_has_first_word_capital (AsAppValidateHelper *helper, const gchar
 	return FALSE;
 }
 
-/**
- * as_app_validate_description_li:
- **/
 static void
 as_app_validate_description_li (const gchar *text, AsAppValidateHelper *helper)
 {
@@ -187,7 +172,15 @@ as_app_validate_description_li (const gchar *text, AsAppValidateHelper *helper)
 		require_sentence_case = FALSE;
 	}
 
-	str_len = strlen (text);
+	/* empty */
+	if (text == NULL) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_STYLE_INCORRECT,
+				     "<li> is empty");
+		return;
+	}
+
+	str_len = (guint) strlen (text);
 	if (str_len < length_li_min) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
@@ -217,9 +210,6 @@ as_app_validate_description_li (const gchar *text, AsAppValidateHelper *helper)
 	}
 }
 
-/**
- * as_app_validate_description_para:
- **/
 static void
 as_app_validate_description_para (const gchar *text, AsAppValidateHelper *helper)
 {
@@ -251,11 +241,13 @@ as_app_validate_description_para (const gchar *text, AsAppValidateHelper *helper
 	}
 	helper->previous_para_was_short = FALSE;
 
-	str_len = strlen (text);
+	str_len = (guint) strlen (text);
 	if (str_len < length_para_min) {
 		/* we don't add the problem now, as we allow a short
 		 * paragraph as an introduction to a list */
 		helper->previous_para_was_short = TRUE;
+		g_free (helper->previous_para_was_short_str);
+		helper->previous_para_was_short_str = g_strdup (text);
 	}
 	if (str_len > length_para_max) {
 		ai_app_validate_add (helper,
@@ -290,9 +282,6 @@ as_app_validate_description_para (const gchar *text, AsAppValidateHelper *helper
 	helper->para_chars_before_list += str_len;
 }
 
-/**
- * as_app_validate_description_list:
- **/
 static void
 as_app_validate_description_list (const gchar *text,
 				  gboolean allow_short_para,
@@ -317,7 +306,9 @@ as_app_validate_description_list (const gchar *text,
 	    helper->para_chars_before_list < (guint) length_para_before_list) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
-				     "Not enough <p> content before <ul>");
+				     "Content before <ul> is too short [%u], at least %u characters required",
+				     helper->para_chars_before_list,
+				     length_para_before_list);
 	}
 
 	/* we allow the previous paragraph to be short to
@@ -326,9 +317,6 @@ as_app_validate_description_list (const gchar *text,
 	helper->para_chars_before_list = 0;
 }
 
-/**
- * as_app_validate_description:
- **/
 static gboolean
 as_app_validate_description (const gchar *xml,
 			     AsAppValidateHelper *helper,
@@ -339,12 +327,10 @@ as_app_validate_description (const gchar *xml,
 {
 	GNode *l;
 	GNode *l2;
-	_cleanup_node_unref_ GNode *node = NULL;
+	g_autoptr(AsNode) node = NULL;
 
 	/* parse xml */
-	node = as_node_from_xml (xml, -1,
-				 AS_NODE_FROM_XML_FLAG_NONE,
-				 error);
+	node = as_node_from_xml (xml, AS_NODE_FROM_XML_FLAG_NONE, error);
 	if (node == NULL)
 		return FALSE;
 	helper->number_paragraphs = 0;
@@ -392,24 +378,26 @@ as_app_validate_description (const gchar *xml,
 	if (helper->previous_para_was_short) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
-				     "<p> is too short");
+				     "<p> is too short [%s]",
+				     helper->previous_para_was_short_str);
 	}
 	if (helper->number_paragraphs < number_para_min) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
-				     "Not enough <p> tags for a good description");
+				     "Not enough <p> tags for a good description [%u/%u]",
+				     helper->number_paragraphs,
+				     number_para_min);
 	}
 	if (helper->number_paragraphs > number_para_max) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
-				     "Too many <p> tags for a good description");
+				     "Too many <p> tags for a good description [%u/%u]",
+				     helper->number_paragraphs,
+				     number_para_max);
 	}
 	return TRUE;
 }
 
-/**
- * as_app_validate_image_url_already_exists:
- */
 static gboolean
 as_app_validate_image_url_already_exists (AsAppValidateHelper *helper,
 					  const gchar *search)
@@ -425,9 +413,6 @@ as_app_validate_image_url_already_exists (AsAppValidateHelper *helper,
 	return FALSE;
 }
 
-/**
- * ai_app_validate_image_check:
- */
 static gboolean
 ai_app_validate_image_check (AsImage *im, AsAppValidateHelper *helper)
 {
@@ -436,17 +421,17 @@ ai_app_validate_image_check (AsImage *im, AsAppValidateHelper *helper)
 	gboolean require_correct_aspect_ratio = FALSE;
 	gdouble desired_aspect = 1.777777778;
 	gdouble screenshot_aspect;
-	gint status_code;
+	guint status_code;
 	guint screenshot_height;
 	guint screenshot_width;
 	guint ss_size_height_max = 900;
 	guint ss_size_height_min = 351;
 	guint ss_size_width_max = 1600;
 	guint ss_size_width_min = 624;
-	_cleanup_object_unref_ GdkPixbuf *pixbuf = NULL;
-	_cleanup_object_unref_ GInputStream *stream = NULL;
-	_cleanup_object_unref_ SoupMessage *msg = NULL;
-	_cleanup_uri_unref_ SoupURI *base_uri = NULL;
+	g_autoptr(GdkPixbuf) pixbuf = NULL;
+	g_autoptr(GInputStream) stream = NULL;
+	g_autoptr(SoupMessage) msg = NULL;
+	g_autoptr(SoupURI) base_uri = NULL;
 
 	/* make the requirements more strict */
 	if ((helper->flags & AS_APP_VALIDATE_FLAG_STRICT) > 0) {
@@ -469,7 +454,7 @@ ai_app_validate_image_check (AsImage *im, AsAppValidateHelper *helper)
 	url = as_image_get_url (im);
 	g_debug ("checking %s", url);
 	base_uri = soup_uri_new (url);
-	if (base_uri == NULL) {
+	if (!SOUP_URI_VALID_FOR_HTTP (base_uri)) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_URL_NOT_FOUND,
 				     "<screenshot> url not valid [%s]", url);
@@ -501,7 +486,7 @@ ai_app_validate_image_check (AsImage *im, AsAppValidateHelper *helper)
 
 	/* create a buffer with the data */
 	stream = g_memory_input_stream_new_from_data (msg->response_body->data,
-						      msg->response_body->length,
+						      (gssize) msg->response_body->length,
 						      NULL);
 	if (stream == NULL) {
 		ai_app_validate_add (helper,
@@ -522,8 +507,8 @@ ai_app_validate_image_check (AsImage *im, AsAppValidateHelper *helper)
 	}
 
 	/* check width matches */
-	screenshot_width = gdk_pixbuf_get_width (pixbuf);
-	screenshot_height = gdk_pixbuf_get_height (pixbuf);
+	screenshot_width = (guint) gdk_pixbuf_get_width (pixbuf);
+	screenshot_height = (guint) gdk_pixbuf_get_height (pixbuf);
 	if (as_image_get_width (im) != 0 &&
 	    as_image_get_width (im) != screenshot_width) {
 		ai_app_validate_add (helper,
@@ -600,9 +585,6 @@ ai_app_validate_image_check (AsImage *im, AsAppValidateHelper *helper)
 	return TRUE;
 }
 
-/**
- * as_app_validate_image:
- **/
 static void
 as_app_validate_image (AsImage *im, AsAppValidateHelper *helper)
 {
@@ -611,7 +593,7 @@ as_app_validate_image (AsImage *im, AsAppValidateHelper *helper)
 
 	/* blank */
 	url = as_image_get_url (im);
-	if (strlen (url) == 0) {
+	if ((guint) strlen (url) == 0) {
 		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_VALUE_MISSING,
 				     "<screenshot> has no content");
@@ -633,9 +615,6 @@ as_app_validate_image (AsImage *im, AsAppValidateHelper *helper)
 		g_ptr_array_add (helper->screenshot_urls, g_strdup (url));
 }
 
-/**
- * as_app_validate_screenshot:
- **/
 static void
 as_app_validate_screenshot (AsScreenshot *ss, AsAppValidateHelper *helper)
 {
@@ -667,16 +646,20 @@ as_app_validate_screenshot (AsScreenshot *ss, AsAppValidateHelper *helper)
 	}
 	tmp = as_screenshot_get_caption (ss, NULL);
 	if (tmp != NULL) {
-		str_len = strlen (tmp);
+		str_len = (guint) strlen (tmp);
 		if (str_len < length_caption_min) {
 			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
-					     "<caption> is too short [%s]", tmp);
+					     "<caption> is too short [%s];"
+					     "shortest allowed is %u chars",
+					     tmp, length_caption_min);
 		}
 		if (str_len > length_caption_max) {
 			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
-					     "<caption> is too long [%s]", tmp);
+					     "<caption> is too long [%s];"
+					     "longest allowed is %u chars",
+					     tmp, length_caption_max);
 		}
 		if (ai_app_validate_fullstop_ending (tmp)) {
 			ai_app_validate_add (helper,
@@ -700,9 +683,6 @@ as_app_validate_screenshot (AsScreenshot *ss, AsAppValidateHelper *helper)
 	}
 }
 
-/**
- * as_app_validate_icons:
- **/
 static void
 as_app_validate_icons (AsApp *app, AsAppValidateHelper *helper)
 {
@@ -717,9 +697,9 @@ as_app_validate_icons (AsApp *app, AsAppValidateHelper *helper)
 
 	/* check the content is correct */
 	icon_kind = as_icon_get_kind (icon);
-	icon_name = as_icon_get_name (icon);
 	switch (icon_kind) {
 	case AS_ICON_KIND_STOCK:
+		icon_name = as_icon_get_name (icon);
 		if (!as_utils_is_stock_icon_name (icon_name)) {
 			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
@@ -728,7 +708,9 @@ as_app_validate_icons (AsApp *app, AsAppValidateHelper *helper)
 		}
 		break;
 	case AS_ICON_KIND_LOCAL:
-		if (!g_str_has_prefix (icon_name, "/")) {
+		icon_name = as_icon_get_filename (icon);
+		if (icon_name == NULL ||
+		    !g_str_has_prefix (icon_name, "/")) {
 			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
 					     "local icon is not a filename [%s]",
@@ -736,7 +718,9 @@ as_app_validate_icons (AsApp *app, AsAppValidateHelper *helper)
 		}
 		break;
 	case AS_ICON_KIND_CACHED:
-		if (g_str_has_prefix (icon_name, "/")) {
+		icon_name = as_icon_get_name (icon);
+		if (icon_name == NULL ||
+		    g_str_has_prefix (icon_name, "/")) {
 			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
 					     "cached icon is a filename [%s]",
@@ -744,6 +728,7 @@ as_app_validate_icons (AsApp *app, AsAppValidateHelper *helper)
 		}
 		break;
 	case AS_ICON_KIND_REMOTE:
+		icon_name = as_icon_get_url (icon);
 		if (!g_str_has_prefix (icon_name, "http://") &&
 		    !g_str_has_prefix (icon_name, "https://")) {
 			ai_app_validate_add (helper,
@@ -757,12 +742,10 @@ as_app_validate_icons (AsApp *app, AsAppValidateHelper *helper)
 	}
 }
 
-/**
- * as_app_validate_screenshots:
- **/
 static void
 as_app_validate_screenshots (AsApp *app, AsAppValidateHelper *helper)
 {
+	AsFormat *format;
 	AsScreenshot *ss;
 	GPtrArray *screenshots;
 	gboolean screenshot_has_default = FALSE;
@@ -776,13 +759,19 @@ as_app_validate_screenshots (AsApp *app, AsAppValidateHelper *helper)
 		number_screenshots_min = 0;
 	}
 
-	/* metainfo and firmware do not require any screenshots */
-	if (as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_METAINFO ||
-	    as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_INF)
+	/* firmware does not need screenshots */
+	if (as_app_get_kind (app) == AS_APP_KIND_FIRMWARE ||
+	    as_app_get_kind (app) == AS_APP_KIND_DRIVER ||
+	    as_app_get_kind (app) == AS_APP_KIND_LOCALIZATION)
+		number_screenshots_min = 0;
+
+	/* metainfo and inf do not require any screenshots */
+	format = as_app_get_format_default (app);
+	if (as_format_get_kind (format) == AS_FORMAT_KIND_METAINFO)
 		number_screenshots_min = 0;
 
 	/* only for AppData and AppStream */
-	if (as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_DESKTOP)
+	if (as_format_get_kind (format) == AS_FORMAT_KIND_DESKTOP)
 		return;
 
 	screenshots = as_app_get_screenshots (app);
@@ -816,15 +805,15 @@ as_app_validate_screenshots (AsApp *app, AsAppValidateHelper *helper)
 	}
 }
 
-/**
- * as_app_validate_release:
- **/
 static gboolean
-as_app_validate_release (AsRelease *release, AsAppValidateHelper *helper, GError **error)
+as_app_validate_release (AsApp *app,
+			 AsRelease *release,
+			 AsAppValidateHelper *helper,
+			 GError **error)
 {
 	const gchar *tmp;
 	guint64 timestamp;
-	guint number_para_max = 2;
+	guint number_para_max = 3;
 	guint number_para_min = 1;
 
 	/* relax the requirements a bit */
@@ -853,6 +842,21 @@ as_app_validate_release (AsRelease *release, AsAppValidateHelper *helper, GError
 				     "<release> timestamp should be a UNIX time");
 	}
 
+	/* check the timestamp is not in the future */
+	if (timestamp > (guint64) g_get_real_time () / G_USEC_PER_SEC) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
+				     "<release> timestamp is in the future");
+	}
+
+	/* for firmware, check urgency */
+	if (as_app_get_kind (app) == AS_APP_KIND_FIRMWARE &&
+	    as_release_get_urgency (release) == AS_URGENCY_KIND_UNKNOWN) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
+				     "<release> urgency is required for firmware");
+	}
+
 	/* check description */
 	tmp = as_release_get_description (release, "C");
 	if (tmp != NULL) {
@@ -874,45 +878,76 @@ as_app_validate_release (AsRelease *release, AsAppValidateHelper *helper, GError
 	return TRUE;
 }
 
-/**
- * as_app_validate_releases:
- **/
 static gboolean
 as_app_validate_releases (AsApp *app, AsAppValidateHelper *helper, GError **error)
 {
-	AsRelease *release;
 	GPtrArray *releases;
-	guint i;
+	AsFormat *format;
 
 	/* only for AppData */
-	if (as_app_get_source_kind (app) != AS_APP_SOURCE_KIND_APPDATA)
+	format = as_app_get_format_default (app);
+	if (as_format_get_kind (format) != AS_FORMAT_KIND_APPDATA &&
+	    as_format_get_kind (format) != AS_FORMAT_KIND_METAINFO)
 		return TRUE;
 
 	releases = as_app_get_releases (app);
-	if (releases->len > 10) {
-		ai_app_validate_add (helper,
-				     AS_PROBLEM_KIND_STYLE_INCORRECT,
-				     "Too many <release> tags");
-	}
-	for (i = 0; i < releases->len; i++) {
-		release = g_ptr_array_index (releases, i);
-		if (!as_app_validate_release (release, helper, error))
+	for (guint i = 0; i < releases->len; i++) {
+		AsRelease *release = g_ptr_array_index (releases, i);
+		if (!as_app_validate_release (app, release, helper, error))
 			return FALSE;
 	}
+
+	/* check the version numbers go down each time */
+	if (releases->len > 1) {
+		AsRelease *release_old = g_ptr_array_index (releases, 0);
+		for (guint i = 1; i < releases->len; i++) {
+			AsRelease *release = g_ptr_array_index (releases, i);
+			const gchar *version = as_release_get_version (release);
+			const gchar *version_old = as_release_get_version (release_old);
+			if (version == NULL || version_old == NULL)
+				continue;
+			if (as_utils_vercmp (version, version_old) > 0) {
+				ai_app_validate_add (helper,
+						     AS_PROBLEM_KIND_TAG_INVALID,
+						     "<release> versions are not in order "
+						     "[%s before %s]",
+						     version_old, version);
+			}
+			release_old = release;
+		}
+	}
+
+	/* check the timestamps go down each time */
+	if (releases->len > 1) {
+		AsRelease *release_old = g_ptr_array_index (releases, 0);
+		for (guint i = 1; i < releases->len; i++) {
+			AsRelease *release = g_ptr_array_index (releases, i);
+			guint64 timestamp = as_release_get_timestamp (release);
+			guint64 timestamp_old = as_release_get_timestamp (release_old);
+			if (timestamp == 0 || timestamp_old == 0)
+				continue;
+			if (timestamp > timestamp_old) {
+				ai_app_validate_add (helper,
+						     AS_PROBLEM_KIND_TAG_INVALID,
+						     "<release> timestamps are not in order "
+						     "[%" G_GUINT64_FORMAT " before %" G_GUINT64_FORMAT "]",
+						     timestamp_old, timestamp);
+			}
+			release_old = release;
+		}
+	}
+
 	return TRUE;
 }
 
-/**
- * as_app_validate_setup_networking:
- **/
 static gboolean
 as_app_validate_setup_networking (AsAppValidateHelper *helper, GError **error)
 {
-	helper->session = soup_session_sync_new_with_options (SOUP_SESSION_USER_AGENT,
-							      "libappstream-glib",
-							      SOUP_SESSION_TIMEOUT,
-							      5000,
-							      NULL);
+	helper->session = soup_session_new_with_options (SOUP_SESSION_USER_AGENT,
+							 "libappstream-glib",
+							 SOUP_SESSION_TIMEOUT,
+							 5000,
+							 NULL);
 	if (helper->session == NULL) {
 		g_set_error_literal (error,
 				     AS_APP_ERROR,
@@ -925,19 +960,25 @@ as_app_validate_setup_networking (AsAppValidateHelper *helper, GError **error)
 	return TRUE;
 }
 
-/**
- * as_app_validate_license:
- **/
 static gboolean
 as_app_validate_license (const gchar *license_text, GError **error)
 {
 	guint i;
-	_cleanup_strv_free_ gchar **licenses = NULL;
+	g_auto(GStrv) licenses = NULL;
 
 	licenses = as_utils_spdx_license_tokenize (license_text);
+	if (licenses == NULL) {
+		g_set_error (error,
+			     AS_APP_ERROR,
+			     AS_APP_ERROR_FAILED,
+			     "SPDX license text '%s' could not be parsed",
+			     license_text);
+		return FALSE;
+	}
 	for (i = 0; licenses[i] != NULL; i++) {
 		if (g_strcmp0 (licenses[i], "&") == 0 ||
 		    g_strcmp0 (licenses[i], "|") == 0 ||
+		    g_strcmp0 (licenses[i], "+") == 0 ||
 		    g_strcmp0 (licenses[i], "(") == 0 ||
 		    g_strcmp0 (licenses[i], ")") == 0)
 			continue;
@@ -954,38 +995,62 @@ as_app_validate_license (const gchar *license_text, GError **error)
 	return TRUE;
 }
 
-/**
- * as_app_validate_is_content_license:
- **/
+static gboolean
+as_app_validate_is_content_license_id (const gchar *license_id)
+{
+	if (g_strcmp0 (license_id, "@CC0-1.0") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@CC-BY-3.0") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@CC-BY-4.0") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@CC-BY-SA-3.0") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@CC-BY-SA-4.0") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@GFDL-1.1") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@GFDL-1.2") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@GFDL-1.3") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "@FSFAP") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "&") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "|") == 0)
+		return TRUE;
+	if (g_strcmp0 (license_id, "+") == 0)
+		return TRUE;
+	return FALSE;
+}
+
 static gboolean
 as_app_validate_is_content_license (const gchar *license)
 {
 	guint i;
-	_cleanup_strv_free_ gchar **tokens = NULL;
+	g_auto(GStrv) tokens = NULL;
 	tokens = as_utils_spdx_license_tokenize (license);
-	for (i = 0; tokens[i] != NULL; i++) {
-		if (g_strcmp0 (tokens[i], "@CC0-1.0") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@CC-BY-3.0") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@CC-BY-4.0") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@CC-BY-SA-3.0") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@CC-BY-SA-4.0") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@GFDL-1.1") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@GFDL-1.2") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "@GFDL-1.3") == 0)
-			continue;
-		if (g_strcmp0 (tokens[i], "&") == 0)
-			continue;
+	if (tokens == NULL)
 		return FALSE;
+	for (i = 0; tokens[i] != NULL; i++) {
+		if (!as_app_validate_is_content_license_id (tokens[i]))
+			return FALSE;
 	}
 	return TRUE;
 }
+
+static void
+as_app_validate_helper_free (AsAppValidateHelper *helper)
+{
+	g_ptr_array_unref (helper->screenshot_urls);
+	g_free (helper->previous_para_was_short_str);
+	if (helper->session != NULL)
+		g_object_unref (helper->session);
+	g_free (helper);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(AsAppValidateHelper, as_app_validate_helper_free);
 
 /**
  * as_app_validate:
@@ -1003,11 +1068,10 @@ GPtrArray *
 as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 {
 	AsAppProblems problems;
-	AsAppValidateHelper helper;
+	AsFormat *format;
 	GError *error_local = NULL;
 	GHashTable *urls;
 	GList *l;
-	GPtrArray *probs = NULL;
 	const gchar *description;
 	const gchar *id;
 	const gchar *key;
@@ -1017,6 +1081,7 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	const gchar *tmp;
 	const gchar *update_contact;
 	gboolean deprectated_failure = FALSE;
+	gboolean require_appstream_spec_only = FALSE;
 	gboolean require_contactdetails = TRUE;
 	gboolean require_copyright = FALSE;
 	gboolean require_project_license = FALSE;
@@ -1025,6 +1090,7 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	gboolean require_url = TRUE;
 	gboolean require_content_license = TRUE;
 	gboolean require_name = TRUE;
+	gboolean require_translation = TRUE;
 	gboolean validate_license = TRUE;
 	gboolean ret;
 	guint length_name_max = 30;
@@ -1034,7 +1100,18 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	guint number_para_max = 4;
 	guint number_para_min = 2;
 	guint str_len;
-	_cleanup_list_free_ GList *keys = NULL;
+	g_autoptr(GList) keys = NULL;
+	g_autoptr(AsAppValidateHelper) helper = g_new0 (AsAppValidateHelper, 1);
+
+	/* has to be set */
+	format = as_app_get_format_default (app);
+	if (format == NULL) {
+		g_set_error_literal (error,
+				     AS_APP_ERROR,
+				     AS_APP_ERROR_FAILED,
+				     "cannot validate without at least one format");
+		return NULL;
+	}
 
 	/* relax the requirements a bit */
 	if ((flags & AS_APP_VALIDATE_FLAG_RELAX) > 0) {
@@ -1047,9 +1124,10 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 		number_para_max = 10;
 		number_para_min = 1;
 		require_sentence_case = FALSE;
-		switch (as_app_get_source_kind (app)) {
-		case AS_APP_SOURCE_KIND_METAINFO:
-		case AS_APP_SOURCE_KIND_APPDATA:
+		require_translation = FALSE;
+		switch (as_format_get_kind (format)) {
+		case AS_FORMAT_KIND_METAINFO:
+		case AS_FORMAT_KIND_APPDATA:
 			require_name = FALSE;
 			break;
 		default:
@@ -1064,59 +1142,63 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 		require_translations = TRUE;
 		require_project_license = TRUE;
 		require_content_license = TRUE;
+		require_appstream_spec_only = TRUE;
+	}
+
+	/* addons don't need such a long description */
+	switch (as_format_get_kind (format)) {
+	case AS_FORMAT_KIND_METAINFO:
+	case AS_FORMAT_KIND_APPDATA:
+		number_para_min = 1;
+		break;
+	default:
+		break;
 	}
 
 	/* set up networking */
-	helper.app = app;
-	helper.probs = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
-	helper.screenshot_urls = g_ptr_array_new_with_free_func (g_free);
-	helper.flags = flags;
-	helper.previous_para_was_short = FALSE;
-	helper.para_chars_before_list = 0;
-	helper.number_paragraphs = 0;
-	ret = as_app_validate_setup_networking (&helper, error);
-	if (!ret)
-		goto out;
-
-	/* success, enough */
-	probs = helper.probs;
+	helper->app = app;
+	helper->probs = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
+	helper->screenshot_urls = g_ptr_array_new_with_free_func (g_free);
+	helper->flags = flags;
+	if (!as_app_validate_setup_networking (helper, error))
+		return NULL;
 
 	/* id */
 	ret = FALSE;
 	id = as_app_get_id (app);
-	switch (as_app_get_id_kind (app)) {
-	case AS_ID_KIND_DESKTOP:
-	case AS_ID_KIND_WEB_APP:
+	switch (as_app_get_kind (app)) {
+	case AS_APP_KIND_DESKTOP:
+	case AS_APP_KIND_WEB_APP:
 		if (g_str_has_suffix (id, ".desktop"))
 			ret = TRUE;
 		break;
-	case AS_ID_KIND_INPUT_METHOD:
+	case AS_APP_KIND_INPUT_METHOD:
 		if (g_str_has_suffix (id, ".xml"))
 			ret = TRUE;
 		else if (g_str_has_suffix (id, ".db"))
 			ret = TRUE;
 		break;
-	case AS_ID_KIND_CODEC:
+	case AS_APP_KIND_CODEC:
 		if (g_str_has_prefix (id, "gstreamer"))
 			ret = TRUE;
 		break;
-	case AS_ID_KIND_UNKNOWN:
-		ai_app_validate_add (&helper,
+	case AS_APP_KIND_UNKNOWN:
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
 				     "<id> has invalid type attribute");
 
 		break;
-	case AS_ID_KIND_FONT:
-	case AS_ID_KIND_ADDON:
-	case AS_ID_KIND_SOURCE:
-	case AS_ID_KIND_FIRMWARE:
+	case AS_APP_KIND_FIRMWARE:
+		if (g_str_has_suffix (id, ".firmware"))
+			ret = TRUE;
+		break;
+	default:
 		/* anything goes */
 		ret = TRUE;
-	default:
 		break;
 	}
 	if (!ret) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_MARKUP_INVALID,
 				     "<id> does not have correct extension for kind");
 	}
@@ -1126,7 +1208,7 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	if (license != NULL) {
 		if (require_content_license &&
 		    !as_app_validate_is_content_license (license)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
 					     "<metadata_license> is not valid [%s]",
 					     license);
@@ -1136,7 +1218,7 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 				g_prefix_error (&error_local,
 						"<metadata_license> is not valid [%s]",
 						license);
-				ai_app_validate_add (&helper,
+				ai_app_validate_add (helper,
 						     AS_PROBLEM_KIND_TAG_INVALID,
 						     "%s", error_local->message);
 				g_clear_error (&error_local);
@@ -1144,10 +1226,10 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 		}
 	}
 	if (license == NULL) {
-		switch (as_app_get_source_kind (app)) {
-		case AS_APP_SOURCE_KIND_APPDATA:
-		case AS_APP_SOURCE_KIND_METAINFO:
-			ai_app_validate_add (&helper,
+		switch (as_format_get_kind (format)) {
+		case AS_FORMAT_KIND_APPDATA:
+		case AS_FORMAT_KIND_METAINFO:
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_MISSING,
 					     "<metadata_license> is not present");
 			break;
@@ -1164,17 +1246,17 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 			g_prefix_error (&error_local,
 					"<project_license> is not valid [%s]",
 					license);
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
 					     "%s", error_local->message);
 			g_clear_error (&error_local);
 		}
 	}
 	if (require_project_license && license == NULL) {
-		switch (as_app_get_source_kind (app)) {
-		case AS_APP_SOURCE_KIND_APPDATA:
-		case AS_APP_SOURCE_KIND_METAINFO:
-			ai_app_validate_add (&helper,
+		switch (as_format_get_kind (format)) {
+		case AS_FORMAT_KIND_APPDATA:
+		case AS_FORMAT_KIND_METAINFO:
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_MISSING,
 					     "<project_license> is not present");
 			break;
@@ -1183,19 +1265,37 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 		}
 	}
 
+	/* translation */
+	if (require_translation &&
+	    as_format_get_kind (format) == AS_FORMAT_KIND_APPDATA &&
+	    as_app_get_translations (app)->len == 0) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_MISSING,
+				     "<translation> not specified");
+	}
+
 	/* pkgname */
 	if (as_app_get_pkgname_default (app) != NULL &&
-	    as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_METAINFO) {
-		ai_app_validate_add (&helper,
+	    as_format_get_kind (format) == AS_FORMAT_KIND_METAINFO) {
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_TAG_INVALID,
 				     "<pkgname> not allowed in metainfo");
 	}
 
+	/* appdata */
+	if (as_app_get_icon_default (app) != NULL &&
+	    as_format_get_kind (format) == AS_FORMAT_KIND_APPDATA &&
+	    as_app_get_kind (app) == AS_APP_KIND_DESKTOP) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_INVALID,
+				     "<icon> not allowed in desktop appdata");
+	}
+
 	/* extends */
 	if (as_app_get_extends(app)->len == 0 &&
-	    as_app_get_id_kind (app) == AS_ID_KIND_ADDON &&
-	    as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_METAINFO) {
-		ai_app_validate_add (&helper,
+	    as_app_get_kind (app) == AS_APP_KIND_ADDON &&
+	    as_format_get_kind (format) == AS_FORMAT_KIND_METAINFO) {
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_TAG_MISSING,
 				     "<extends> is not present");
 	}
@@ -1204,21 +1304,21 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	update_contact = as_app_get_update_contact (app);
 	if (g_strcmp0 (update_contact,
 		       "someone_who_cares@upstream_project.org") == 0) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_TAG_INVALID,
 				     "<update_contact> is still set to a dummy value");
 	}
 	if (update_contact != NULL && strlen (update_contact) < 6) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
 				     "<update_contact> is too short [%s]",
 				     update_contact);
 	}
 	if (require_contactdetails && update_contact == NULL) {
-		switch (as_app_get_source_kind (app)) {
-		case AS_APP_SOURCE_KIND_APPDATA:
-		case AS_APP_SOURCE_KIND_METAINFO:
-			ai_app_validate_add (&helper,
+		switch (as_format_get_kind (format)) {
+		case AS_FORMAT_KIND_APPDATA:
+		case AS_FORMAT_KIND_METAINFO:
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_MISSING,
 					     "<update_contact> is not present");
 			break;
@@ -1229,24 +1329,66 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 
 	/* only found for files */
 	problems = as_app_get_problems (app);
-	if (as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_APPDATA ||
-	    as_app_get_source_kind (app) == AS_APP_SOURCE_KIND_METAINFO) {
+	if (as_format_get_kind (format) == AS_FORMAT_KIND_APPDATA ||
+	    as_format_get_kind (format) == AS_FORMAT_KIND_METAINFO) {
 		if ((problems & AS_APP_PROBLEM_NO_XML_HEADER) > 0) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_MARKUP_INVALID,
 					     "<?xml> header not found");
 		}
 		if (require_copyright &&
 		    (problems & AS_APP_PROBLEM_NO_COPYRIGHT_INFO) > 0) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_VALUE_MISSING,
 					     "<!-- Copyright [year] [name] --> is not present");
 		}
+		if (deprectated_failure &&
+		    (problems & AS_APP_PROBLEM_UPDATECONTACT_FALLBACK) > 0) {
+			ai_app_validate_add (helper,
+					     AS_PROBLEM_KIND_TAG_INVALID,
+					     "<updatecontact> should be <update_contact>");
+		}
+	}
+
+	/* check invalid values */
+	if ((problems & AS_APP_PROBLEM_INVALID_PROJECT_GROUP) > 0) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_INVALID,
+				     "<project_group> is not valid");
+	}
+
+	/* only allow XML in the specification */
+	if (require_appstream_spec_only &&
+	    (problems & AS_APP_PROBLEM_INVALID_XML_TAG) > 0) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_INVALID,
+				     "XML data contains unknown tag");
+	}
+
+	/* only allow XML in the specification */
+	if (problems & AS_APP_PROBLEM_EXPECTED_CHILDREN) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_INVALID,
+				     "Expected children for tag");
+	}
+
+	/* only allow XML in the specification */
+	if (problems & AS_APP_PROBLEM_INVALID_KEYWORDS) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_INVALID,
+				     "<keyword> invalid contents");
+	}
+
+	/* releases all have to have unique versions */
+	if (problems & AS_APP_PROBLEM_DUPLICATE_RELEASE) {
+		ai_app_validate_add (helper,
+				     AS_PROBLEM_KIND_TAG_INVALID,
+				     "<release> version was duplicated");
 	}
 
 	/* check for things that have to exist */
 	if (as_app_get_id (app) == NULL) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_TAG_MISSING,
 				     "<id> is not present");
 	}
@@ -1257,7 +1399,7 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	for (l = keys; l != NULL; l = l->next) {
 		key = l->data;
 		if (g_strcmp0 (key, "unknown") == 0) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
 					     "<url> type invalid [%s]", key);
 		}
@@ -1266,7 +1408,7 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 			continue;
 		if (!g_str_has_prefix (tmp, "http://") &&
 		    !g_str_has_prefix (tmp, "https://")) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_INVALID,
 					     "<url> does not start with 'http://' [%s]",
 					     tmp);
@@ -1274,51 +1416,50 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	}
 
 	/* screenshots */
-	as_app_validate_screenshots (app, &helper);
+	as_app_validate_screenshots (app, helper);
 
 	/* icons */
-	as_app_validate_icons (app, &helper);
+	as_app_validate_icons (app, helper);
 
 	/* releases */
-	ret = as_app_validate_releases (app, &helper, error);
-	if (!ret)
-		goto out;
+	if (!as_app_validate_releases (app, helper, error))
+		return NULL;
 
 	/* name */
 	name = as_app_get_name (app, "C");
 	if (name != NULL) {
-		str_len = strlen (name);
+		str_len = (guint) strlen (name);
 		if (str_len < length_name_min) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<name> is too short [%s]", name);
 		}
 		if (str_len > length_name_max) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<name> is too long [%s]", name);
 		}
 		if (ai_app_validate_fullstop_ending (name)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<name> cannot end in '.' [%s]",
 					     name);
 		}
 		if (as_app_validate_has_hyperlink (name)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<name> cannot contain a hyperlink [%s]",
 					     name);
 		}
 		if (require_sentence_case &&
-		    !as_app_validate_has_first_word_capital (&helper, name)) {
-			ai_app_validate_add (&helper,
+		    !as_app_validate_has_first_word_capital (helper, name)) {
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<name> requires sentence case [%s]",
 					     name);
 		}
 	} else if (require_name) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_TAG_MISSING,
 				     "<name> is not present");
 	}
@@ -1326,59 +1467,59 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	/* comment */
 	summary = as_app_get_comment (app, "C");
 	if (summary != NULL) {
-		str_len = strlen (summary);
+		str_len = (guint) strlen (summary);
 		if (str_len < length_summary_min) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<summary> is too short [%s]",
 					     summary);
 		}
 		if (str_len > length_summary_max) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<summary> is too long [%s]",
 					     summary);
 		}
 		if (ai_app_validate_fullstop_ending (summary)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<summary> cannot end in '.' [%s]",
 					     summary);
 		}
 		if (as_app_validate_has_hyperlink (summary)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<summary> cannot contain a hyperlink [%s]",
 					     summary);
 		}
 		if (require_sentence_case &&
-		    !as_app_validate_has_first_word_capital (&helper, summary)) {
-			ai_app_validate_add (&helper,
+		    !as_app_validate_has_first_word_capital (helper, summary)) {
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<summary> requires sentence case [%s]",
 					     summary);
 		}
 	} else if (require_name) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_TAG_MISSING,
 				     "<summary> is not present");
 	}
 	if (summary != NULL && name != NULL &&
 	    strlen (summary) < strlen (name)) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_STYLE_INCORRECT,
 				     "<summary> is shorter than <name>");
 	}
 	description = as_app_get_description (app, "C");
 	if (description != NULL) {
 		ret = as_app_validate_description (description,
-						   &helper,
+						   helper,
 						   number_para_min,
 						   number_para_max,
 						   FALSE,
 						   &error_local);
 		if (!ret) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_MARKUP_INVALID,
 					     "%s", error_local->message);
 			g_error_free (error_local);
@@ -1388,21 +1529,21 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 		if (name != NULL &&
 		    as_app_get_name_size (app) == 1 &&
 		    (problems & AS_APP_PROBLEM_INTLTOOL_NAME) == 0) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TRANSLATIONS_REQUIRED,
 					     "<name> has no translations");
 		}
 		if (summary != NULL &&
 		    as_app_get_comment_size (app) == 1 &&
 		    (problems & AS_APP_PROBLEM_INTLTOOL_SUMMARY) == 0) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TRANSLATIONS_REQUIRED,
 					     "<summary> has no translations");
 		}
 		if (description != NULL &&
 		    as_app_get_description_size (app) == 1 &&
 		    (problems & AS_APP_PROBLEM_INTLTOOL_DESCRIPTION) == 0) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TRANSLATIONS_REQUIRED,
 					     "<description> has no translations");
 		}
@@ -1411,27 +1552,27 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 	/* developer_name */
 	name = as_app_get_developer_name (app, NULL);
 	if (name != NULL) {
-		str_len = strlen (name);
+		str_len = (guint) strlen (name);
 		if (str_len < length_name_min) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<developer_name> is too short [%s]",
 					     name);
 		}
 		if (str_len > length_name_max) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<developer_name> is too long [%s]",
 					     name);
 		}
 		if (as_app_validate_has_hyperlink (name)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<developer_name> cannot contain a hyperlink [%s]",
 					     name);
 		}
 		if (as_app_validate_has_email (name)) {
-			ai_app_validate_add (&helper,
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_STYLE_INCORRECT,
 					     "<developer_name> cannot contain an email address [%s]",
 					     name);
@@ -1440,23 +1581,23 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 
 	/* using deprecated names */
 	if (deprectated_failure && (problems & AS_APP_PROBLEM_DEPRECATED_LICENCE) > 0) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_ATTRIBUTE_INVALID,
 				     "<licence> is deprecated, use "
 				     "<metadata_license> instead");
 	}
 	if ((problems & AS_APP_PROBLEM_MULTIPLE_ENTRIES) > 0) {
-		ai_app_validate_add (&helper,
+		ai_app_validate_add (helper,
 				     AS_PROBLEM_KIND_MARKUP_INVALID,
 				     "<application> used more than once");
 	}
 
 	/* require homepage */
 	if (require_url && as_app_get_url_item (app, AS_URL_KIND_HOMEPAGE) == NULL) {
-		switch (as_app_get_source_kind (app)) {
-		case AS_APP_SOURCE_KIND_APPDATA:
-		case AS_APP_SOURCE_KIND_METAINFO:
-			ai_app_validate_add (&helper,
+		switch (as_format_get_kind (format)) {
+		case AS_FORMAT_KIND_APPDATA:
+		case AS_FORMAT_KIND_METAINFO:
+			ai_app_validate_add (helper,
 					     AS_PROBLEM_KIND_TAG_MISSING,
 					     "<url> is not present");
 			break;
@@ -1464,9 +1605,5 @@ as_app_validate (AsApp *app, AsAppValidateFlags flags, GError **error)
 			break;
 		}
 	}
-out:
-	g_ptr_array_unref (helper.screenshot_urls);
-	if (helper.session != NULL)
-		g_object_unref (helper.session);
-	return probs;
+	return helper->probs;
 }

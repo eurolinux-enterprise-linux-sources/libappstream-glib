@@ -90,24 +90,26 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_GPERF_TRUE@am__append_1 = as-tag-private.h
-@HAVE_GPERF_TRUE@am__append_2 = as-tag-private.h
+@HAVE_GCAB_TRUE@am__append_1 = \
+@HAVE_GCAB_TRUE@	as-store-cab.c 						\
+@HAVE_GCAB_TRUE@	as-store-cab.h
+
 check_PROGRAMS = as-self-test$(EXEEXT)
 TESTS = as-self-test$(EXEEXT)
-@HAVE_INTROSPECTION_TRUE@am__append_3 = $(gir_DATA) $(typelib_DATA)
+@HAVE_INTROSPECTION_TRUE@am__append_2 = $(gir_DATA) $(typelib_DATA)
 subdir = libappstream-glib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/as-linguas.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_link_flag.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/gtk-doc.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_check_xml_catalog.m4 \
 	$(top_srcdir)/m4/gtkdoc_jh_path_xml_catalog.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
-	$(top_srcdir)/m4/intltool.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -152,37 +154,61 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libappstream_glib_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am__libappstream_glib_la_SOURCES_DIST = as-app.c as-app-desktop.c \
-	as-app-inf.c as-app-private.h as-app-validate.c as-bundle.c \
-	as-bundle-private.h as-cleanup.h as-enums.c as-icon.c \
+	as-app-builder.c as-app-inf.c as-app-private.h \
+	as-app-validate.c as-bundle.c as-bundle-private.h \
+	as-checksum.c as-checksum-private.h as-content-rating.c \
+	as-content-rating-private.h as-enums.c as-format.c as-icon.c \
 	as-icon-private.h as-image.c as-image-private.h as-inf.c \
-	as-inf.h as-node.c as-node-private.h as-problem.c as-problem.h \
-	as-provide.c as-provide-private.h as-release.c \
-	as-release-private.h as-resources.c as-resources.h \
-	as-screenshot.c as-screenshot-private.h as-store.c as-tag.c \
-	as-utils.c as-utils-private.h as-version.h as-yaml.c as-yaml.h \
-	as-tag-private.h
-am__objects_1 =
+	as-inf.h as-markup.c as-monitor.c as-monitor.h as-node.c \
+	as-node-private.h as-problem.c as-problem.h as-profile.c \
+	as-profile.h as-provide.c as-provide-private.h as-ref-string.c \
+	as-ref-string.h as-release.c as-release-private.h as-require.c \
+	as-require-private.h as-review.c as-review-private.h \
+	as-resources.c as-resources.h as-screenshot.c \
+	as-screenshot-private.h as-stemmer.c as-stemmer.h as-store.c \
+	as-suggest.c as-suggest-private.h as-tag.c as-translation.c \
+	as-translation-private.h as-utils.c as-utils-private.h \
+	as-version.h as-yaml.c as-yaml.h as-store-cab.c as-store-cab.h
+@HAVE_GCAB_TRUE@am__objects_1 = libappstream_glib_la-as-store-cab.lo
 am_libappstream_glib_la_OBJECTS = libappstream_glib_la-as-app.lo \
 	libappstream_glib_la-as-app-desktop.lo \
+	libappstream_glib_la-as-app-builder.lo \
 	libappstream_glib_la-as-app-inf.lo \
 	libappstream_glib_la-as-app-validate.lo \
 	libappstream_glib_la-as-bundle.lo \
+	libappstream_glib_la-as-checksum.lo \
+	libappstream_glib_la-as-content-rating.lo \
 	libappstream_glib_la-as-enums.lo \
+	libappstream_glib_la-as-format.lo \
 	libappstream_glib_la-as-icon.lo \
 	libappstream_glib_la-as-image.lo \
-	libappstream_glib_la-as-inf.lo libappstream_glib_la-as-node.lo \
+	libappstream_glib_la-as-inf.lo \
+	libappstream_glib_la-as-markup.lo \
+	libappstream_glib_la-as-monitor.lo \
+	libappstream_glib_la-as-node.lo \
 	libappstream_glib_la-as-problem.lo \
+	libappstream_glib_la-as-profile.lo \
 	libappstream_glib_la-as-provide.lo \
+	libappstream_glib_la-as-ref-string.lo \
 	libappstream_glib_la-as-release.lo \
+	libappstream_glib_la-as-require.lo \
+	libappstream_glib_la-as-review.lo \
 	libappstream_glib_la-as-resources.lo \
 	libappstream_glib_la-as-screenshot.lo \
+	libappstream_glib_la-as-stemmer.lo \
 	libappstream_glib_la-as-store.lo \
+	libappstream_glib_la-as-suggest.lo \
 	libappstream_glib_la-as-tag.lo \
+	libappstream_glib_la-as-translation.lo \
 	libappstream_glib_la-as-utils.lo \
 	libappstream_glib_la-as-yaml.lo $(am__objects_1)
-libappstream_glib_la_OBJECTS = $(am_libappstream_glib_la_OBJECTS)
+nodist_libappstream_glib_la_OBJECTS =
+libappstream_glib_la_OBJECTS = $(am_libappstream_glib_la_OBJECTS) \
+	$(nodist_libappstream_glib_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -194,6 +220,7 @@ libappstream_glib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 am_as_self_test_OBJECTS = as_self_test-as-self-test.$(OBJEXT)
 as_self_test_OBJECTS = $(am_as_self_test_OBJECTS)
 as_self_test_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) $(lib_LTLIBRARIES)
 as_self_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -233,7 +260,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libappstream_glib_la_SOURCES) $(as_self_test_SOURCES)
+SOURCES = $(libappstream_glib_la_SOURCES) \
+	$(nodist_libappstream_glib_la_SOURCES) $(as_self_test_SOURCES)
 DIST_SOURCES = $(am__libappstream_glib_la_SOURCES_DIST) \
 	$(as_self_test_SOURCES)
 am__can_run_installinfo = \
@@ -453,6 +481,7 @@ AR = @AR@
 AS_MAJOR_VERSION = @AS_MAJOR_VERSION@
 AS_MICRO_VERSION = @AS_MICRO_VERSION@
 AS_MINOR_VERSION = @AS_MINOR_VERSION@
+AS_PLUGIN_VERSION = @AS_PLUGIN_VERSION@
 AS_VERSION = @AS_VERSION@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -482,6 +511,9 @@ FGREP = @FGREP@
 FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
 FREETYPE_LIBS = @FREETYPE_LIBS@
 GCAB = @GCAB@
+GCAB_CFLAGS = @GCAB_CFLAGS@
+GCAB_DEPENDENCY = @GCAB_DEPENDENCY@
+GCAB_LIBS = @GCAB_LIBS@
 GDKPIXBUF_CFLAGS = @GDKPIXBUF_CFLAGS@
 GDKPIXBUF_LIBS = @GDKPIXBUF_LIBS@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
@@ -507,14 +539,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTLLIBS = @INTLLIBS@
-INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-INTLTOOL_MERGE = @INTLTOOL_MERGE@
-INTLTOOL_PERL = @INTLTOOL_PERL@
-INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-INTLTOOL_V_MERGE = @INTLTOOL_V_MERGE@
-INTLTOOL_V_MERGE_OPTIONS = @INTLTOOL_V_MERGE_OPTIONS@
-INTLTOOL__v_MERGE_ = @INTLTOOL__v_MERGE_@
-INTLTOOL__v_MERGE_0 = @INTLTOOL__v_MERGE_0@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 INTROSPECTION_CFLAGS = @INTROSPECTION_CFLAGS@
 INTROSPECTION_COMPILER = @INTROSPECTION_COMPILER@
@@ -524,6 +548,8 @@ INTROSPECTION_LIBS = @INTROSPECTION_LIBS@
 INTROSPECTION_MAKEFILE = @INTROSPECTION_MAKEFILE@
 INTROSPECTION_SCANNER = @INTROSPECTION_SCANNER@
 INTROSPECTION_TYPELIBDIR = @INTROSPECTION_TYPELIBDIR@
+JSON_GLIB_CFLAGS = @JSON_GLIB_CFLAGS@
+JSON_GLIB_LIBS = @JSON_GLIB_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBARCHIVE_CFLAGS = @LIBARCHIVE_CFLAGS@
@@ -541,6 +567,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_REVISION = @LT_REVISION@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -551,8 +578,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSTREE_CFLAGS = @OSTREE_CFLAGS@
-OSTREE_LIBS = @OSTREE_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -570,6 +595,7 @@ PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+RELRO_LDFLAGS = @RELRO_LDFLAGS@
 RPM_CFLAGS = @RPM_CFLAGS@
 RPM_LIBS = @RPM_LIBS@
 SED = @SED@
@@ -577,12 +603,13 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SOUP_CFLAGS = @SOUP_CFLAGS@
 SOUP_LIBS = @SOUP_LIBS@
-SQLITE_CFLAGS = @SQLITE_CFLAGS@
-SQLITE_LIBS = @SQLITE_LIBS@
+STEMMER_LIBS = @STEMMER_LIBS@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
+UUID_CFLAGS = @UUID_CFLAGS@
+UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
-WARNINGFLAGS_C = @WARNINGFLAGS_C@
+WARN_CFLAGS = @WARN_CFLAGS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -625,8 +652,6 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-intltool__v_merge_options_ = @intltool__v_merge_options_@
-intltool__v_merge_options_0 = @intltool__v_merge_options_0@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -651,15 +676,18 @@ top_srcdir = @top_srcdir@
 @HAVE_INTROSPECTION_TRUE@INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 AM_CPPFLAGS = \
 	$(GLIB_CFLAGS)						\
+	$(GCAB_CFLAGS)						\
 	$(GDKPIXBUF_CFLAGS)					\
 	$(LIBARCHIVE_CFLAGS)					\
 	$(SOUP_CFLAGS)						\
+	$(UUID_CFLAGS)						\
 	$(YAML_CFLAGS)						\
 	-I$(top_srcdir)/libappstream-glib			\
 	-I$(top_builddir)/libappstream-glib			\
 	-I.							\
 	-DAS_COMPILATION					\
-	-DTESTDATADIR=\""$(top_srcdir)/data/tests"\"		\
+	-DTESTDIRSRC=\""$(top_srcdir)/data/tests"\"		\
+	-DTESTDIRBUILD=\""$(top_builddir)/data/tests"\"		\
 	-DLOCALSTATEDIR=\""$(localstatedir)"\"			\
 	-DG_LOG_DOMAIN=\"As\"
 
@@ -667,7 +695,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = \
 	appstream-glib.pc
 
-BUILT_SOURCES = as-resources.c as-resources.h $(am__append_2)
+BUILT_SOURCES = as-resources.c as-resources.h as-tag-private.h
 lib_LTLIBRARIES = \
 	libappstream-glib.la
 
@@ -675,37 +703,57 @@ libappstream_glib_includedir = $(includedir)/libappstream-glib
 libappstream_glib_include_HEADERS = \
 	appstream-glib.h					\
 	as-app.h						\
+	as-app-builder.h					\
 	as-bundle.h						\
+	as-checksum.h						\
+	as-content-rating.h					\
 	as-enums.h						\
 	as-icon.h						\
 	as-image.h						\
 	as-inf.h						\
+	as-markup.h						\
 	as-node.h						\
 	as-problem.h						\
+	as-profile.h						\
 	as-provide.h						\
 	as-release.h						\
+	as-require.h						\
+	as-review.h						\
 	as-screenshot.h						\
+	as-format.h						\
 	as-store.h						\
+	as-suggest.h						\
 	as-tag.h						\
+	as-translation.h					\
 	as-utils.h						\
 	as-version.h
 
-libappstream_glib_la_SOURCES = as-app.c as-app-desktop.c as-app-inf.c \
-	as-app-private.h as-app-validate.c as-bundle.c \
-	as-bundle-private.h as-cleanup.h as-enums.c as-icon.c \
+nodist_libappstream_glib_la_SOURCES = as-tag-private.h
+libappstream_glib_la_SOURCES = as-app.c as-app-desktop.c \
+	as-app-builder.c as-app-inf.c as-app-private.h \
+	as-app-validate.c as-bundle.c as-bundle-private.h \
+	as-checksum.c as-checksum-private.h as-content-rating.c \
+	as-content-rating-private.h as-enums.c as-format.c as-icon.c \
 	as-icon-private.h as-image.c as-image-private.h as-inf.c \
-	as-inf.h as-node.c as-node-private.h as-problem.c as-problem.h \
-	as-provide.c as-provide-private.h as-release.c \
-	as-release-private.h as-resources.c as-resources.h \
-	as-screenshot.c as-screenshot-private.h as-store.c as-tag.c \
-	as-utils.c as-utils-private.h as-version.h as-yaml.c as-yaml.h \
-	$(am__append_1)
-CLEANFILES = $(BUILT_SOURCES) $(am__append_3)
+	as-inf.h as-markup.c as-monitor.c as-monitor.h as-node.c \
+	as-node-private.h as-problem.c as-problem.h as-profile.c \
+	as-profile.h as-provide.c as-provide-private.h as-ref-string.c \
+	as-ref-string.h as-release.c as-release-private.h as-require.c \
+	as-require-private.h as-review.c as-review-private.h \
+	as-resources.c as-resources.h as-screenshot.c \
+	as-screenshot-private.h as-stemmer.c as-stemmer.h as-store.c \
+	as-suggest.c as-suggest-private.h as-tag.c as-translation.c \
+	as-translation-private.h as-utils.c as-utils-private.h \
+	as-version.h as-yaml.c as-yaml.h $(am__append_1)
+CLEANFILES = $(BUILT_SOURCES) $(am__append_2)
 libappstream_glib_la_LIBADD = \
 	$(GLIB_LIBS)						\
+	$(GCAB_LIBS)						\
 	$(GDKPIXBUF_LIBS)					\
 	$(LIBARCHIVE_LIBS)					\
 	$(SOUP_LIBS)						\
+	$(STEMMER_LIBS)						\
+	$(UUID_LIBS)						\
 	$(YAML_LIBS)
 
 libappstream_glib_la_LDFLAGS = \
@@ -715,7 +763,7 @@ libappstream_glib_la_LDFLAGS = \
 	-export-symbols-regex '^as_.*'
 
 libappstream_glib_la_CFLAGS = \
-	$(WARNINGFLAGS_C)
+	$(WARN_CFLAGS)
 
 as_self_test_SOURCES = \
 	as-self-test.c
@@ -725,16 +773,24 @@ as_self_test_LDADD = \
 	$(GDKPIXBUF_LIBS)					\
 	$(LIBARCHIVE_LIBS)					\
 	$(SOUP_LIBS)						\
+	$(STEMMER_LIBS)						\
+	$(UUID_LIBS)						\
 	$(YAML_LIBS)						\
 	$(lib_LTLIBRARIES)
 
-as_self_test_CFLAGS = $(WARNINGFLAGS_C)
+as_self_test_CFLAGS = $(WARN_CFLAGS)
 @HAVE_INTROSPECTION_TRUE@introspection_sources = \
 @HAVE_INTROSPECTION_TRUE@	as-app.c						\
 @HAVE_INTROSPECTION_TRUE@	as-app-validate.c					\
 @HAVE_INTROSPECTION_TRUE@	as-app.h						\
 @HAVE_INTROSPECTION_TRUE@	as-bundle.c						\
 @HAVE_INTROSPECTION_TRUE@	as-bundle.h						\
+@HAVE_INTROSPECTION_TRUE@	as-checksum.c						\
+@HAVE_INTROSPECTION_TRUE@	as-checksum.h						\
+@HAVE_INTROSPECTION_TRUE@	as-content-rating.c					\
+@HAVE_INTROSPECTION_TRUE@	as-content-rating.h					\
+@HAVE_INTROSPECTION_TRUE@	as-format.c						\
+@HAVE_INTROSPECTION_TRUE@	as-format.h						\
 @HAVE_INTROSPECTION_TRUE@	as-enums.c						\
 @HAVE_INTROSPECTION_TRUE@	as-enums.h						\
 @HAVE_INTROSPECTION_TRUE@	as-icon.c						\
@@ -743,6 +799,8 @@ as_self_test_CFLAGS = $(WARNINGFLAGS_C)
 @HAVE_INTROSPECTION_TRUE@	as-image.h						\
 @HAVE_INTROSPECTION_TRUE@	as-inf.c						\
 @HAVE_INTROSPECTION_TRUE@	as-inf.h						\
+@HAVE_INTROSPECTION_TRUE@	as-markup.c						\
+@HAVE_INTROSPECTION_TRUE@	as-markup.h						\
 @HAVE_INTROSPECTION_TRUE@	as-node.c						\
 @HAVE_INTROSPECTION_TRUE@	as-node.h						\
 @HAVE_INTROSPECTION_TRUE@	as-problem.c						\
@@ -751,12 +809,20 @@ as_self_test_CFLAGS = $(WARNINGFLAGS_C)
 @HAVE_INTROSPECTION_TRUE@	as-provide.h						\
 @HAVE_INTROSPECTION_TRUE@	as-release.c						\
 @HAVE_INTROSPECTION_TRUE@	as-release.h						\
+@HAVE_INTROSPECTION_TRUE@	as-require.c						\
+@HAVE_INTROSPECTION_TRUE@	as-require.h						\
+@HAVE_INTROSPECTION_TRUE@	as-review.c						\
+@HAVE_INTROSPECTION_TRUE@	as-review.h						\
 @HAVE_INTROSPECTION_TRUE@	as-screenshot.c						\
 @HAVE_INTROSPECTION_TRUE@	as-screenshot.h						\
 @HAVE_INTROSPECTION_TRUE@	as-store.c						\
 @HAVE_INTROSPECTION_TRUE@	as-store.h						\
+@HAVE_INTROSPECTION_TRUE@	as-suggest.c						\
+@HAVE_INTROSPECTION_TRUE@	as-suggest.h						\
 @HAVE_INTROSPECTION_TRUE@	as-tag.c						\
 @HAVE_INTROSPECTION_TRUE@	as-tag.h						\
+@HAVE_INTROSPECTION_TRUE@	as-translation.c					\
+@HAVE_INTROSPECTION_TRUE@	as-translation.h					\
 @HAVE_INTROSPECTION_TRUE@	as-utils.c						\
 @HAVE_INTROSPECTION_TRUE@	as-utils.h						\
 @HAVE_INTROSPECTION_TRUE@	as-version.h
@@ -782,7 +848,6 @@ DISTCLEANFILES = \
 EXTRA_DIST = \
 	appstream-glib.gresource.xml				\
 	appstream-glib.pc.in					\
-	as-blacklist-ids.txt					\
 	as-category-ids.txt					\
 	as-environment-ids.txt					\
 	as-license-ids.txt					\
@@ -887,23 +952,37 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/as_self_test-as-self-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-app-builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-app-desktop.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-app-inf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-app-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-app.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-bundle.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-checksum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-content-rating.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-enums.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-format.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-icon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-inf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-markup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-monitor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-problem.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-profile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-provide.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-ref-string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-release.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-require.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-resources.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-review.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-screenshot.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-stemmer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-store-cab.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-store.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-suggest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-tag.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-translation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-utils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libappstream_glib_la-as-yaml.Plo@am__quote@
 
@@ -942,6 +1021,13 @@ libappstream_glib_la-as-app-desktop.lo: as-app-desktop.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-app-desktop.lo `test -f 'as-app-desktop.c' || echo '$(srcdir)/'`as-app-desktop.c
 
+libappstream_glib_la-as-app-builder.lo: as-app-builder.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-app-builder.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-app-builder.Tpo -c -o libappstream_glib_la-as-app-builder.lo `test -f 'as-app-builder.c' || echo '$(srcdir)/'`as-app-builder.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-app-builder.Tpo $(DEPDIR)/libappstream_glib_la-as-app-builder.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-app-builder.c' object='libappstream_glib_la-as-app-builder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-app-builder.lo `test -f 'as-app-builder.c' || echo '$(srcdir)/'`as-app-builder.c
+
 libappstream_glib_la-as-app-inf.lo: as-app-inf.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-app-inf.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-app-inf.Tpo -c -o libappstream_glib_la-as-app-inf.lo `test -f 'as-app-inf.c' || echo '$(srcdir)/'`as-app-inf.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-app-inf.Tpo $(DEPDIR)/libappstream_glib_la-as-app-inf.Plo
@@ -963,12 +1049,33 @@ libappstream_glib_la-as-bundle.lo: as-bundle.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-bundle.lo `test -f 'as-bundle.c' || echo '$(srcdir)/'`as-bundle.c
 
+libappstream_glib_la-as-checksum.lo: as-checksum.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-checksum.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-checksum.Tpo -c -o libappstream_glib_la-as-checksum.lo `test -f 'as-checksum.c' || echo '$(srcdir)/'`as-checksum.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-checksum.Tpo $(DEPDIR)/libappstream_glib_la-as-checksum.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-checksum.c' object='libappstream_glib_la-as-checksum.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-checksum.lo `test -f 'as-checksum.c' || echo '$(srcdir)/'`as-checksum.c
+
+libappstream_glib_la-as-content-rating.lo: as-content-rating.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-content-rating.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-content-rating.Tpo -c -o libappstream_glib_la-as-content-rating.lo `test -f 'as-content-rating.c' || echo '$(srcdir)/'`as-content-rating.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-content-rating.Tpo $(DEPDIR)/libappstream_glib_la-as-content-rating.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-content-rating.c' object='libappstream_glib_la-as-content-rating.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-content-rating.lo `test -f 'as-content-rating.c' || echo '$(srcdir)/'`as-content-rating.c
+
 libappstream_glib_la-as-enums.lo: as-enums.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-enums.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-enums.Tpo -c -o libappstream_glib_la-as-enums.lo `test -f 'as-enums.c' || echo '$(srcdir)/'`as-enums.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-enums.Tpo $(DEPDIR)/libappstream_glib_la-as-enums.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-enums.c' object='libappstream_glib_la-as-enums.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-enums.lo `test -f 'as-enums.c' || echo '$(srcdir)/'`as-enums.c
+
+libappstream_glib_la-as-format.lo: as-format.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-format.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-format.Tpo -c -o libappstream_glib_la-as-format.lo `test -f 'as-format.c' || echo '$(srcdir)/'`as-format.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-format.Tpo $(DEPDIR)/libappstream_glib_la-as-format.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-format.c' object='libappstream_glib_la-as-format.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-format.lo `test -f 'as-format.c' || echo '$(srcdir)/'`as-format.c
 
 libappstream_glib_la-as-icon.lo: as-icon.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-icon.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-icon.Tpo -c -o libappstream_glib_la-as-icon.lo `test -f 'as-icon.c' || echo '$(srcdir)/'`as-icon.c
@@ -991,6 +1098,20 @@ libappstream_glib_la-as-inf.lo: as-inf.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-inf.lo `test -f 'as-inf.c' || echo '$(srcdir)/'`as-inf.c
 
+libappstream_glib_la-as-markup.lo: as-markup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-markup.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-markup.Tpo -c -o libappstream_glib_la-as-markup.lo `test -f 'as-markup.c' || echo '$(srcdir)/'`as-markup.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-markup.Tpo $(DEPDIR)/libappstream_glib_la-as-markup.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-markup.c' object='libappstream_glib_la-as-markup.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-markup.lo `test -f 'as-markup.c' || echo '$(srcdir)/'`as-markup.c
+
+libappstream_glib_la-as-monitor.lo: as-monitor.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-monitor.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-monitor.Tpo -c -o libappstream_glib_la-as-monitor.lo `test -f 'as-monitor.c' || echo '$(srcdir)/'`as-monitor.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-monitor.Tpo $(DEPDIR)/libappstream_glib_la-as-monitor.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-monitor.c' object='libappstream_glib_la-as-monitor.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-monitor.lo `test -f 'as-monitor.c' || echo '$(srcdir)/'`as-monitor.c
+
 libappstream_glib_la-as-node.lo: as-node.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-node.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-node.Tpo -c -o libappstream_glib_la-as-node.lo `test -f 'as-node.c' || echo '$(srcdir)/'`as-node.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-node.Tpo $(DEPDIR)/libappstream_glib_la-as-node.Plo
@@ -1005,6 +1126,13 @@ libappstream_glib_la-as-problem.lo: as-problem.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-problem.lo `test -f 'as-problem.c' || echo '$(srcdir)/'`as-problem.c
 
+libappstream_glib_la-as-profile.lo: as-profile.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-profile.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-profile.Tpo -c -o libappstream_glib_la-as-profile.lo `test -f 'as-profile.c' || echo '$(srcdir)/'`as-profile.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-profile.Tpo $(DEPDIR)/libappstream_glib_la-as-profile.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-profile.c' object='libappstream_glib_la-as-profile.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-profile.lo `test -f 'as-profile.c' || echo '$(srcdir)/'`as-profile.c
+
 libappstream_glib_la-as-provide.lo: as-provide.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-provide.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-provide.Tpo -c -o libappstream_glib_la-as-provide.lo `test -f 'as-provide.c' || echo '$(srcdir)/'`as-provide.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-provide.Tpo $(DEPDIR)/libappstream_glib_la-as-provide.Plo
@@ -1012,12 +1140,33 @@ libappstream_glib_la-as-provide.lo: as-provide.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-provide.lo `test -f 'as-provide.c' || echo '$(srcdir)/'`as-provide.c
 
+libappstream_glib_la-as-ref-string.lo: as-ref-string.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-ref-string.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-ref-string.Tpo -c -o libappstream_glib_la-as-ref-string.lo `test -f 'as-ref-string.c' || echo '$(srcdir)/'`as-ref-string.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-ref-string.Tpo $(DEPDIR)/libappstream_glib_la-as-ref-string.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-ref-string.c' object='libappstream_glib_la-as-ref-string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-ref-string.lo `test -f 'as-ref-string.c' || echo '$(srcdir)/'`as-ref-string.c
+
 libappstream_glib_la-as-release.lo: as-release.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-release.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-release.Tpo -c -o libappstream_glib_la-as-release.lo `test -f 'as-release.c' || echo '$(srcdir)/'`as-release.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-release.Tpo $(DEPDIR)/libappstream_glib_la-as-release.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-release.c' object='libappstream_glib_la-as-release.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-release.lo `test -f 'as-release.c' || echo '$(srcdir)/'`as-release.c
+
+libappstream_glib_la-as-require.lo: as-require.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-require.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-require.Tpo -c -o libappstream_glib_la-as-require.lo `test -f 'as-require.c' || echo '$(srcdir)/'`as-require.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-require.Tpo $(DEPDIR)/libappstream_glib_la-as-require.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-require.c' object='libappstream_glib_la-as-require.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-require.lo `test -f 'as-require.c' || echo '$(srcdir)/'`as-require.c
+
+libappstream_glib_la-as-review.lo: as-review.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-review.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-review.Tpo -c -o libappstream_glib_la-as-review.lo `test -f 'as-review.c' || echo '$(srcdir)/'`as-review.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-review.Tpo $(DEPDIR)/libappstream_glib_la-as-review.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-review.c' object='libappstream_glib_la-as-review.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-review.lo `test -f 'as-review.c' || echo '$(srcdir)/'`as-review.c
 
 libappstream_glib_la-as-resources.lo: as-resources.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-resources.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-resources.Tpo -c -o libappstream_glib_la-as-resources.lo `test -f 'as-resources.c' || echo '$(srcdir)/'`as-resources.c
@@ -1033,6 +1182,13 @@ libappstream_glib_la-as-screenshot.lo: as-screenshot.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-screenshot.lo `test -f 'as-screenshot.c' || echo '$(srcdir)/'`as-screenshot.c
 
+libappstream_glib_la-as-stemmer.lo: as-stemmer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-stemmer.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-stemmer.Tpo -c -o libappstream_glib_la-as-stemmer.lo `test -f 'as-stemmer.c' || echo '$(srcdir)/'`as-stemmer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-stemmer.Tpo $(DEPDIR)/libappstream_glib_la-as-stemmer.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-stemmer.c' object='libappstream_glib_la-as-stemmer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-stemmer.lo `test -f 'as-stemmer.c' || echo '$(srcdir)/'`as-stemmer.c
+
 libappstream_glib_la-as-store.lo: as-store.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-store.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-store.Tpo -c -o libappstream_glib_la-as-store.lo `test -f 'as-store.c' || echo '$(srcdir)/'`as-store.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-store.Tpo $(DEPDIR)/libappstream_glib_la-as-store.Plo
@@ -1040,12 +1196,26 @@ libappstream_glib_la-as-store.lo: as-store.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-store.lo `test -f 'as-store.c' || echo '$(srcdir)/'`as-store.c
 
+libappstream_glib_la-as-suggest.lo: as-suggest.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-suggest.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-suggest.Tpo -c -o libappstream_glib_la-as-suggest.lo `test -f 'as-suggest.c' || echo '$(srcdir)/'`as-suggest.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-suggest.Tpo $(DEPDIR)/libappstream_glib_la-as-suggest.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-suggest.c' object='libappstream_glib_la-as-suggest.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-suggest.lo `test -f 'as-suggest.c' || echo '$(srcdir)/'`as-suggest.c
+
 libappstream_glib_la-as-tag.lo: as-tag.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-tag.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-tag.Tpo -c -o libappstream_glib_la-as-tag.lo `test -f 'as-tag.c' || echo '$(srcdir)/'`as-tag.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-tag.Tpo $(DEPDIR)/libappstream_glib_la-as-tag.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-tag.c' object='libappstream_glib_la-as-tag.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-tag.lo `test -f 'as-tag.c' || echo '$(srcdir)/'`as-tag.c
+
+libappstream_glib_la-as-translation.lo: as-translation.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-translation.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-translation.Tpo -c -o libappstream_glib_la-as-translation.lo `test -f 'as-translation.c' || echo '$(srcdir)/'`as-translation.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-translation.Tpo $(DEPDIR)/libappstream_glib_la-as-translation.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-translation.c' object='libappstream_glib_la-as-translation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-translation.lo `test -f 'as-translation.c' || echo '$(srcdir)/'`as-translation.c
 
 libappstream_glib_la-as-utils.lo: as-utils.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-utils.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-utils.Tpo -c -o libappstream_glib_la-as-utils.lo `test -f 'as-utils.c' || echo '$(srcdir)/'`as-utils.c
@@ -1060,6 +1230,13 @@ libappstream_glib_la-as-yaml.lo: as-yaml.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-yaml.c' object='libappstream_glib_la-as-yaml.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-yaml.lo `test -f 'as-yaml.c' || echo '$(srcdir)/'`as-yaml.c
+
+libappstream_glib_la-as-store-cab.lo: as-store-cab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -MT libappstream_glib_la-as-store-cab.lo -MD -MP -MF $(DEPDIR)/libappstream_glib_la-as-store-cab.Tpo -c -o libappstream_glib_la-as-store-cab.lo `test -f 'as-store-cab.c' || echo '$(srcdir)/'`as-store-cab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libappstream_glib_la-as-store-cab.Tpo $(DEPDIR)/libappstream_glib_la-as-store-cab.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='as-store-cab.c' object='libappstream_glib_la-as-store-cab.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libappstream_glib_la_CFLAGS) $(CFLAGS) -c -o libappstream_glib_la-as-store-cab.lo `test -f 'as-store-cab.c' || echo '$(srcdir)/'`as-store-cab.c
 
 as_self_test-as-self-test.o: as-self-test.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(as_self_test_CFLAGS) $(CFLAGS) -MT as_self_test-as-self-test.o -MD -MP -MF $(DEPDIR)/as_self_test-as-self-test.Tpo -c -o as_self_test-as-self-test.o `test -f 'as-self-test.c' || echo '$(srcdir)/'`as-self-test.c
@@ -1558,13 +1735,12 @@ uninstall-am: uninstall-girDATA uninstall-libLTLIBRARIES \
 
 @HAVE_INTROSPECTION_TRUE@-include $(INTROSPECTION_MAKEFILE)
 
-@HAVE_GPERF_TRUE@as-tag-private.h: as-tag.gperf
-@HAVE_GPERF_TRUE@	$(AM_V_GEN) gperf < $< > $@
+as-tag-private.h: as-tag.gperf
+	$(AM_V_GEN) gperf < $< > $@
 
 as-resources.c: appstream-glib.gresource.xml			\
 		as-stock-icons.txt				\
 		as-license-ids.txt				\
-		as-blacklist-ids.txt				\
 		as-category-ids.txt				\
 		as-environment-ids.txt
 	$(AM_V_GEN)						\
@@ -1578,7 +1754,6 @@ as-resources.c: appstream-glib.gresource.xml			\
 as-resources.h: appstream-glib.gresource.xml			\
 		as-stock-icons.txt				\
 		as-license-ids.txt				\
-		as-blacklist-ids.txt				\
 		as-category-ids.txt				\
 		as-environment-ids.txt
 	$(AM_V_GEN)						\
@@ -1591,6 +1766,10 @@ as-resources.h: appstream-glib.gresource.xml			\
 		$(srcdir)/appstream-glib.gresource.xml
 
 @HAVE_INTROSPECTION_TRUE@AppStreamGlib-1.0.gir: libappstream-glib.la
+
+massif:
+	valgrind --tool=massif --massif-out-file=massif.log .libs/lt-as-self-test;	\
+	ms_print massif.log > massif.txt
 
 clean-local:
 	rm -f *~

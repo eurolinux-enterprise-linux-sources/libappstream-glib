@@ -34,12 +34,14 @@ G_BEGIN_DECLS
  * AsInfError:
  * @AS_INF_ERROR_FAILED:			Generic failure
  * @AS_INF_ERROR_INVALID_TYPE:			Invalid type
+ * @AS_INF_ERROR_NOT_FOUND:			Data not found
  *
  * The error type.
  **/
 typedef enum {
 	AS_INF_ERROR_FAILED,
 	AS_INF_ERROR_INVALID_TYPE,
+	AS_INF_ERROR_NOT_FOUND,
 	/*< private >*/
 	AS_INF_ERROR_LAST
 } AsInfError;
@@ -66,14 +68,17 @@ GQuark		 as_inf_error_quark		(void);
 gboolean	 as_inf_load_data		(GKeyFile	*keyfile,
 						 const gchar	*data,
 						 AsInfLoadFlags	 flags,
-						 GError		**error);
+						 GError		**error)
+G_DEPRECATED;
 gboolean	 as_inf_load_file		(GKeyFile	*keyfile,
 						 const gchar	*filename,
 						 AsInfLoadFlags	 flags,
-						 GError		**error);
+						 GError		**error)
+G_DEPRECATED;
 gchar		*as_inf_get_driver_version	(GKeyFile	*keyfile,
 						 guint64	*timestamp,
-						 GError		**error);
+						 GError		**error)
+G_DEPRECATED;
 
 G_END_DECLS
 

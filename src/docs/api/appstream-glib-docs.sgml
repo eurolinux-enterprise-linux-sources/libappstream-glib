@@ -34,8 +34,13 @@
       </para>
     </partintro>
     <xi:include href="xml/as-app.xml"/>
+    <xi:include href="xml/as-bundle.xml"/>
+    <xi:include href="xml/as-checksum.xml"/>
+    <xi:include href="xml/as-content-rating.xml"/>
+    <xi:include href="xml/as-format.xml"/>
     <xi:include href="xml/as-icon.xml"/>
     <xi:include href="xml/as-image.xml"/>
+    <xi:include href="xml/as-markup.xml"/>
     <xi:include href="xml/as-release.xml"/>
     <xi:include href="xml/as-provide.xml"/>
     <xi:include href="xml/as-screenshot.xml"/>
@@ -44,6 +49,7 @@
     <xi:include href="xml/as-enums.xml"/>
     <xi:include href="xml/as-node.xml"/>
     <xi:include href="xml/as-tag.xml"/>
+    <xi:include href="xml/as-translation.xml"/>
     <xi:include href="xml/as-utils.xml"/>
     <xi:include href="xml/as-version.xml"/>
   </reference>

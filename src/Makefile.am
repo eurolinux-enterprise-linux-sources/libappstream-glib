@@ -42,6 +42,8 @@ MAINTAINERCLEANFILES =					\
 	po/Rules-quot					\
 	po/*.sed					\
 	po/*.sin					\
+	po/*.po~					\
+	.zanata-cache					\
 	test-driver
 
 EXTRA_DIST =						\
@@ -74,8 +76,18 @@ ChangeLog:
 
 DISTCHECK_CONFIGURE_FLAGS =				\
 	--enable-dep11					\
+	--enable-firmware				\
+	--enable-fonts					\
 	--enable-builder				\
 	--with-bashcompletiondir=/${prefix}/share/bash-completion/completions
+
+massif:
+	make && \
+	time ./client/appstream-util search gimp --help > /dev/null && \
+	valgrind --massif-out-file=massif.out --threshold=0.1 --tool=massif \
+		./client/.libs/lt-appstream-util search gimp --profile && \
+	ms_print massif.out > massif.txt && \
+	head -n 30 massif.txt
 
 .PHONY: ChangeLog
 
