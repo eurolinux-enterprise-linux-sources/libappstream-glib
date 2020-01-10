@@ -1,0 +1,349 @@
+<!-- ##### SECTION Title ##### -->
+as-node
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### ENUM AsNodeToXmlFlags ##### -->
+<para>
+
+</para>
+
+@AS_NODE_TO_XML_FLAG_NONE: 
+@AS_NODE_TO_XML_FLAG_ADD_HEADER: 
+@AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE: 
+@AS_NODE_TO_XML_FLAG_FORMAT_INDENT: 
+@AS_NODE_TO_XML_FLAG_INCLUDE_SIBLINGS: 
+@AS_NODE_TO_XML_FLAG_SORT_CHILDREN: 
+
+<!-- ##### ENUM AsNodeFromXmlFlags ##### -->
+<para>
+
+</para>
+
+@AS_NODE_FROM_XML_FLAG_NONE: 
+@AS_NODE_FROM_XML_FLAG_LITERAL_TEXT: 
+@AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS: 
+
+<!-- ##### ENUM AsNodeInsertFlags ##### -->
+<para>
+
+</para>
+
+@AS_NODE_INSERT_FLAG_NONE: 
+@AS_NODE_INSERT_FLAG_PRE_ESCAPED: 
+@AS_NODE_INSERT_FLAG_SWAPPED: 
+@AS_NODE_INSERT_FLAG_NO_MARKUP: 
+@AS_NODE_INSERT_FLAG_DEDUPE_LANG: 
+@AS_NODE_INSERT_FLAG_MARK_TRANSLATABLE: 
+@AS_NODE_INSERT_FLAG_BASE64_ENCODED: 
+
+<!-- ##### ENUM AsNodeError ##### -->
+<para>
+
+</para>
+
+@AS_NODE_ERROR_FAILED: 
+@AS_NODE_ERROR_INVALID_MARKUP: 
+@AS_NODE_ERROR_NO_SUPPORT: 
+
+<!-- ##### MACRO AS_NODE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION as_node_new ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_error_quark ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_unref ##### -->
+<para>
+
+</para>
+
+@node: 
+
+
+<!-- ##### FUNCTION as_node_get_name ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_data ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_comment ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_tag ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_attribute ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_attribute_as_int ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_localized ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_localized_best ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_get_localized_unwrap ##### -->
+<para>
+
+</para>
+
+@node: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_set_name ##### -->
+<para>
+
+</para>
+
+@node: 
+@name: 
+
+
+<!-- ##### FUNCTION as_node_set_data ##### -->
+<para>
+
+</para>
+
+@node: 
+@cdata: 
+@cdata_len: 
+@insert_flags: 
+
+
+<!-- ##### FUNCTION as_node_set_comment ##### -->
+<para>
+
+</para>
+
+@node: 
+@comment: 
+@comment_len: 
+
+
+<!-- ##### FUNCTION as_node_add_attribute ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+@value: 
+@value_len: 
+
+
+<!-- ##### FUNCTION as_node_add_attribute_as_int ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+@value: 
+
+
+<!-- ##### FUNCTION as_node_remove_attribute ##### -->
+<para>
+
+</para>
+
+@node: 
+@key: 
+
+
+<!-- ##### FUNCTION as_node_to_xml ##### -->
+<para>
+
+</para>
+
+@node: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_from_xml ##### -->
+<para>
+
+</para>
+
+@data: 
+@data_len: 
+@flags: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_from_file ##### -->
+<para>
+
+</para>
+
+@file: 
+@flags: 
+@cancellable: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_to_file ##### -->
+<para>
+
+</para>
+
+@root: 
+@file: 
+@flags: 
+@cancellable: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_find ##### -->
+<para>
+
+</para>
+
+@root: 
+@path: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_find_with_attribute ##### -->
+<para>
+
+</para>
+
+@root: 
+@path: 
+@attr_key: 
+@attr_value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_insert ##### -->
+<para>
+
+</para>
+
+@parent: 
+@name: 
+@cdata: 
+@insert_flags: 
+@...: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_node_insert_localized ##### -->
+<para>
+
+</para>
+
+@parent: 
+@name: 
+@localized: 
+@insert_flags: 
+
+
+<!-- ##### FUNCTION as_node_insert_hash ##### -->
+<para>
+
+</para>
+
+@parent: 
+@name: 
+@attr_key: 
+@hash: 
+@insert_flags: 
+
+

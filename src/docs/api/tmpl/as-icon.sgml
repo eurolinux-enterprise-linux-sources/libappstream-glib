@@ -1,0 +1,259 @@
+<!-- ##### SECTION Title ##### -->
+AsIcon
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### ENUM AsIconError ##### -->
+<para>
+
+</para>
+
+@AS_ICON_ERROR_FAILED: 
+
+<!-- ##### ENUM AsIconKind ##### -->
+<para>
+
+</para>
+
+@AS_ICON_KIND_UNKNOWN: 
+@AS_ICON_KIND_STOCK: 
+@AS_ICON_KIND_CACHED: 
+@AS_ICON_KIND_REMOTE: 
+@AS_ICON_KIND_EMBEDDED: 
+@AS_ICON_KIND_LOCAL: 
+
+<!-- ##### ENUM AsIconLoadFlags ##### -->
+<para>
+
+</para>
+
+@AS_ICON_LOAD_FLAG_NONE: 
+@AS_ICON_LOAD_FLAG_SEARCH_SIZE: 
+
+<!-- ##### MACRO AS_ICON_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION as_icon_new ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_error_quark ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_kind_to_string ##### -->
+<para>
+
+</para>
+
+@icon_kind: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_kind_from_string ##### -->
+<para>
+
+</para>
+
+@icon_kind: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_name ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_url ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_filename ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_prefix ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_width ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_height ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_kind ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_get_pixbuf ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_set_name ##### -->
+<para>
+
+</para>
+
+@icon: 
+@name: 
+@name_len: 
+
+
+<!-- ##### FUNCTION as_icon_set_url ##### -->
+<para>
+
+</para>
+
+@icon: 
+@url: 
+
+
+<!-- ##### FUNCTION as_icon_set_filename ##### -->
+<para>
+
+</para>
+
+@icon: 
+@filename: 
+
+
+<!-- ##### FUNCTION as_icon_set_prefix ##### -->
+<para>
+
+</para>
+
+@icon: 
+@prefix: 
+
+
+<!-- ##### FUNCTION as_icon_set_width ##### -->
+<para>
+
+</para>
+
+@icon: 
+@width: 
+
+
+<!-- ##### FUNCTION as_icon_set_height ##### -->
+<para>
+
+</para>
+
+@icon: 
+@height: 
+
+
+<!-- ##### FUNCTION as_icon_set_kind ##### -->
+<para>
+
+</para>
+
+@icon: 
+@kind: 
+
+
+<!-- ##### FUNCTION as_icon_set_pixbuf ##### -->
+<para>
+
+</para>
+
+@icon: 
+@pixbuf: 
+
+
+<!-- ##### FUNCTION as_icon_load ##### -->
+<para>
+
+</para>
+
+@icon: 
+@flags: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_convert_to_kind ##### -->
+<para>
+
+</para>
+
+@icon: 
+@kind: 
+@error: 
+@Returns: 
+
+

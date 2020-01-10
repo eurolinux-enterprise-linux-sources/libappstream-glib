@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AppStream-glib Reference Manual: as-tag</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="appstream-glib-as-node.html" title="as-node">
+<link rel="next" href="appstream-glib-as-utils.html" title="as-utils">
+<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#appstream-glib-as-tag.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="appstream-glib-as-node.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="appstream-glib-as-utils.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="appstream-glib-as-tag"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="appstream-glib-as-tag.top_of_page"></a>as-tag</span></h2>
+<p>as-tag — Helper functions to convert to and from tag enums</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="returnvalue">AsTag</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-tag.html#as-tag-from-string" title="as_tag_from_string ()">as_tag_from_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="returnvalue">AsTag</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-tag.html#as-tag-from-string-full" title="as_tag_from_string_full ()">as_tag_from_string_full</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-tag.html#as-tag-to-string" title="as_tag_to_string ()">as_tag_to_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag">AsTag</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-tag.html#AsTagFlags" title="enum AsTagFlags">AsTagFlags</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.description"></a><h2>Description</h2>
+<p>These functions will convert a tag enum such as <a class="link" href="appstream-glib-as-tag.html#AS-TAG-APPLICATION:CAPS"><code class="literal">AS_TAG_APPLICATION</code></a> to
+it's string form, and also vice-versa.</p>
+<p>These helper functions may be useful if implementing an AppStream parser.</p>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-tag-from-string"></a><h3>as_tag_from_string ()</h3>
+<pre class="programlisting"><a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="returnvalue">AsTag</span></a>
+as_tag_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *tag</code></em>);</pre>
+<p>Converts the text representation to an enumerated value.</p>
+<div class="refsect3">
+<a name="id-1.2.13.8.2.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>tag</p></td>
+<td class="parameter_description"><p>the string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.13.8.2.6"></a><h4>Returns</h4>
+<p> a <a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><code class="literal">AsTag</code></a>, or <a class="link" href="appstream-glib-as-tag.html#AS-TAG-UNKNOWN:CAPS"><code class="literal">AS_TAG_UNKNOWN</code></a> if not known.</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-tag-from-string-full"></a><h3>as_tag_from_string_full ()</h3>
+<pre class="programlisting"><a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="returnvalue">AsTag</span></a>
+as_tag_from_string_full (<em class="parameter"><code>const <span class="type">gchar</span> *tag</code></em>,
+                         <em class="parameter"><code><a class="link" href="appstream-glib-as-tag.html#AsTagFlags" title="enum AsTagFlags"><span class="type">AsTagFlags</span></a> flags</code></em>);</pre>
+<p>Converts the text representation to an enumerated value also converting
+legacy key names.</p>
+<div class="refsect3">
+<a name="id-1.2.13.8.3.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>tag</p></td>
+<td class="parameter_description"><p>the string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-tag.html#AsTagFlags" title="enum AsTagFlags"><span class="type">AsTagFlags</span></a> e.g. <a class="link" href="appstream-glib-as-tag.html#AS-TAG-FLAG-USE-FALLBACKS:CAPS"><code class="literal">AS_TAG_FLAG_USE_FALLBACKS</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.13.8.3.6"></a><h4>Returns</h4>
+<p> a <a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><code class="literal">AsTag</code></a>, or <a class="link" href="appstream-glib-as-tag.html#AS-TAG-UNKNOWN:CAPS"><code class="literal">AS_TAG_UNKNOWN</code></a> if not known.</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-tag-to-string"></a><h3>as_tag_to_string ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_tag_to_string (<em class="parameter"><code><a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="type">AsTag</span></a> tag</code></em>);</pre>
+<p>Converts the enumerated value to an text representation.</p>
+<div class="refsect3">
+<a name="id-1.2.13.8.4.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>tag</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><code class="literal">AsTag</code></a> value.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.13.8.4.6"></a><h4>Returns</h4>
+<p> string version of <em class="parameter"><code>tag</code></em>
+</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-tag.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsTag"></a><h3>enum AsTag</h3>
+<p>The tag type.</p>
+<div class="refsect3">
+<a name="id-1.2.13.9.2.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-UNKNOWN:CAPS"></a>AS_TAG_UNKNOWN</p></td>
+<td class="enum_member_description">
+<p>Type invalid or not known</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-APPLICATIONS:CAPS"></a>AS_TAG_APPLICATIONS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">applications</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-APPLICATION:CAPS"></a>AS_TAG_APPLICATION</p></td>
+<td class="enum_member_description">
+<p><code class="literal">application</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-ID:CAPS"></a>AS_TAG_ID</p></td>
+<td class="enum_member_description">
+<p><code class="literal">id</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PKGNAME:CAPS"></a>AS_TAG_PKGNAME</p></td>
+<td class="enum_member_description">
+<p><code class="literal">pkgname</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-NAME:CAPS"></a>AS_TAG_NAME</p></td>
+<td class="enum_member_description">
+<p><code class="literal">name</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-SUMMARY:CAPS"></a>AS_TAG_SUMMARY</p></td>
+<td class="enum_member_description">
+<p><code class="literal">summary</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-DESCRIPTION:CAPS"></a>AS_TAG_DESCRIPTION</p></td>
+<td class="enum_member_description">
+<p><code class="literal">description</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-URL:CAPS"></a>AS_TAG_URL</p></td>
+<td class="enum_member_description">
+<p><code class="literal">url</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-ICON:CAPS"></a>AS_TAG_ICON</p></td>
+<td class="enum_member_description">
+<p><code class="literal">icon</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-CATEGORIES:CAPS"></a>AS_TAG_CATEGORIES</p></td>
+<td class="enum_member_description">
+<p><code class="literal">categories</code> (or <code class="literal">appcategories</code>)</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-CATEGORY:CAPS"></a>AS_TAG_CATEGORY</p></td>
+<td class="enum_member_description">
+<p><code class="literal">category</code> (or <code class="literal">appcategory</code>)</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-KEYWORDS:CAPS"></a>AS_TAG_KEYWORDS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">keywords</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-KEYWORD:CAPS"></a>AS_TAG_KEYWORD</p></td>
+<td class="enum_member_description">
+<p><code class="literal">keyword</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-MIMETYPES:CAPS"></a>AS_TAG_MIMETYPES</p></td>
+<td class="enum_member_description">
+<p><code class="literal">mimetypes</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-MIMETYPE:CAPS"></a>AS_TAG_MIMETYPE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">mimetype</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PROJECT-GROUP:CAPS"></a>AS_TAG_PROJECT_GROUP</p></td>
+<td class="enum_member_description">
+<p><code class="literal">project_group</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PROJECT-LICENSE:CAPS"></a>AS_TAG_PROJECT_LICENSE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">project_license</code> (or <code class="literal">licence</code>)</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-SCREENSHOT:CAPS"></a>AS_TAG_SCREENSHOT</p></td>
+<td class="enum_member_description">
+<p><code class="literal">screenshot</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-SCREENSHOTS:CAPS"></a>AS_TAG_SCREENSHOTS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">screenshots</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-UPDATE-CONTACT:CAPS"></a>AS_TAG_UPDATE_CONTACT</p></td>
+<td class="enum_member_description">
+<p><code class="literal">update_contact</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-IMAGE:CAPS"></a>AS_TAG_IMAGE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">image</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-COMPULSORY-FOR-DESKTOP:CAPS"></a>AS_TAG_COMPULSORY_FOR_DESKTOP</p></td>
+<td class="enum_member_description">
+<p><code class="literal">compulsory_for_desktop</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PRIORITY:CAPS"></a>AS_TAG_PRIORITY</p></td>
+<td class="enum_member_description">
+<p><code class="literal">priority</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-CAPTION:CAPS"></a>AS_TAG_CAPTION</p></td>
+<td class="enum_member_description">
+<p><code class="literal">caption</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-LANGUAGES:CAPS"></a>AS_TAG_LANGUAGES</p></td>
+<td class="enum_member_description">
+<p><code class="literal">languages</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-LANG:CAPS"></a>AS_TAG_LANG</p></td>
+<td class="enum_member_description">
+<p><code class="literal">lang</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-METADATA:CAPS"></a>AS_TAG_METADATA</p></td>
+<td class="enum_member_description">
+<p><code class="literal">metadata</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-VALUE:CAPS"></a>AS_TAG_VALUE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">value</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-RELEASES:CAPS"></a>AS_TAG_RELEASES</p></td>
+<td class="enum_member_description">
+<p><code class="literal">releases</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-RELEASE:CAPS"></a>AS_TAG_RELEASE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">release</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-ARCHITECTURES:CAPS"></a>AS_TAG_ARCHITECTURES</p></td>
+<td class="enum_member_description">
+<p><code class="literal">architectures</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-ARCH:CAPS"></a>AS_TAG_ARCH</p></td>
+<td class="enum_member_description">
+<p><code class="literal">arch</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-METADATA-LICENSE:CAPS"></a>AS_TAG_METADATA_LICENSE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">metadata_license</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PROVIDES:CAPS"></a>AS_TAG_PROVIDES</p></td>
+<td class="enum_member_description">
+<p><code class="literal">provides</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-EXTENDS:CAPS"></a>AS_TAG_EXTENDS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">extends</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-DEVELOPER-NAME:CAPS"></a>AS_TAG_DEVELOPER_NAME</p></td>
+<td class="enum_member_description">
+<p><code class="literal">developer_name</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-KUDOS:CAPS"></a>AS_TAG_KUDOS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">kudos</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-KUDO:CAPS"></a>AS_TAG_KUDO</p></td>
+<td class="enum_member_description">
+<p><code class="literal">kudo</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-SOURCE-PKGNAME:CAPS"></a>AS_TAG_SOURCE_PKGNAME</p></td>
+<td class="enum_member_description">
+<p><code class="literal">source_pkgname</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-VETOS:CAPS"></a>AS_TAG_VETOS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">vetos</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-VETO:CAPS"></a>AS_TAG_VETO</p></td>
+<td class="enum_member_description">
+<p><code class="literal">veto</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-BUNDLE:CAPS"></a>AS_TAG_BUNDLE</p></td>
+<td class="enum_member_description">
+<p><code class="literal">bundle</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PERMISSIONS:CAPS"></a>AS_TAG_PERMISSIONS</p></td>
+<td class="enum_member_description">
+<p><code class="literal">permissions</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-PERMISSION:CAPS"></a>AS_TAG_PERMISSION</p></td>
+<td class="enum_member_description">
+<p><code class="literal">permission</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-LOCATION:CAPS"></a>AS_TAG_LOCATION</p></td>
+<td class="enum_member_description">
+<p><code class="literal">location</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-CHECKSUM:CAPS"></a>AS_TAG_CHECKSUM</p></td>
+<td class="enum_member_description">
+<p><code class="literal">checksum</code></p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsTagFlags"></a><h3>enum AsTagFlags</h3>
+<p>The flags to use when matching <a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><code class="literal">AsTag</code></a>'s.</p>
+<div class="refsect3">
+<a name="id-1.2.13.9.3.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-FLAG-NONE:CAPS"></a>AS_TAG_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No special actions to use</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-FLAG-USE-FALLBACKS:CAPS"></a>AS_TAG_FLAG_USE_FALLBACKS</p></td>
+<td class="enum_member_description">
+<p>Use fallback tag names</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-TAG-FLAG-USE-TRANSLATED:CAPS"></a>AS_TAG_FLAG_USE_TRANSLATED</p></td>
+<td class="enum_member_description">
+<p>Use translated tag names</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>
+          Generated by GTK-Doc V1.21</div>
+</body>
+</html>

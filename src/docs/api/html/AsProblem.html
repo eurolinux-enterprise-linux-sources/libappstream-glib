@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AppStream-glib Reference Manual: AsProblem</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="AsStore.html" title="AsStore">
+<link rel="next" href="appstream-glib-as-enums.html" title="as-enums">
+<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#AsProblem.description" class="shortcut">Description</a></span><span id="nav_hierarchy">  <span class="dim">|</span> 
+                  <a href="#AsProblem.object-hierarchy" class="shortcut">Object Hierarchy</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="AsStore.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="appstream-glib-as-enums.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="AsProblem"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="AsProblem.top_of_page"></a>AsProblem</span></h2>
+<p>AsProblem — Object representing a problem with an application</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="AsProblem.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="AsProblem.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a class="link" href="AsProblem.html" title="AsProblem"><span class="returnvalue">AsProblem</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-new" title="as_problem_new ()">as_problem_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-kind-to-string" title="as_problem_kind_to_string ()">as_problem_kind_to_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="returnvalue">AsProblemKind</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-get-kind" title="as_problem_get_kind ()">as_problem_get_kind</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">guint</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-get-line-number" title="as_problem_get_line_number ()">as_problem_get_line_number</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-get-message" title="as_problem_get_message ()">as_problem_get_message</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-set-kind" title="as_problem_set_kind ()">as_problem_set_kind</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-set-line-number" title="as_problem_set_line_number ()">as_problem_set_line_number</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsProblem.html#as-problem-set-message" title="as_problem_set_message ()">as_problem_set_message</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsProblem.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody><tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind">AsProblemKind</a></td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsProblem.object-hierarchy"></a><h2>Object Hierarchy</h2>
+<pre class="screen">    GObject
+    <span class="lineart">╰──</span> AsProblem
+</pre>
+</div>
+<div class="refsect1">
+<a name="AsProblem.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="AsProblem.description"></a><h2>Description</h2>
+<p>Problems have a unlocalized message and also contain a line number and kind.</p>
+<p>See also: <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a></p>
+</div>
+<div class="refsect1">
+<a name="AsProblem.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-problem-new"></a><h3>as_problem_new ()</h3>
+<pre class="programlisting"><a class="link" href="AsProblem.html" title="AsProblem"><span class="returnvalue">AsProblem</span></a> *
+as_problem_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Creates a new <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a>.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.2.5"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a>. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-kind-to-string"></a><h3>as_problem_kind_to_string ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_problem_kind_to_string (<em class="parameter"><code><a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="type">AsProblemKind</span></a> kind</code></em>);</pre>
+<p>Converts the enumerated value to an text representation.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.3.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>the <a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="type">AsProblemKind</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.10.9.3.6"></a><h4>Returns</h4>
+<p> string version of <em class="parameter"><code>kind</code></em>
+</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-get-kind"></a><h3>as_problem_get_kind ()</h3>
+<pre class="programlisting"><a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="returnvalue">AsProblemKind</span></a>
+as_problem_get_kind (<em class="parameter"><code><a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> *problem</code></em>);</pre>
+<p>Gets the problem kind.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.4.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>problem</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.10.9.4.6"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="type">AsProblemKind</span></a>, e.g. <a class="link" href="AsProblem.html#AS-PROBLEM-KIND-TAG-MISSING:CAPS"><code class="literal">AS_PROBLEM_KIND_TAG_MISSING</code></a></p>
+<p></p>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-get-line-number"></a><h3>as_problem_get_line_number ()</h3>
+<pre class="programlisting"><span class="returnvalue">guint</span>
+as_problem_get_line_number (<em class="parameter"><code><a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> *problem</code></em>);</pre>
+<p>Gets the line number of the problem if known.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.5.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>problem</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.10.9.5.6"></a><h4>Returns</h4>
+<p> a line number, where 0 is unknown</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-get-message"></a><h3>as_problem_get_message ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_problem_get_message (<em class="parameter"><code><a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> *problem</code></em>);</pre>
+<p>Gets the specific message for the problem.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.6.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>problem</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.10.9.6.6"></a><h4>Returns</h4>
+<p> the message</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-set-kind"></a><h3>as_problem_set_kind ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_problem_set_kind (<em class="parameter"><code><a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> *problem</code></em>,
+                     <em class="parameter"><code><a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="type">AsProblemKind</span></a> kind</code></em>);</pre>
+<p>Sets the problem kind.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.7.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>problem</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>the <a class="link" href="AsProblem.html#AsProblemKind" title="enum AsProblemKind"><span class="type">AsProblemKind</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-set-line-number"></a><h3>as_problem_set_line_number ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_problem_set_line_number (<em class="parameter"><code><a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> *problem</code></em>,
+                            <em class="parameter"><code><span class="type">guint</span> line_number</code></em>);</pre>
+<p>Adds an line_number to the problem.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.8.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>problem</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>line_number</p></td>
+<td class="parameter_description"><p>a <span class="type">guint</span> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-problem-set-message"></a><h3>as_problem_set_message ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_problem_set_message (<em class="parameter"><code><a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> *problem</code></em>,
+                        <em class="parameter"><code>const <span class="type">gchar</span> *message</code></em>);</pre>
+<p>Sets a message on the problem.</p>
+<div class="refsect3">
+<a name="id-1.2.10.9.9.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>problem</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsProblem.html" title="AsProblem"><span class="type">AsProblem</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>message</p></td>
+<td class="parameter_description"><p>the message text.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="AsProblem.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsProblemKind"></a><h3>enum AsProblemKind</h3>
+<p>The problem type.</p>
+<div class="refsect3">
+<a name="id-1.2.10.10.2.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-UNKNOWN:CAPS"></a>AS_PROBLEM_KIND_UNKNOWN</p></td>
+<td class="enum_member_description">
+<p>Type invalid or not known</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-TAG-DUPLICATED:CAPS"></a>AS_PROBLEM_KIND_TAG_DUPLICATED</p></td>
+<td class="enum_member_description">
+<p>A tag is duplicated</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-TAG-MISSING:CAPS"></a>AS_PROBLEM_KIND_TAG_MISSING</p></td>
+<td class="enum_member_description">
+<p>A required tag is missing</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-TAG-INVALID:CAPS"></a>AS_PROBLEM_KIND_TAG_INVALID</p></td>
+<td class="enum_member_description">
+<p>A tag value is invalid</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-ATTRIBUTE-MISSING:CAPS"></a>AS_PROBLEM_KIND_ATTRIBUTE_MISSING</p></td>
+<td class="enum_member_description">
+<p>A required attribute is missing</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-ATTRIBUTE-INVALID:CAPS"></a>AS_PROBLEM_KIND_ATTRIBUTE_INVALID</p></td>
+<td class="enum_member_description">
+<p>An attribute is invalid</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-MARKUP-INVALID:CAPS"></a>AS_PROBLEM_KIND_MARKUP_INVALID</p></td>
+<td class="enum_member_description">
+<p>The XML markup is invalid</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-STYLE-INCORRECT:CAPS"></a>AS_PROBLEM_KIND_STYLE_INCORRECT</p></td>
+<td class="enum_member_description">
+<p>Style guidelines are incorrect</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-TRANSLATIONS-REQUIRED:CAPS"></a>AS_PROBLEM_KIND_TRANSLATIONS_REQUIRED</p></td>
+<td class="enum_member_description">
+<p>Translations are required</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-DUPLICATE-DATA:CAPS"></a>AS_PROBLEM_KIND_DUPLICATE_DATA</p></td>
+<td class="enum_member_description">
+<p>Some data is duplicated</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-VALUE-MISSING:CAPS"></a>AS_PROBLEM_KIND_VALUE_MISSING</p></td>
+<td class="enum_member_description">
+<p>A value is required</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-URL-NOT-FOUND:CAPS"></a>AS_PROBLEM_KIND_URL_NOT_FOUND</p></td>
+<td class="enum_member_description">
+<p>The URL is not found</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-FILE-INVALID:CAPS"></a>AS_PROBLEM_KIND_FILE_INVALID</p></td>
+<td class="enum_member_description">
+<p>The file is invalid</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-ASPECT-RATIO-INCORRECT:CAPS"></a>AS_PROBLEM_KIND_ASPECT_RATIO_INCORRECT</p></td>
+<td class="enum_member_description">
+<p>The image aspect ratio is wrong</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-PROBLEM-KIND-RESOLUTION-INCORRECT:CAPS"></a>AS_PROBLEM_KIND_RESOLUTION_INCORRECT</p></td>
+<td class="enum_member_description">
+<p>The image resolution is wrong</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>
+          Generated by GTK-Doc V1.21</div>
+</body>
+</html>

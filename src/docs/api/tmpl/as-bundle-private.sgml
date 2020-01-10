@@ -1,0 +1,57 @@
+<!-- ##### SECTION Title ##### -->
+as-bundle-private
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION as_bundle_node_insert ##### -->
+<para>
+
+</para>
+
+@bundle: 
+@parent: 
+@ctx: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_bundle_node_parse ##### -->
+<para>
+
+</para>
+
+@bundle: 
+@node: 
+@ctx: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_bundle_node_parse_dep11 ##### -->
+<para>
+
+</para>
+
+@bundle: 
+@node: 
+@ctx: 
+@error: 
+@Returns: 
+
+

@@ -1,0 +1,88 @@
+<!-- ##### SECTION Title ##### -->
+as-yaml
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION as_yaml_unref ##### -->
+<para>
+
+</para>
+
+@node: 
+
+
+<!-- ##### FUNCTION as_yaml_to_string ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_yaml_from_data ##### -->
+<para>
+
+</para>
+
+@data: 
+@data_len: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_yaml_from_file ##### -->
+<para>
+
+</para>
+
+@file: 
+@cancellable: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_yaml_node_get_key ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_yaml_node_get_value ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_yaml_node_get_value_as_int ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+

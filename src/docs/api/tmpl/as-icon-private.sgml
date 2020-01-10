@@ -1,0 +1,75 @@
+<!-- ##### SECTION Title ##### -->
+as-icon-private
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION as_icon_get_data ##### -->
+<para>
+
+</para>
+
+@icon: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_set_data ##### -->
+<para>
+
+</para>
+
+@icon: 
+@data: 
+
+
+<!-- ##### FUNCTION as_icon_node_insert ##### -->
+<para>
+
+</para>
+
+@icon: 
+@parent: 
+@ctx: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_node_parse ##### -->
+<para>
+
+</para>
+
+@icon: 
+@node: 
+@ctx: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_icon_node_parse_dep11 ##### -->
+<para>
+
+</para>
+
+@icon: 
+@node: 
+@ctx: 
+@error: 
+@Returns: 
+
+

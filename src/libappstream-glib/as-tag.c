@@ -1,0 +1,197 @@
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
+ *
+ * Copyright (C) 2014-2015 Richard Hughes <richard@hughsie.com>
+ *
+ * Licensed under the GNU Lesser General Public License Version 2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+ */
+
+/**
+ * SECTION:as-tag
+ * @short_description: Helper functions to convert to and from tag enums
+ * @include: appstream-glib.h
+ * @stability: Stable
+ *
+ * These functions will convert a tag enum such as %AS_TAG_APPLICATION to
+ * it's string form, and also vice-versa.
+ *
+ * These helper functions may be useful if implementing an AppStream parser.
+ */
+
+#include "config.h"
+
+#include "as-tag.h"
+
+#ifdef HAVE_GPERF
+  /* we need to define this now as gperf just writes a big header file */
+  const struct tag_data *as_tag_from_gperf (const char *tag, guint etag);
+  #include "as-tag-private.h"
+#endif
+
+/**
+ * as_tag_from_string:
+ * @tag: the string.
+ *
+ * Converts the text representation to an enumerated value.
+ *
+ * Returns: a %AsTag, or %AS_TAG_UNKNOWN if not known.
+ *
+ * Since: 0.1.0
+ **/
+AsTag
+as_tag_from_string (const gchar *tag)
+{
+	return as_tag_from_string_full (tag, AS_TAG_FLAG_NONE);
+}
+
+/**
+ * as_tag_from_string_full:
+ * @tag: the string.
+ * @flags: the #AsTagFlags e.g. %AS_TAG_FLAG_USE_FALLBACKS
+ *
+ * Converts the text representation to an enumerated value also converting
+ * legacy key names.
+ *
+ * Returns: a %AsTag, or %AS_TAG_UNKNOWN if not known.
+ *
+ * Since: 0.1.2
+ **/
+AsTag
+as_tag_from_string_full (const gchar *tag, AsTagFlags flags)
+{
+#ifdef HAVE_GPERF
+	const struct tag_data *ky;
+#else
+	guint i;
+#endif
+	AsTag etag = AS_TAG_UNKNOWN;
+
+	/* invalid */
+	if (tag == NULL)
+		return AS_TAG_UNKNOWN;
+
+#ifdef HAVE_GPERF
+	/* use a perfect hash */
+	ky = as_tag_from_gperf (tag, strlen (tag));
+	if (ky != NULL)
+		etag = ky->etag;
+#else
+	for (i = 0; i < AS_TAG_LAST; i++) {
+		if (g_strcmp0 (tag, as_tag_to_string (i)) == 0) {
+			etag = i;
+			break;
+		}
+	}
+#endif
+
+	/* deprecated names */
+	if (etag == AS_TAG_UNKNOWN && (flags & AS_TAG_FLAG_USE_FALLBACKS)) {
+		if (g_strcmp0 (tag, "appcategories") == 0)
+			return AS_TAG_CATEGORIES;
+		if (g_strcmp0 (tag, "appcategory") == 0)
+			return AS_TAG_CATEGORY;
+		if (g_strcmp0 (tag, "licence") == 0)
+			return AS_TAG_PROJECT_LICENSE;
+		if (g_strcmp0 (tag, "applications") == 0)
+			return AS_TAG_APPLICATIONS;
+		if (g_strcmp0 (tag, "application") == 0)
+			return AS_TAG_APPLICATION;
+		if (g_strcmp0 (tag, "updatecontact") == 0)
+			return AS_TAG_UPDATE_CONTACT;
+		/* fix spelling error */
+		if (g_strcmp0 (tag, "metadata_licence") == 0)
+			return AS_TAG_METADATA_LICENSE;
+	}
+
+	/* translated versions */
+	if (etag == AS_TAG_UNKNOWN && (flags & AS_TAG_FLAG_USE_TRANSLATED)) {
+		if (g_strcmp0 (tag, "_name") == 0)
+			return AS_TAG_NAME;
+		if (g_strcmp0 (tag, "_summary") == 0)
+			return AS_TAG_SUMMARY;
+		if (g_strcmp0 (tag, "_caption") == 0)
+			return AS_TAG_CAPTION;
+	}
+
+	return etag;
+}
+
+/**
+ * as_tag_to_string:
+ * @tag: the %AsTag value.
+ *
+ * Converts the enumerated value to an text representation.
+ *
+ * Returns: string version of @tag
+ *
+ * Since: 0.1.0
+ **/
+const gchar *
+as_tag_to_string (AsTag tag)
+{
+	const gchar *str[] = {
+		"unknown",
+		"components",
+		"component",
+		"id",
+		"pkgname",
+		"name",
+		"summary",
+		"description",
+		"url",
+		"icon",
+		"categories",
+		"category",
+		"keywords",
+		"keyword",
+		"mimetypes",
+		"mimetype",
+		"project_group",
+		"project_license",
+		"screenshot",
+		"screenshots",
+		"update_contact",
+		"image",
+		"compulsory_for_desktop",
+		"priority",
+		"caption",
+		"languages",
+		"lang",
+		"metadata",
+		"value",
+		"releases",
+		"release",
+		"architectures",
+		"arch",
+		"metadata_license",
+		"provides",
+		"extends",
+		"developer_name",
+		"kudos",
+		"kudo",
+		"source_pkgname",
+		"vetos",
+		"veto",
+		"bundle",
+		"permissions",
+		"permission",
+		"location",
+		"checksum",
+		NULL };
+	if (tag > AS_TAG_LAST)
+		tag = AS_TAG_LAST;
+	return str[tag];
+}

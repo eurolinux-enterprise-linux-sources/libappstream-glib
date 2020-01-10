@@ -1,0 +1,1550 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AppStream-glib Reference Manual: as-node</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="appstream-glib-as-enums.html" title="as-enums">
+<link rel="next" href="appstream-glib-as-tag.html" title="as-tag">
+<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#appstream-glib-as-node.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="appstream-glib-as-enums.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="appstream-glib-as-tag.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="appstream-glib-as-node"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="appstream-glib-as-node.top_of_page"></a>as-node</span></h2>
+<p>as-node — A simple DOM parser</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GNode</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-new" title="as_node_new ()">as_node_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GQuark</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-error-quark" title="as_node_error_quark ()">as_node_error_quark</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-unref" title="as_node_unref ()">as_node_unref</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-name" title="as_node_get_name ()">as_node_get_name</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-data" title="as_node_get_data ()">as_node_get_data</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-comment" title="as_node_get_comment ()">as_node_get_comment</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="returnvalue">AsTag</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-tag" title="as_node_get_tag ()">as_node_get_tag</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-attribute" title="as_node_get_attribute ()">as_node_get_attribute</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gint</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-attribute-as-int" title="as_node_get_attribute_as_int ()">as_node_get_attribute_as_int</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GHashTable</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-localized" title="as_node_get_localized ()">as_node_get_localized</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-localized-best" title="as_node_get_localized_best ()">as_node_get_localized_best</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GHashTable</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-get-localized-unwrap" title="as_node_get_localized_unwrap ()">as_node_get_localized_unwrap</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-set-name" title="as_node_set_name ()">as_node_set_name</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-set-data" title="as_node_set_data ()">as_node_set_data</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-set-comment" title="as_node_set_comment ()">as_node_set_comment</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-add-attribute" title="as_node_add_attribute ()">as_node_add_attribute</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-add-attribute-as-int" title="as_node_add_attribute_as_int ()">as_node_add_attribute_as_int</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-remove-attribute" title="as_node_remove_attribute ()">as_node_remove_attribute</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GString</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-to-xml" title="as_node_to_xml ()">as_node_to_xml</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GNode</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-from-xml" title="as_node_from_xml ()">as_node_from_xml</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GNode</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-from-file" title="as_node_from_file ()">as_node_from_file</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-to-file" title="as_node_to_file ()">as_node_to_file</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GNode</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-find" title="as_node_find ()">as_node_find</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GNode</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-find-with-attribute" title="as_node_find_with_attribute ()">as_node_find_with_attribute</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GNode</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-insert" title="as_node_insert ()">as_node_insert</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-insert-localized" title="as_node_insert_localized ()">as_node_insert_localized</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-node.html#as-node-insert-hash" title="as_node_insert_hash ()">as_node_insert_hash</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-node.html#AsNodeToXmlFlags" title="enum AsNodeToXmlFlags">AsNodeToXmlFlags</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-node.html#AsNodeFromXmlFlags" title="enum AsNodeFromXmlFlags">AsNodeFromXmlFlags</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags">AsNodeInsertFlags</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-node.html#AsNodeError" title="enum AsNodeError">AsNodeError</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-node.html#AS-NODE-ERROR:CAPS" title="AS_NODE_ERROR">AS_NODE_ERROR</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.description"></a><h2>Description</h2>
+<p>These helper functions allow parsing to and from <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a>'s and the AppStream
+XML representation. This parser is UTF-8 safe, but not very fast, and parsers
+like expat should be used if full XML specification adherence is required.</p>
+<p>See also: <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a></p>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-node-new"></a><h3>as_node_new ()</h3>
+<pre class="programlisting"><span class="returnvalue">GNode</span> *
+as_node_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Creates a new empty tree whicah can have nodes appended to it.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.2.5"></a><h4>Returns</h4>
+<p> a new empty tree. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-error-quark"></a><h3>as_node_error_quark ()</h3>
+<pre class="programlisting"><span class="returnvalue">GQuark</span>
+as_node_error_quark (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<div class="refsect3">
+<a name="id-1.2.12.8.3.4"></a><h4>Returns</h4>
+<p> An error quark.</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-unref"></a><h3>as_node_unref ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_unref (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>);</pre>
+<p>Deallocates all notes in the tree.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.4.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-name"></a><h3>as_node_get_name ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_node_get_name (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>);</pre>
+<p>Gets the node name, e.g. "body"</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.5.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.5.6"></a><h4>Returns</h4>
+<p> string value</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-data"></a><h3>as_node_get_data ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_node_get_data (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>);</pre>
+<p>Gets the node data, e.g. "paragraph text"</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.6.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.6.6"></a><h4>Returns</h4>
+<p> string value</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-comment"></a><h3>as_node_get_comment ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_node_get_comment (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>);</pre>
+<p>Gets the node data, e.g. "Copyright 2014 Richard Hughes"</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.7.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.7.6"></a><h4>Returns</h4>
+<p> string value, or <code class="literal">NULL</code></p>
+<p></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-tag"></a><h3>as_node_get_tag ()</h3>
+<pre class="programlisting"><a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="returnvalue">AsTag</span></a>
+as_node_get_tag (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>);</pre>
+<p>Gets the node tag enum.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.8.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.8.6"></a><h4>Returns</h4>
+<p> <a class="link" href="appstream-glib-as-tag.html#AsTag" title="enum AsTag"><span class="type">AsTag</span></a>, e.g. <a class="link" href="appstream-glib-as-tag.html#AS-TAG-PKGNAME:CAPS"><code class="literal">AS_TAG_PKGNAME</code></a></p>
+<p></p>
+</div>
+<p class="since">Since 0.1.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-attribute"></a><h3>as_node_get_attribute ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_node_get_attribute (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>,
+                       <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>);</pre>
+<p>Gets a node attribute, e.g. "false"</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.9.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the attribute key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.9.6"></a><h4>Returns</h4>
+<p> string value</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-attribute-as-int"></a><h3>as_node_get_attribute_as_int ()</h3>
+<pre class="programlisting"><span class="returnvalue">gint</span>
+as_node_get_attribute_as_int (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>,
+                              <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>);</pre>
+<p>Gets a node attribute, e.g. 34</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.10.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the attribute key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.10.6"></a><h4>Returns</h4>
+<p> integer value, or <code class="literal">G_MAXINT</code> for error</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-localized"></a><h3>as_node_get_localized ()</h3>
+<pre class="programlisting"><span class="returnvalue">GHashTable</span> *
+as_node_get_localized (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>,
+                       <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>);</pre>
+<p>Extracts localized values from the DOM tree</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.11.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the key to use, e.g. "copyright"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.11.6"></a><h4>Returns</h4>
+<p> A hash table with the locale (e.g. en_GB) as the key. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-localized-best"></a><h3>as_node_get_localized_best ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_node_get_localized_best (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>,
+                            <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>);</pre>
+<p>Gets the 'best' locale version of a specific data value.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.12.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the tag name.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.12.6"></a><h4>Returns</h4>
+<p> the string value, or <code class="literal">NULL</code> if there was no data</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-get-localized-unwrap"></a><h3>as_node_get_localized_unwrap ()</h3>
+<pre class="programlisting"><span class="returnvalue">GHashTable</span> *
+as_node_get_localized_unwrap (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>,
+                              <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Denormalize AppData data like this:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="symbol">&lt;</span><span class="normal">description</span><span class="symbol">&gt;</span>
+<span class="normal"> </span><span class="symbol">&lt;</span><span class="normal">p</span><span class="symbol">&gt;</span><span class="normal">Hi</span><span class="symbol">&lt;/</span><span class="normal">p</span><span class="symbol">&gt;</span>
+<span class="normal"> </span><span class="symbol">&lt;</span><span class="usertype">p</span><span class="normal"> xml</span><span class="symbol">:</span><span class="normal">lang</span><span class="symbol">=</span><span class="string">"pl"</span><span class="symbol">&gt;</span><span class="normal">Czesc</span><span class="symbol">&lt;/</span><span class="normal">p</span><span class="symbol">&gt;</span>
+<span class="normal"> </span><span class="symbol">&lt;</span><span class="normal">ul</span><span class="symbol">&gt;</span>
+<span class="normal">  </span><span class="symbol">&lt;</span><span class="normal">li</span><span class="symbol">&gt;</span><span class="normal">First</span><span class="symbol">&lt;/</span><span class="normal">li</span><span class="symbol">&gt;</span>
+<span class="normal">  </span><span class="symbol">&lt;</span><span class="usertype">li</span><span class="normal"> xml</span><span class="symbol">:</span><span class="normal">lang</span><span class="symbol">=</span><span class="string">"pl"</span><span class="symbol">&gt;</span><span class="normal">Pierwszy</span><span class="symbol">&lt;/</span><span class="normal">li</span><span class="symbol">&gt;</span>
+<span class="normal"> </span><span class="symbol">&lt;/</span><span class="normal">ul</span><span class="symbol">&gt;</span>
+<span class="symbol">&lt;/</span><span class="normal">description</span><span class="symbol">&gt;</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p></p>
+<p>into a hash that contains:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="string">"C"</span><span class="normal">  </span><span class="symbol">-&gt;</span><span class="normal">  </span><span class="string">"&lt;p&gt;Hi&lt;/p&gt;&lt;ul&gt;&lt;li&gt;First&lt;/li&gt;&lt;/ul&gt;"</span>
+<span class="string">"pl"</span><span class="normal"> </span><span class="symbol">-&gt;</span><span class="normal">  </span><span class="string">"&lt;p&gt;Czesc&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Pierwszy&lt;/li&gt;&lt;/ul&gt;"</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p></p>
+<div class="refsect3">
+<a name="id-1.2.12.8.13.10"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.13.11"></a><h4>Returns</h4>
+<p> a hash table of data. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-set-name"></a><h3>as_node_set_name ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_set_name (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>,
+                  <em class="parameter"><code>const <span class="type">gchar</span> *name</code></em>);</pre>
+<p>Sets the node name, e.g. "body"</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.14.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p>the new name</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-set-data"></a><h3>as_node_set_data ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_set_data (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>,
+                  <em class="parameter"><code>const <span class="type">gchar</span> *cdata</code></em>,
+                  <em class="parameter"><code><span class="type">gssize</span> cdata_len</code></em>,
+                  <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><span class="type">AsNodeInsertFlags</span></a> insert_flags</code></em>);</pre>
+<p>Sets new data on a node.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.15.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cdata</p></td>
+<td class="parameter_description"><p>new data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cdata_len</p></td>
+<td class="parameter_description"><p>length of <em class="parameter"><code>data</code></em>
+, or -1 if NULL terminated</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>insert_flags</p></td>
+<td class="parameter_description"><p>any <a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><code class="literal">AsNodeInsertFlags</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-set-comment"></a><h3>as_node_set_comment ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_set_comment (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>,
+                     <em class="parameter"><code>const <span class="type">gchar</span> *comment</code></em>,
+                     <em class="parameter"><code><span class="type">gssize</span> comment_len</code></em>);</pre>
+<p>Sets new comment for the node.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.16.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>comment</p></td>
+<td class="parameter_description"><p>new comment</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>comment_len</p></td>
+<td class="parameter_description"><p>length of <em class="parameter"><code>data</code></em>
+, or -1 if NULL terminated</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-add-attribute"></a><h3>as_node_add_attribute ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_add_attribute (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>,
+                       <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>,
+                       <em class="parameter"><code>const <span class="type">gchar</span> *value</code></em>,
+                       <em class="parameter"><code><span class="type">gssize</span> value_len</code></em>);</pre>
+<p>Adds a new attribute to a node.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.17.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the attribute key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>value</p></td>
+<td class="parameter_description"><p>new data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>value_len</p></td>
+<td class="parameter_description"><p>length of <em class="parameter"><code>data</code></em>
+, or -1 if NULL terminated</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-add-attribute-as-int"></a><h3>as_node_add_attribute_as_int ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_add_attribute_as_int (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>,
+                              <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>,
+                              <em class="parameter"><code><span class="type">gint</span> value</code></em>);</pre>
+<p>Adds a new attribute to a node.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.18.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the attribute key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>value</p></td>
+<td class="parameter_description"><p>new data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.3.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-remove-attribute"></a><h3>as_node_remove_attribute ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_remove_attribute (<em class="parameter"><code><span class="type">GNode</span> *node</code></em>,
+                          <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>);</pre>
+<p>Removes a node attribute, e.g. "type"</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.19.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the attribute key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.2.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-to-xml"></a><h3>as_node_to_xml ()</h3>
+<pre class="programlisting"><span class="returnvalue">GString</span> *
+as_node_to_xml (<em class="parameter"><code>const <span class="type">GNode</span> *node</code></em>,
+                <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeToXmlFlags" title="enum AsNodeToXmlFlags"><span class="type">AsNodeToXmlFlags</span></a> flags</code></em>);</pre>
+<p>Converts a node and it's children to XML.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.20.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>node</p></td>
+<td class="parameter_description"><p>a <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>the AsNodeToXmlFlags, e.g. <a class="link" href="appstream-glib-as-node.html#AS-NODE-INSERT-FLAG-PRE-ESCAPED:CAPS"><code class="literal">AS_NODE_INSERT_FLAG_PRE_ESCAPED</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.20.6"></a><h4>Returns</h4>
+<p> a <span class="type">GString</span>. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-from-xml"></a><h3>as_node_from_xml ()</h3>
+<pre class="programlisting"><span class="returnvalue">GNode</span> *
+as_node_from_xml (<em class="parameter"><code>const <span class="type">gchar</span> *data</code></em>,
+                  <em class="parameter"><code><span class="type">gssize</span> data_len</code></em>,
+                  <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeFromXmlFlags" title="enum AsNodeFromXmlFlags"><span class="type">AsNodeFromXmlFlags</span></a> flags</code></em>,
+                  <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Parses XML data into a DOM tree.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.21.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>XML data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data_len</p></td>
+<td class="parameter_description"><p>Length of <em class="parameter"><code>data</code></em>
+, or -1 if NULL terminated</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p><a class="link" href="appstream-glib-as-node.html#AsNodeFromXmlFlags" title="enum AsNodeFromXmlFlags"><span class="type">AsNodeFromXmlFlags</span></a>, e.g. <a class="link" href="appstream-glib-as-node.html#AS-NODE-FROM-XML-FLAG-NONE:CAPS"><code class="literal">AS_NODE_FROM_XML_FLAG_NONE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.21.6"></a><h4>Returns</h4>
+<p> A populated <span class="type">GNode</span> tree. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-from-file"></a><h3>as_node_from_file ()</h3>
+<pre class="programlisting"><span class="returnvalue">GNode</span> *
+as_node_from_file (<em class="parameter"><code><span class="type">GFile</span> *file</code></em>,
+                   <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeFromXmlFlags" title="enum AsNodeFromXmlFlags"><span class="type">AsNodeFromXmlFlags</span></a> flags</code></em>,
+                   <em class="parameter"><code><span class="type">GCancellable</span> *cancellable</code></em>,
+                   <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Parses an XML file into a DOM tree.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.22.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>file</p></td>
+<td class="parameter_description"><p>file</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p><a class="link" href="appstream-glib-as-node.html#AsNodeFromXmlFlags" title="enum AsNodeFromXmlFlags"><span class="type">AsNodeFromXmlFlags</span></a>, e.g. <a class="link" href="appstream-glib-as-node.html#AS-NODE-FROM-XML-FLAG-NONE:CAPS"><code class="literal">AS_NODE_FROM_XML_FLAG_NONE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cancellable</p></td>
+<td class="parameter_description"><p>A <span class="type">GCancellable</span>, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.22.6"></a><h4>Returns</h4>
+<p> A populated <span class="type">GNode</span> tree. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-to-file"></a><h3>as_node_to_file ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_node_to_file (<em class="parameter"><code>const <span class="type">GNode</span> *root</code></em>,
+                 <em class="parameter"><code><span class="type">GFile</span> *file</code></em>,
+                 <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeToXmlFlags" title="enum AsNodeToXmlFlags"><span class="type">AsNodeToXmlFlags</span></a> flags</code></em>,
+                 <em class="parameter"><code><span class="type">GCancellable</span> *cancellable</code></em>,
+                 <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Exports a DOM tree to an XML file.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.23.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>root</p></td>
+<td class="parameter_description"><p>A populated <span class="type">GNode</span> tree</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>file</p></td>
+<td class="parameter_description"><p>a <span class="type">GFile</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p><a class="link" href="appstream-glib-as-node.html#AsNodeToXmlFlags" title="enum AsNodeToXmlFlags"><span class="type">AsNodeToXmlFlags</span></a>, e.g. <a class="link" href="appstream-glib-as-node.html#AS-NODE-TO-XML-FLAG-NONE:CAPS"><code class="literal">AS_NODE_TO_XML_FLAG_NONE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cancellable</p></td>
+<td class="parameter_description"><p>A <span class="type">GCancellable</span>, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.23.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-find"></a><h3>as_node_find ()</h3>
+<pre class="programlisting"><span class="returnvalue">GNode</span> *
+as_node_find (<em class="parameter"><code><span class="type">GNode</span> *root</code></em>,
+              <em class="parameter"><code>const <span class="type">gchar</span> *path</code></em>);</pre>
+<p>Gets a node from the DOM tree.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.24.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>root</p></td>
+<td class="parameter_description"><p>a root node, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>path</p></td>
+<td class="parameter_description"><p>a path in the DOM, e.g. "html/body"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.24.6"></a><h4>Returns</h4>
+<p> A <span class="type">GNode</span>, or <code class="literal">NULL</code> if not found</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-find-with-attribute"></a><h3>as_node_find_with_attribute ()</h3>
+<pre class="programlisting"><span class="returnvalue">GNode</span> *
+as_node_find_with_attribute (<em class="parameter"><code><span class="type">GNode</span> *root</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *path</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *attr_key</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *attr_value</code></em>);</pre>
+<p>Gets a node from the DOM tree with a specified attribute.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.25.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>root</p></td>
+<td class="parameter_description"><p>a root node, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>path</p></td>
+<td class="parameter_description"><p>a path in the DOM, e.g. "html/body"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>attr_key</p></td>
+<td class="parameter_description"><p>the attribute key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>attr_value</p></td>
+<td class="parameter_description"><p>the attribute value</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.25.6"></a><h4>Returns</h4>
+<p> A <span class="type">GNode</span>, or <code class="literal">NULL</code> if not found</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-insert"></a><h3>as_node_insert ()</h3>
+<pre class="programlisting"><span class="returnvalue">GNode</span> *
+as_node_insert (<em class="parameter"><code><span class="type">GNode</span> *parent</code></em>,
+                <em class="parameter"><code>const <span class="type">gchar</span> *name</code></em>,
+                <em class="parameter"><code>const <span class="type">gchar</span> *cdata</code></em>,
+                <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><span class="type">AsNodeInsertFlags</span></a> insert_flags</code></em>,
+                <em class="parameter"><code>...</code></em>);</pre>
+<p>Inserts a node into the DOM.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.26.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>parent</p></td>
+<td class="parameter_description"><p>a parent <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p>the tag name, e.g. "id".</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cdata</p></td>
+<td class="parameter_description"><p>the tag data, or <code class="literal">NULL</code>, e.g. "org.gnome.Software.desktop".</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>insert_flags</p></td>
+<td class="parameter_description"><p>any <a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><code class="literal">AsNodeInsertFlags</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>...</p></td>
+<td class="parameter_description"><p>any attributes to add to the node, terminated by <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.12.8.26.6"></a><h4>Returns</h4>
+<p> A populated <span class="type">GNode</span>. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-insert-localized"></a><h3>as_node_insert_localized ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_insert_localized (<em class="parameter"><code><span class="type">GNode</span> *parent</code></em>,
+                          <em class="parameter"><code>const <span class="type">gchar</span> *name</code></em>,
+                          <em class="parameter"><code><span class="type">GHashTable</span> *localized</code></em>,
+                          <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><span class="type">AsNodeInsertFlags</span></a> insert_flags</code></em>);</pre>
+<p>Inserts a localized key into the DOM.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.27.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>parent</p></td>
+<td class="parameter_description"><p>a parent <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p>the tag name, e.g. "id".</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>localized</p></td>
+<td class="parameter_description"><p>the hash table of data, with the locale as the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>insert_flags</p></td>
+<td class="parameter_description"><p>any <a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><code class="literal">AsNodeInsertFlags</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-node-insert-hash"></a><h3>as_node_insert_hash ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_node_insert_hash (<em class="parameter"><code><span class="type">GNode</span> *parent</code></em>,
+                     <em class="parameter"><code>const <span class="type">gchar</span> *name</code></em>,
+                     <em class="parameter"><code>const <span class="type">gchar</span> *attr_key</code></em>,
+                     <em class="parameter"><code><span class="type">GHashTable</span> *hash</code></em>,
+                     <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><span class="type">AsNodeInsertFlags</span></a> insert_flags</code></em>);</pre>
+<p>Inserts a hash table of data into the DOM.</p>
+<div class="refsect3">
+<a name="id-1.2.12.8.28.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>parent</p></td>
+<td class="parameter_description"><p>a parent <span class="type">GNode</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p>the tag name, e.g. "id".</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>attr_key</p></td>
+<td class="parameter_description"><p>the key to use as the attribute in the XML, e.g. "key".</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>hash</p></td>
+<td class="parameter_description"><p>the hash table with the key as the key to use in the XML.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>insert_flags</p></td>
+<td class="parameter_description"><p>any <a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><code class="literal">AsNodeInsertFlags</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-node.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsNodeToXmlFlags"></a><h3>enum AsNodeToXmlFlags</h3>
+<p>The flags for converting to XML.</p>
+<div class="refsect3">
+<a name="id-1.2.12.9.2.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-TO-XML-FLAG-NONE:CAPS"></a>AS_NODE_TO_XML_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No extra flags to use</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-TO-XML-FLAG-ADD-HEADER:CAPS"></a>AS_NODE_TO_XML_FLAG_ADD_HEADER</p></td>
+<td class="enum_member_description">
+<p>Add an XML header to the data</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-TO-XML-FLAG-FORMAT-MULTILINE:CAPS"></a>AS_NODE_TO_XML_FLAG_FORMAT_MULTILINE</p></td>
+<td class="enum_member_description">
+<p>Split up children with a newline</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-TO-XML-FLAG-FORMAT-INDENT:CAPS"></a>AS_NODE_TO_XML_FLAG_FORMAT_INDENT</p></td>
+<td class="enum_member_description">
+<p>Indent the XML by child depth</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-TO-XML-FLAG-INCLUDE-SIBLINGS:CAPS"></a>AS_NODE_TO_XML_FLAG_INCLUDE_SIBLINGS</p></td>
+<td class="enum_member_description">
+<p>Include the siblings when converting</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-TO-XML-FLAG-SORT-CHILDREN:CAPS"></a>AS_NODE_TO_XML_FLAG_SORT_CHILDREN</p></td>
+<td class="enum_member_description">
+<p>Sort the tags by alphabetical order</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsNodeFromXmlFlags"></a><h3>enum AsNodeFromXmlFlags</h3>
+<p>The flags for converting from XML.</p>
+<div class="refsect3">
+<a name="id-1.2.12.9.3.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-FROM-XML-FLAG-NONE:CAPS"></a>AS_NODE_FROM_XML_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No extra flags to use</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-FROM-XML-FLAG-LITERAL-TEXT:CAPS"></a>AS_NODE_FROM_XML_FLAG_LITERAL_TEXT</p></td>
+<td class="enum_member_description">
+<p>Treat the text as an exact string</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-FROM-XML-FLAG-KEEP-COMMENTS:CAPS"></a>AS_NODE_FROM_XML_FLAG_KEEP_COMMENTS</p></td>
+<td class="enum_member_description">
+<p>Retain comments in the XML file</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsNodeInsertFlags"></a><h3>enum AsNodeInsertFlags</h3>
+<p>The flags to use when inserting a node.</p>
+<div class="refsect3">
+<a name="id-1.2.12.9.4.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-NONE:CAPS"></a>AS_NODE_INSERT_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No extra flags to use</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-PRE-ESCAPED:CAPS"></a>AS_NODE_INSERT_FLAG_PRE_ESCAPED</p></td>
+<td class="enum_member_description">
+<p>The data is already XML escaped</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-SWAPPED:CAPS"></a>AS_NODE_INSERT_FLAG_SWAPPED</p></td>
+<td class="enum_member_description">
+<p>The name and key should be swapped</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-NO-MARKUP:CAPS"></a>AS_NODE_INSERT_FLAG_NO_MARKUP</p></td>
+<td class="enum_member_description">
+<p>Preformat the 'description' markup</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-DEDUPE-LANG:CAPS"></a>AS_NODE_INSERT_FLAG_DEDUPE_LANG</p></td>
+<td class="enum_member_description">
+<p>No xml:lang keys where text matches 'C'</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-MARK-TRANSLATABLE:CAPS"></a>AS_NODE_INSERT_FLAG_MARK_TRANSLATABLE</p></td>
+<td class="enum_member_description">
+<p>Mark the tag name as translatable</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-INSERT-FLAG-BASE64-ENCODED:CAPS"></a>AS_NODE_INSERT_FLAG_BASE64_ENCODED</p></td>
+<td class="enum_member_description">
+<p>The data is Base64 enoded</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsNodeError"></a><h3>enum AsNodeError</h3>
+<p>The error type.</p>
+<div class="refsect3">
+<a name="id-1.2.12.9.5.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-ERROR-FAILED:CAPS"></a>AS_NODE_ERROR_FAILED</p></td>
+<td class="enum_member_description">
+<p>Generic failure</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-ERROR-INVALID-MARKUP:CAPS"></a>AS_NODE_ERROR_INVALID_MARKUP</p></td>
+<td class="enum_member_description">
+<p>XML markup was invalid</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-NODE-ERROR-NO-SUPPORT:CAPS"></a>AS_NODE_ERROR_NO_SUPPORT</p></td>
+<td class="enum_member_description">
+<p>No support for parsing</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-NODE-ERROR:CAPS"></a><h3>AS_NODE_ERROR</h3>
+<pre class="programlisting">#define AS_NODE_ERROR				as_node_error_quark ()
+</pre>
+<p>
+</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>
+          Generated by GTK-Doc V1.21</div>
+</body>
+</html>

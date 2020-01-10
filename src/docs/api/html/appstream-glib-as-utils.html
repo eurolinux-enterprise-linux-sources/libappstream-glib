@@ -1,0 +1,1094 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AppStream-glib Reference Manual: as-utils</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="appstream-glib-as-tag.html" title="as-tag">
+<link rel="next" href="appstream-glib-as-version.html" title="as-version">
+<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#appstream-glib-as-utils.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="appstream-glib-as-tag.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="appstream-glib-as-version.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="appstream-glib-as-utils"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="appstream-glib-as-utils.top_of_page"></a>as-utils</span></h2>
+<p>as-utils — Helper functions that are used inside libappstream-glib</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-markup-convert-simple" title="as_markup_convert_simple ()">as_markup_convert_simple</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-markup-convert" title="as_markup_convert ()">as_markup_convert</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> **
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-markup-strsplit-words" title="as_markup_strsplit_words ()">as_markup_strsplit_words</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GQuark</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-error-quark" title="as_utils_error_quark ()">as_utils_error_quark</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-is-stock-icon-name" title="as_utils_is_stock_icon_name ()">as_utils_is_stock_icon_name</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-is-spdx-license-id" title="as_utils_is_spdx_license_id ()">as_utils_is_spdx_license_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-is-spdx-license" title="as_utils_is_spdx_license ()">as_utils_is_spdx_license</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-is-environment-id" title="as_utils_is_environment_id ()">as_utils_is_environment_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-is-category-id" title="as_utils_is_category_id ()">as_utils_is_category_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-is-blacklisted-id" title="as_utils_is_blacklisted_id ()">as_utils_is_blacklisted_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> **
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-spdx-license-tokenize" title="as_utils_spdx_license_tokenize ()">as_utils_spdx_license_tokenize</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-spdx-license-detokenize" title="as_utils_spdx_license_detokenize ()">as_utils_spdx_license_detokenize</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-check-url-exists" title="as_utils_check_url_exists ()">as_utils_check_url_exists</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-find-icon-filename" title="as_utils_find_icon_filename ()">as_utils_find_icon_filename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-find-icon-filename-full" title="as_utils_find_icon_filename_full ()">as_utils_find_icon_filename_full</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-get-string-overlap" title="as_utils_get_string_overlap ()">as_utils_get_string_overlap</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-install-filename" title="as_utils_install_filename ()">as_utils_install_filename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-search-token-valid" title="as_utils_search_token_valid ()">as_utils_search_token_valid</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gchar</span> **
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-search-tokenize" title="as_utils_search_tokenize ()">as_utils_search_tokenize</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gint</span>
+</td>
+<td class="function_name">
+<a class="link" href="appstream-glib-as-utils.html#as-utils-vercmp" title="as_utils_vercmp ()">as_utils_vercmp</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-utils.html#AsUtilsError" title="enum AsUtilsError">AsUtilsError</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-utils.html#AS-UTILS-ERROR:CAPS" title="AS_UTILS_ERROR">AS_UTILS_ERROR</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-utils.html#AsUtilsFindIconFlag" title="enum AsUtilsFindIconFlag">AsUtilsFindIconFlag</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-utils.html#AsUtilsLocation" title="enum AsUtilsLocation">AsUtilsLocation</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="appstream-glib-as-utils.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat">AsMarkupConvertFormat</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.description"></a><h2>Description</h2>
+<p>These functions are used internally to libappstream-glib, and some may be
+useful to user-applications.</p>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-markup-convert-simple"></a><h3>as_markup_convert_simple ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> *
+as_markup_convert_simple (<em class="parameter"><code>const <span class="type">gchar</span> *markup</code></em>,
+                          <em class="parameter"><code><span class="type">gssize</span> markup_len</code></em>,
+                          <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Converts an XML description into a printable form.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.2.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>markup</p></td>
+<td class="parameter_description"><p>the text to copy.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>markup_len</p></td>
+<td class="parameter_description"><p>the length of <em class="parameter"><code>markup</code></em>
+, or -1 if <em class="parameter"><code>markup</code></em>
+is NULL terminated.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.2.6"></a><h4>Returns</h4>
+<p> a newly allocated <code class="literal">NULL</code> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-convert"></a><h3>as_markup_convert ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> *
+as_markup_convert (<em class="parameter"><code>const <span class="type">gchar</span> *markup</code></em>,
+                   <em class="parameter"><code><span class="type">gssize</span> markup_len</code></em>,
+                   <em class="parameter"><code><a class="link" href="appstream-glib-as-utils.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a> format</code></em>,
+                   <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Converts an XML description into a printable form.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.3.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>markup</p></td>
+<td class="parameter_description"><p>the text to copy.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>markup_len</p></td>
+<td class="parameter_description"><p>the length of <em class="parameter"><code>markup</code></em>
+, or -1 if <em class="parameter"><code>markup</code></em>
+is NULL terminated.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-utils.html#AsMarkupConvertFormat" title="enum AsMarkupConvertFormat"><span class="type">AsMarkupConvertFormat</span></a>, e.g. <a class="link" href="appstream-glib-as-utils.html#AS-MARKUP-CONVERT-FORMAT-MARKDOWN:CAPS"><code class="literal">AS_MARKUP_CONVERT_FORMAT_MARKDOWN</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.3.6"></a><h4>Returns</h4>
+<p> a newly allocated <code class="literal">NULL</code> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.3.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-markup-strsplit-words"></a><h3>as_markup_strsplit_words ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> **
+as_markup_strsplit_words (<em class="parameter"><code>const <span class="type">gchar</span> *text</code></em>,
+                          <em class="parameter"><code><span class="type">guint</span> line_len</code></em>);</pre>
+<p>Splits up a long line into an array of smaller strings, each being no longer
+than <em class="parameter"><code>line_len</code></em>
+. Words are not split.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.4.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>text</p></td>
+<td class="parameter_description"><p>the text to split.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>line_len</p></td>
+<td class="parameter_description"><p>the maximum length of the output line</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.4.6"></a><h4>Returns</h4>
+<p> lines, or <code class="literal">NULL</code> in event of an error. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.3.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-error-quark"></a><h3>as_utils_error_quark ()</h3>
+<pre class="programlisting"><span class="returnvalue">GQuark</span>
+as_utils_error_quark (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<div class="refsect3">
+<a name="id-1.2.14.8.5.4"></a><h4>Returns</h4>
+<p> An error quark.</p>
+<p></p>
+</div>
+<p class="since">Since 0.3.7</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-is-stock-icon-name"></a><h3>as_utils_is_stock_icon_name ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_is_stock_icon_name (<em class="parameter"><code>const <span class="type">gchar</span> *name</code></em>);</pre>
+<p>Searches the known list of stock icons.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.6.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p>an icon name</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.6.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the icon is a "stock icon name" and does not need to be
+included in the AppStream icon tarball</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.3</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-is-spdx-license-id"></a><h3>as_utils_is_spdx_license_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_is_spdx_license_id (<em class="parameter"><code>const <span class="type">gchar</span> *license_id</code></em>);</pre>
+<p>Searches the known list of SPDX license IDs.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.7.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>license_id</p></td>
+<td class="parameter_description"><p>a single SPDX license ID, e.g. "CC-BY-3.0"</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.7.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the icon is a valid "SPDX license ID"</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-is-spdx-license"></a><h3>as_utils_is_spdx_license ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_is_spdx_license (<em class="parameter"><code>const <span class="type">gchar</span> *license</code></em>);</pre>
+<p>Checks the licence string to check it being a valid licence.
+NOTE: SPDX licences can't typically contain brackets.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.8.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>license</p></td>
+<td class="parameter_description"><p>a SPDX license string, e.g. "CC-BY-3.0 and GFDL-1.3"</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.8.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the icon is a valid "SPDX license"</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-is-environment-id"></a><h3>as_utils_is_environment_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_is_environment_id (<em class="parameter"><code>const <span class="type">gchar</span> *environment_id</code></em>);</pre>
+<p>Searches the known list of registered environment IDs.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.9.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>environment_id</p></td>
+<td class="parameter_description"><p>a desktop ID, e.g. "GNOME"</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.9.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the environment ID is valid</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-is-category-id"></a><h3>as_utils_is_category_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_is_category_id (<em class="parameter"><code>const <span class="type">gchar</span> *category_id</code></em>);</pre>
+<p>Searches the known list of registered category IDs.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.10.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>category_id</p></td>
+<td class="parameter_description"><p>a desktop ID, e.g. "AudioVideoEditing"</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.10.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the category ID is valid</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-is-blacklisted-id"></a><h3>as_utils_is_blacklisted_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_is_blacklisted_id (<em class="parameter"><code>const <span class="type">gchar</span> *desktop_id</code></em>);</pre>
+<p>Searches the known list of blacklisted desktop IDs.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.11.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>desktop_id</p></td>
+<td class="parameter_description"><p>a desktop ID, e.g. "gimp.desktop"</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.11.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the desktop ID is blacklisted</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-spdx-license-tokenize"></a><h3>as_utils_spdx_license_tokenize ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> **
+as_utils_spdx_license_tokenize (<em class="parameter"><code>const <span class="type">gchar</span> *license</code></em>);</pre>
+<p>Tokenizes the SPDX license string (or any simarly formatted string)
+into parts. Any licence parts of the string e.g. "LGPL-2.0+" are prefexed
+with "@", the conjunctive replaced with "&amp;" and the disjunctive replaced
+with "|". Brackets are added as indervidual tokens and other strings are
+appended into single tokens where possible.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.12.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>license</p></td>
+<td class="parameter_description"><p>a license string, e.g. "LGPLv2+ and (QPL or GPLv2) and MIT"</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.12.6"></a><h4>Returns</h4>
+<p> array of strings. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-spdx-license-detokenize"></a><h3>as_utils_spdx_license_detokenize ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> *
+as_utils_spdx_license_detokenize (<em class="parameter"><code><span class="type">gchar</span> **license_tokens</code></em>);</pre>
+<p>De-tokenizes the SPDX licenses into a string.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.13.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>license_tokens</p></td>
+<td class="parameter_description"><p>license tokens, typically from <a class="link" href="appstream-glib-as-utils.html#as-utils-spdx-license-tokenize" title="as_utils_spdx_license_tokenize ()"><code class="function">as_utils_spdx_license_tokenize()</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.13.6"></a><h4>Returns</h4>
+<p> string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.2.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-check-url-exists"></a><h3>as_utils_check_url_exists ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_check_url_exists (<em class="parameter"><code>const <span class="type">gchar</span> *url</code></em>,
+                           <em class="parameter"><code><span class="type">guint</span> timeout</code></em>,
+                           <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Checks to see if a URL is reachable.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.14.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>url</p></td>
+<td class="parameter_description"><p>the URL to check.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>timeout</p></td>
+<td class="parameter_description"><p>the timeout in seconds.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.14.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the URL was reachable and pointed to a non-zero-length file.</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-find-icon-filename"></a><h3>as_utils_find_icon_filename ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> *
+as_utils_find_icon_filename (<em class="parameter"><code>const <span class="type">gchar</span> *destdir</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *search</code></em>,
+                             <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Finds an icon filename from a filesystem root.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.15.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>destdir</p></td>
+<td class="parameter_description"><p>the destdir.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>search</p></td>
+<td class="parameter_description"><p>the icon search name, e.g. "microphone.svg"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.15.6"></a><h4>Returns</h4>
+<p> a newly allocated <code class="literal">NULL</code> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.2.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-find-icon-filename-full"></a><h3>as_utils_find_icon_filename_full ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> *
+as_utils_find_icon_filename_full (<em class="parameter"><code>const <span class="type">gchar</span> *destdir</code></em>,
+                                  <em class="parameter"><code>const <span class="type">gchar</span> *search</code></em>,
+                                  <em class="parameter"><code><a class="link" href="appstream-glib-as-utils.html#AsUtilsFindIconFlag" title="enum AsUtilsFindIconFlag"><span class="type">AsUtilsFindIconFlag</span></a> flags</code></em>,
+                                  <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Finds an icon filename from a filesystem root.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.16.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>destdir</p></td>
+<td class="parameter_description"><p>the destdir.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>search</p></td>
+<td class="parameter_description"><p>the icon search name, e.g. "microphone.svg"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>A <a class="link" href="appstream-glib-as-utils.html#AsUtilsFindIconFlag" title="enum AsUtilsFindIconFlag"><span class="type">AsUtilsFindIconFlag</span></a> bitfield</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.16.6"></a><h4>Returns</h4>
+<p> a newly allocated <code class="literal">NULL</code> terminated string. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.3.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-get-string-overlap"></a><h3>as_utils_get_string_overlap ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> *
+as_utils_get_string_overlap (<em class="parameter"><code>const <span class="type">gchar</span> *s1</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *s2</code></em>);</pre>
+<p>Return a prefix and sufffix that is common to both strings.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.17.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>s1</p></td>
+<td class="parameter_description"><p>A string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>s2</p></td>
+<td class="parameter_description"><p>Another string</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.17.6"></a><h4>Returns</h4>
+<p> a newly allocated <code class="literal">NULL</code> terminated string, or <code class="literal">NULL</code>. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.3.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-install-filename"></a><h3>as_utils_install_filename ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_install_filename (<em class="parameter"><code><a class="link" href="appstream-glib-as-utils.html#AsUtilsLocation" title="enum AsUtilsLocation"><span class="type">AsUtilsLocation</span></a> location</code></em>,
+                           <em class="parameter"><code>const <span class="type">gchar</span> *filename</code></em>,
+                           <em class="parameter"><code>const <span class="type">gchar</span> *origin</code></em>,
+                           <em class="parameter"><code>const <span class="type">gchar</span> *destdir</code></em>,
+                           <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Installs an AppData, MetaInfo, AppStream XML or AppStream Icon metadata file.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.18.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>location</p></td>
+<td class="parameter_description"><p>the <a class="link" href="appstream-glib-as-utils.html#AsUtilsLocation" title="enum AsUtilsLocation"><span class="type">AsUtilsLocation</span></a>, e.g. <a class="link" href="appstream-glib-as-utils.html#AS-UTILS-LOCATION-CACHE:CAPS"><code class="literal">AS_UTILS_LOCATION_CACHE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>filename</p></td>
+<td class="parameter_description"><p>the full path of the file to install</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>origin</p></td>
+<td class="parameter_description"><p>the origin to use for the installation, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>destdir</p></td>
+<td class="parameter_description"><p>the destdir to use, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.18.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success, <code class="literal">FALSE</code> if error is set</p>
+<p></p>
+</div>
+<p class="since">Since 0.3.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-search-token-valid"></a><h3>as_utils_search_token_valid ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_utils_search_token_valid (<em class="parameter"><code>const <span class="type">gchar</span> *token</code></em>);</pre>
+<p>Checks the search token if it is valid. Valid tokens are at least 3 chars in
+length, not common words like "and", and do not contain markup.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.19.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>token</p></td>
+<td class="parameter_description"><p>the search token</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.19.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> is the search token was valid</p>
+<p></p>
+</div>
+<p class="since">Since 0.3.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-search-tokenize"></a><h3>as_utils_search_tokenize ()</h3>
+<pre class="programlisting"><span class="returnvalue">gchar</span> **
+as_utils_search_tokenize (<em class="parameter"><code>const <span class="type">gchar</span> *search</code></em>);</pre>
+<p>Splits up a string into tokens and returns tokens that are suitable for
+searching. This includes taking out common words and casefolding the
+returned search tokens.</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.20.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>search</p></td>
+<td class="parameter_description"><p>the search string</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.20.6"></a><h4>Returns</h4>
+<p> Valid tokens to search for, or <code class="literal">NULL</code> for error. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.3.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-utils-vercmp"></a><h3>as_utils_vercmp ()</h3>
+<pre class="programlisting"><span class="returnvalue">gint</span>
+as_utils_vercmp (<em class="parameter"><code>const <span class="type">gchar</span> *version_a</code></em>,
+                 <em class="parameter"><code>const <span class="type">gchar</span> *version_b</code></em>);</pre>
+<p>Compares version numbers for sorting. This function cannot deal with version
+strings that do not contain numbers, for instance "rev2706" or "1.2_alpha".</p>
+<div class="refsect3">
+<a name="id-1.2.14.8.21.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>version_a</p></td>
+<td class="parameter_description"><p>the release version, e.g. 1.2.3</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>version_b</p></td>
+<td class="parameter_description"><p>the release version, e.g. 1.2.3.1</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.14.8.21.6"></a><h4>Returns</h4>
+<p> -1 if a &lt; b, +1 if a &gt; b, 0 if they are equal, and <code class="literal">G_MAXINT</code> on error</p>
+<p></p>
+</div>
+<p class="since">Since 0.3.5</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="appstream-glib-as-utils.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsUtilsError"></a><h3>enum AsUtilsError</h3>
+<p>The error type.</p>
+<div class="refsect3">
+<a name="id-1.2.14.9.2.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-ERROR-FAILED:CAPS"></a>AS_UTILS_ERROR_FAILED</p></td>
+<td class="enum_member_description">
+<p>Generic failure</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-ERROR-INVALID-TYPE:CAPS"></a>AS_UTILS_ERROR_INVALID_TYPE</p></td>
+<td class="enum_member_description">
+<p>Invalid type</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-UTILS-ERROR:CAPS"></a><h3>AS_UTILS_ERROR</h3>
+<pre class="programlisting">#define AS_UTILS_ERROR				as_utils_error_quark ()
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsUtilsFindIconFlag"></a><h3>enum AsUtilsFindIconFlag</h3>
+<p>The flags used when finding icons.</p>
+<div class="refsect3">
+<a name="id-1.2.14.9.4.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-FIND-ICON-NONE:CAPS"></a>AS_UTILS_FIND_ICON_NONE</p></td>
+<td class="enum_member_description">
+<p>No flags set</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-FIND-ICON-HI-DPI:CAPS"></a>AS_UTILS_FIND_ICON_HI_DPI</p></td>
+<td class="enum_member_description">
+<p>Prefer a HiDPI icon</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsUtilsLocation"></a><h3>enum AsUtilsLocation</h3>
+<p>The flags used when installing and removing metadata files.</p>
+<div class="refsect3">
+<a name="id-1.2.14.9.5.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-LOCATION-SHARED:CAPS"></a>AS_UTILS_LOCATION_SHARED</p></td>
+<td class="enum_member_description">
+<p>Installed by the vendor, shared</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-LOCATION-CACHE:CAPS"></a>AS_UTILS_LOCATION_CACHE</p></td>
+<td class="enum_member_description">
+<p>Installed as metadata, shared</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-UTILS-LOCATION-USER:CAPS"></a>AS_UTILS_LOCATION_USER</p></td>
+<td class="enum_member_description">
+<p>Installed by the user</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsMarkupConvertFormat"></a><h3>enum AsMarkupConvertFormat</h3>
+<p>The output format used when converting AppStream descriptions.</p>
+<div class="refsect3">
+<a name="id-1.2.14.9.6.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-SIMPLE:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_SIMPLE</p></td>
+<td class="enum_member_description"> </td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-MARKUP-CONVERT-FORMAT-MARKDOWN:CAPS"></a>AS_MARKUP_CONVERT_FORMAT_MARKDOWN</p></td>
+<td class="enum_member_description">
+<p>Markdown format</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>
+          Generated by GTK-Doc V1.21</div>
+</body>
+</html>

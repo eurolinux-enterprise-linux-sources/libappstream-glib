@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE book PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "">
+<book xmlns="http://www.devhelp.net/book" title="AppStream-glib Reference Manual" link="index.html" author="Richard Hughes" name="appstream-glib" version="2" language="c">
+  <chapters>
+    <sub name="libappstream-glib GObject library" link="libappstream-glib.html">
+      <sub name="AsApp" link="AsApp.html"/>
+      <sub name="AsIcon" link="AsIcon.html"/>
+      <sub name="AsImage" link="AsImage.html"/>
+      <sub name="AsRelease" link="AsRelease.html"/>
+      <sub name="AsProvide" link="AsProvide.html"/>
+      <sub name="AsScreenshot" link="AsScreenshot.html"/>
+      <sub name="AsStore" link="AsStore.html"/>
+      <sub name="AsProblem" link="AsProblem.html"/>
+      <sub name="as-enums" link="appstream-glib-as-enums.html"/>
+      <sub name="as-node" link="appstream-glib-as-node.html"/>
+      <sub name="as-tag" link="appstream-glib-as-tag.html"/>
+      <sub name="as-utils" link="appstream-glib-as-utils.html"/>
+      <sub name="as-version" link="appstream-glib-as-version.html"/>
+    </sub>
+    <sub name="Annotation Glossary" link="annotation-glossary.html"/>
+  </chapters>
+  <functions>
+    <keyword type="function" name="as_app_new ()" link="AsApp.html#as-app-new" since="0.1.0"/>
+    <keyword type="function" name="as_app_error_quark ()" link="AsApp.html#as-app-error-quark" since="0.1.2"/>
+    <keyword type="function" name="as_app_guess_source_kind ()" link="AsApp.html#as-app-guess-source-kind" since="0.1.8"/>
+    <keyword type="function" name="as_app_source_kind_from_string ()" link="AsApp.html#as-app-source-kind-from-string" since="0.2.2"/>
+    <keyword type="function" name="as_app_source_kind_to_string ()" link="AsApp.html#as-app-source-kind-to-string" since="0.2.2"/>
+    <keyword type="function" name="as_app_state_to_string ()" link="AsApp.html#as-app-state-to-string" since="0.2.2"/>
+    <keyword type="function" name="as_app_get_id_kind ()" link="AsApp.html#as-app-get-id-kind" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_source_kind ()" link="AsApp.html#as-app-get-source-kind" since="0.1.4"/>
+    <keyword type="function" name="as_app_get_state ()" link="AsApp.html#as-app-get-state" since="0.2.2"/>
+    <keyword type="function" name="as_app_get_trust_flags ()" link="AsApp.html#as-app-get-trust-flags" since="0.2.2"/>
+    <keyword type="function" name="as_app_get_languages ()" link="AsApp.html#as-app-get-languages" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_addons ()" link="AsApp.html#as-app-get-addons" since="0.1.7"/>
+    <keyword type="function" name="as_app_get_categories ()" link="AsApp.html#as-app-get-categories" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_compulsory_for_desktops ()" link="AsApp.html#as-app-get-compulsory-for-desktops" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_extends ()" link="AsApp.html#as-app-get-extends" since="0.1.7"/>
+    <keyword type="function" name="as_app_get_keywords ()" link="AsApp.html#as-app-get-keywords" since="0.3.0"/>
+    <keyword type="function" name="as_app_get_kudos ()" link="AsApp.html#as-app-get-kudos" since="0.2.2"/>
+    <keyword type="function" name="as_app_get_permissions ()" link="AsApp.html#as-app-get-permissions" since="0.3.5"/>
+    <keyword type="function" name="as_app_get_mimetypes ()" link="AsApp.html#as-app-get-mimetypes" since="0.2.0"/>
+    <keyword type="function" name="as_app_get_pkgnames ()" link="AsApp.html#as-app-get-pkgnames" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_architectures ()" link="AsApp.html#as-app-get-architectures" since="0.1.1"/>
+    <keyword type="function" name="as_app_get_releases ()" link="AsApp.html#as-app-get-releases" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_provides ()" link="AsApp.html#as-app-get-provides" since="0.1.6"/>
+    <keyword type="function" name="as_app_get_screenshots ()" link="AsApp.html#as-app-get-screenshots" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_icons ()" link="AsApp.html#as-app-get-icons" since="0.3.1"/>
+    <keyword type="function" name="as_app_get_bundles ()" link="AsApp.html#as-app-get-bundles" since="0.3.5"/>
+    <keyword type="function" name="as_app_get_names ()" link="AsApp.html#as-app-get-names" since="0.1.6"/>
+    <keyword type="function" name="as_app_get_comments ()" link="AsApp.html#as-app-get-comments" since="0.1.6"/>
+    <keyword type="function" name="as_app_get_developer_names ()" link="AsApp.html#as-app-get-developer-names" since="0.1.8"/>
+    <keyword type="function" name="as_app_get_metadata ()" link="AsApp.html#as-app-get-metadata" since="0.1.6"/>
+    <keyword type="function" name="as_app_get_descriptions ()" link="AsApp.html#as-app-get-descriptions" since="0.1.6"/>
+    <keyword type="function" name="as_app_get_urls ()" link="AsApp.html#as-app-get-urls" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_vetos ()" link="AsApp.html#as-app-get-vetos" since="0.2.5"/>
+    <keyword type="function" name="as_app_get_icon_path ()" link="AsApp.html#as-app-get-icon-path" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_id_filename ()" link="AsApp.html#as-app-get-id-filename" since="0.3.0"/>
+    <keyword type="function" name="as_app_get_id ()" link="AsApp.html#as-app-get-id" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_pkgname_default ()" link="AsApp.html#as-app-get-pkgname-default" since="0.2.0"/>
+    <keyword type="function" name="as_app_get_source_pkgname ()" link="AsApp.html#as-app-get-source-pkgname" since="0.2.4"/>
+    <keyword type="function" name="as_app_get_origin ()" link="AsApp.html#as-app-get-origin" since="0.3.2"/>
+    <keyword type="function" name="as_app_get_project_group ()" link="AsApp.html#as-app-get-project-group" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_project_license ()" link="AsApp.html#as-app-get-project-license" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_metadata_license ()" link="AsApp.html#as-app-get-metadata-license" since="0.1.4"/>
+    <keyword type="function" name="as_app_get_update_contact ()" link="AsApp.html#as-app-get-update-contact" since="0.1.4"/>
+    <keyword type="function" name="as_app_get_source_file ()" link="AsApp.html#as-app-get-source-file" since="0.2.2"/>
+    <keyword type="function" name="as_app_get_name ()" link="AsApp.html#as-app-get-name" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_comment ()" link="AsApp.html#as-app-get-comment" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_developer_name ()" link="AsApp.html#as-app-get-developer-name" since="0.1.8"/>
+    <keyword type="function" name="as_app_get_description ()" link="AsApp.html#as-app-get-description" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_priority ()" link="AsApp.html#as-app-get-priority" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_language ()" link="AsApp.html#as-app-get-language" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_metadata_item ()" link="AsApp.html#as-app-get-metadata-item" since="0.1.0"/>
+    <keyword type="function" name="as_app_get_url_item ()" link="AsApp.html#as-app-get-url-item" since="0.1.0"/>
+    <keyword type="function" name="as_app_has_category ()" link="AsApp.html#as-app-has-category" since="0.1.5"/>
+    <keyword type="function" name="as_app_has_kudo ()" link="AsApp.html#as-app-has-kudo" since="0.2.2"/>
+    <keyword type="function" name="as_app_has_kudo_kind ()" link="AsApp.html#as-app-has-kudo-kind" since="0.2.2"/>
+    <keyword type="function" name="as_app_has_permission ()" link="AsApp.html#as-app-has-permission" since="0.3.5"/>
+    <keyword type="function" name="as_app_set_id ()" link="AsApp.html#as-app-set-id" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_id_kind ()" link="AsApp.html#as-app-set-id-kind" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_source_kind ()" link="AsApp.html#as-app-set-source-kind" since="0.1.4"/>
+    <keyword type="function" name="as_app_set_state ()" link="AsApp.html#as-app-set-state" since="0.2.2"/>
+    <keyword type="function" name="as_app_set_trust_flags ()" link="AsApp.html#as-app-set-trust-flags" since="0.2.2"/>
+    <keyword type="function" name="as_app_set_origin ()" link="AsApp.html#as-app-set-origin" since="0.3.2"/>
+    <keyword type="function" name="as_app_set_project_group ()" link="AsApp.html#as-app-set-project-group" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_project_license ()" link="AsApp.html#as-app-set-project-license" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_metadata_license ()" link="AsApp.html#as-app-set-metadata-license" since="0.1.4"/>
+    <keyword type="function" name="as_app_set_source_pkgname ()" link="AsApp.html#as-app-set-source-pkgname" since="0.2.4"/>
+    <keyword type="function" name="as_app_set_update_contact ()" link="AsApp.html#as-app-set-update-contact" since="0.1.4"/>
+    <keyword type="function" name="as_app_set_icon_path ()" link="AsApp.html#as-app-set-icon-path" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_name ()" link="AsApp.html#as-app-set-name" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_comment ()" link="AsApp.html#as-app-set-comment" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_developer_name ()" link="AsApp.html#as-app-set-developer-name" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_description ()" link="AsApp.html#as-app-set-description" since="0.1.0"/>
+    <keyword type="function" name="as_app_set_source_file ()" link="AsApp.html#as-app-set-source-file" since="0.2.2"/>
+    <keyword type="function" name="as_app_set_priority ()" link="AsApp.html#as-app-set-priority" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_category ()" link="AsApp.html#as-app-add-category" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_keyword ()" link="AsApp.html#as-app-add-keyword" since="0.3.0"/>
+    <keyword type="function" name="as_app_add_kudo ()" link="AsApp.html#as-app-add-kudo" since="0.2.2"/>
+    <keyword type="function" name="as_app_add_kudo_kind ()" link="AsApp.html#as-app-add-kudo-kind" since="0.2.2"/>
+    <keyword type="function" name="as_app_add_permission ()" link="AsApp.html#as-app-add-permission" since="0.3.5"/>
+    <keyword type="function" name="as_app_add_mimetype ()" link="AsApp.html#as-app-add-mimetype" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_pkgname ()" link="AsApp.html#as-app-add-pkgname" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_arch ()" link="AsApp.html#as-app-add-arch" since="0.1.1"/>
+    <keyword type="function" name="as_app_add_release ()" link="AsApp.html#as-app-add-release" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_provide ()" link="AsApp.html#as-app-add-provide" since="0.1.6"/>
+    <keyword type="function" name="as_app_add_screenshot ()" link="AsApp.html#as-app-add-screenshot" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_icon ()" link="AsApp.html#as-app-add-icon" since="0.3.1"/>
+    <keyword type="function" name="as_app_add_bundle ()" link="AsApp.html#as-app-add-bundle" since="0.3.5"/>
+    <keyword type="function" name="as_app_add_language ()" link="AsApp.html#as-app-add-language" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_compulsory_for_desktop ()" link="AsApp.html#as-app-add-compulsory-for-desktop" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_url ()" link="AsApp.html#as-app-add-url" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_metadata ()" link="AsApp.html#as-app-add-metadata" since="0.1.0"/>
+    <keyword type="function" name="as_app_remove_metadata ()" link="AsApp.html#as-app-remove-metadata" since="0.1.0"/>
+    <keyword type="function" name="as_app_add_addon ()" link="AsApp.html#as-app-add-addon" since="0.1.7"/>
+    <keyword type="function" name="as_app_add_extends ()" link="AsApp.html#as-app-add-extends" since="0.1.7"/>
+    <keyword type="function" name="as_app_validate ()" link="AsApp.html#as-app-validate" since="0.1.4"/>
+    <keyword type="function" name="as_app_subsume ()" link="AsApp.html#as-app-subsume" since="0.1.0"/>
+    <keyword type="function" name="as_app_subsume_full ()" link="AsApp.html#as-app-subsume-full" since="0.1.4"/>
+    <keyword type="function" name="as_app_add_veto ()" link="AsApp.html#as-app-add-veto" since="0.2.5"/>
+    <keyword type="function" name="as_app_search_matches_all ()" link="AsApp.html#as-app-search-matches-all" since="0.1.3"/>
+    <keyword type="function" name="as_app_search_matches ()" link="AsApp.html#as-app-search-matches" since="0.1.0"/>
+    <keyword type="function" name="as_app_parse_file ()" link="AsApp.html#as-app-parse-file" since="0.1.2"/>
+    <keyword type="function" name="as_app_to_file ()" link="AsApp.html#as-app-to-file" since="0.2.0"/>
+    <keyword type="function" name="as_app_get_icon_default ()" link="AsApp.html#as-app-get-icon-default" since="0.3.1"/>
+    <keyword type="function" name="as_app_get_icon_for_size ()" link="AsApp.html#as-app-get-icon-for-size" since="0.3.1"/>
+    <keyword type="function" name="as_app_get_bundle_default ()" link="AsApp.html#as-app-get-bundle-default" since="0.3.5"/>
+    <keyword type="function" name="as_app_get_release ()" link="AsApp.html#as-app-get-release" since="0.3.5"/>
+    <keyword type="function" name="as_app_get_release_default ()" link="AsApp.html#as-app-get-release-default" since="0.3.5"/>
+    <keyword type="function" name="as_app_convert_icons ()" link="AsApp.html#as-app-convert-icons" since="0.3.1"/>
+    <keyword type="enum" name="enum AsAppParseFlags" link="AsApp.html#AsAppParseFlags"/>
+    <keyword type="enum" name="enum AsAppSubsumeFlags" link="AsApp.html#AsAppSubsumeFlags"/>
+    <keyword type="enum" name="enum AsAppError" link="AsApp.html#AsAppError"/>
+    <keyword type="enum" name="enum AsAppValidateFlags" link="AsApp.html#AsAppValidateFlags"/>
+    <keyword type="enum" name="enum AsAppTrustFlags" link="AsApp.html#AsAppTrustFlags"/>
+    <keyword type="enum" name="enum AsAppSourceKind" link="AsApp.html#AsAppSourceKind"/>
+    <keyword type="enum" name="enum AsAppState" link="AsApp.html#AsAppState"/>
+    <keyword type="macro" name="AS_APP_ERROR" link="AsApp.html#AS-APP-ERROR:CAPS"/>
+    <keyword type="function" name="as_icon_new ()" link="AsIcon.html#as-icon-new" since="0.3.1"/>
+    <keyword type="function" name="as_icon_error_quark ()" link="AsIcon.html#as-icon-error-quark" since="0.3.1"/>
+    <keyword type="function" name="as_icon_kind_to_string ()" link="AsIcon.html#as-icon-kind-to-string" since="0.1.0"/>
+    <keyword type="function" name="as_icon_kind_from_string ()" link="AsIcon.html#as-icon-kind-from-string" since="0.1.0"/>
+    <keyword type="function" name="as_icon_get_name ()" link="AsIcon.html#as-icon-get-name" since="0.3.1"/>
+    <keyword type="function" name="as_icon_get_url ()" link="AsIcon.html#as-icon-get-url" since="0.3.2"/>
+    <keyword type="function" name="as_icon_get_filename ()" link="AsIcon.html#as-icon-get-filename" since="0.3.2"/>
+    <keyword type="function" name="as_icon_get_prefix ()" link="AsIcon.html#as-icon-get-prefix" since="0.1.6"/>
+    <keyword type="function" name="as_icon_get_width ()" link="AsIcon.html#as-icon-get-width" since="0.3.1"/>
+    <keyword type="function" name="as_icon_get_height ()" link="AsIcon.html#as-icon-get-height" since="0.3.1"/>
+    <keyword type="function" name="as_icon_get_kind ()" link="AsIcon.html#as-icon-get-kind" since="0.3.1"/>
+    <keyword type="function" name="as_icon_get_pixbuf ()" link="AsIcon.html#as-icon-get-pixbuf" since="0.3.1"/>
+    <keyword type="function" name="as_icon_set_name ()" link="AsIcon.html#as-icon-set-name" since="0.3.1"/>
+    <keyword type="function" name="as_icon_set_url ()" link="AsIcon.html#as-icon-set-url" since="0.3.2"/>
+    <keyword type="function" name="as_icon_set_filename ()" link="AsIcon.html#as-icon-set-filename" since="0.3.2"/>
+    <keyword type="function" name="as_icon_set_prefix ()" link="AsIcon.html#as-icon-set-prefix" since="0.1.6"/>
+    <keyword type="function" name="as_icon_set_width ()" link="AsIcon.html#as-icon-set-width" since="0.3.1"/>
+    <keyword type="function" name="as_icon_set_height ()" link="AsIcon.html#as-icon-set-height" since="0.3.1"/>
+    <keyword type="function" name="as_icon_set_kind ()" link="AsIcon.html#as-icon-set-kind" since="0.3.1"/>
+    <keyword type="function" name="as_icon_set_pixbuf ()" link="AsIcon.html#as-icon-set-pixbuf" since="0.3.1"/>
+    <keyword type="function" name="as_icon_load ()" link="AsIcon.html#as-icon-load" since="0.3.1"/>
+    <keyword type="function" name="as_icon_convert_to_kind ()" link="AsIcon.html#as-icon-convert-to-kind" since="0.3.1"/>
+    <keyword type="enum" name="enum AsIconError" link="AsIcon.html#AsIconError"/>
+    <keyword type="enum" name="enum AsIconKind" link="AsIcon.html#AsIconKind"/>
+    <keyword type="enum" name="enum AsIconLoadFlags" link="AsIcon.html#AsIconLoadFlags"/>
+    <keyword type="macro" name="AS_ICON_ERROR" link="AsIcon.html#AS-ICON-ERROR:CAPS"/>
+    <keyword type="function" name="as_image_new ()" link="AsImage.html#as-image-new" since="0.1.0"/>
+    <keyword type="function" name="as_image_kind_from_string ()" link="AsImage.html#as-image-kind-from-string" since="0.1.0"/>
+    <keyword type="function" name="as_image_kind_to_string ()" link="AsImage.html#as-image-kind-to-string" since="0.1.0"/>
+    <keyword type="function" name="as_image_get_url ()" link="AsImage.html#as-image-get-url" since="0.1.0"/>
+    <keyword type="function" name="as_image_get_md5 ()" link="AsImage.html#as-image-get-md5" since="0.1.6"/>
+    <keyword type="function" name="as_image_get_basename ()" link="AsImage.html#as-image-get-basename" since="0.1.6"/>
+    <keyword type="function" name="as_image_get_width ()" link="AsImage.html#as-image-get-width" since="0.1.0"/>
+    <keyword type="function" name="as_image_get_height ()" link="AsImage.html#as-image-get-height" since="0.1.0"/>
+    <keyword type="function" name="as_image_get_kind ()" link="AsImage.html#as-image-get-kind" since="0.1.0"/>
+    <keyword type="function" name="as_image_get_pixbuf ()" link="AsImage.html#as-image-get-pixbuf" since="0.1.6"/>
+    <keyword type="function" name="as_image_set_url ()" link="AsImage.html#as-image-set-url" since="0.1.0"/>
+    <keyword type="function" name="as_image_set_basename ()" link="AsImage.html#as-image-set-basename" since="0.1.6"/>
+    <keyword type="function" name="as_image_set_width ()" link="AsImage.html#as-image-set-width" since="0.1.0"/>
+    <keyword type="function" name="as_image_set_height ()" link="AsImage.html#as-image-set-height" since="0.1.0"/>
+    <keyword type="function" name="as_image_set_kind ()" link="AsImage.html#as-image-set-kind" since="0.1.0"/>
+    <keyword type="function" name="as_image_set_pixbuf ()" link="AsImage.html#as-image-set-pixbuf" since="0.1.6"/>
+    <keyword type="function" name="as_image_get_alpha_flags ()" link="AsImage.html#as-image-get-alpha-flags" since="0.2.2"/>
+    <keyword type="function" name="as_image_load_filename ()" link="AsImage.html#as-image-load-filename" since="0.1.6"/>
+    <keyword type="function" name="as_image_save_pixbuf ()" link="AsImage.html#as-image-save-pixbuf" since="0.1.6"/>
+    <keyword type="function" name="as_image_save_filename ()" link="AsImage.html#as-image-save-filename" since="0.1.6"/>
+    <keyword type="enum" name="enum AsImageKind" link="AsImage.html#AsImageKind"/>
+    <keyword type="enum" name="enum AsImageSaveFlags" link="AsImage.html#AsImageSaveFlags"/>
+    <keyword type="enum" name="enum AsImageAlphaFlags" link="AsImage.html#AsImageAlphaFlags"/>
+    <keyword type="macro" name="AS_IMAGE_LARGE_HEIGHT" link="AsImage.html#AS-IMAGE-LARGE-HEIGHT:CAPS"/>
+    <keyword type="macro" name="AS_IMAGE_LARGE_WIDTH" link="AsImage.html#AS-IMAGE-LARGE-WIDTH:CAPS"/>
+    <keyword type="macro" name="AS_IMAGE_NORMAL_HEIGHT" link="AsImage.html#AS-IMAGE-NORMAL-HEIGHT:CAPS"/>
+    <keyword type="macro" name="AS_IMAGE_NORMAL_WIDTH" link="AsImage.html#AS-IMAGE-NORMAL-WIDTH:CAPS"/>
+    <keyword type="macro" name="AS_IMAGE_THUMBNAIL_HEIGHT" link="AsImage.html#AS-IMAGE-THUMBNAIL-HEIGHT:CAPS"/>
+    <keyword type="macro" name="AS_IMAGE_THUMBNAIL_WIDTH" link="AsImage.html#AS-IMAGE-THUMBNAIL-WIDTH:CAPS"/>
+    <keyword type="function" name="as_release_new ()" link="AsRelease.html#as-release-new" since="0.1.0"/>
+    <keyword type="function" name="as_release_get_version ()" link="AsRelease.html#as-release-get-version" since="0.1.0"/>
+    <keyword type="function" name="as_release_get_timestamp ()" link="AsRelease.html#as-release-get-timestamp" since="0.1.0"/>
+    <keyword type="function" name="as_release_get_description ()" link="AsRelease.html#as-release-get-description" since="0.1.0"/>
+    <keyword type="function" name="as_release_get_locations ()" link="AsRelease.html#as-release-get-locations" since="0.3.5"/>
+    <keyword type="function" name="as_release_get_location_default ()" link="AsRelease.html#as-release-get-location-default" since="0.3.5"/>
+    <keyword type="function" name="as_release_get_checksum ()" link="AsRelease.html#as-release-get-checksum" since="0.3.5"/>
+    <keyword type="function" name="as_release_set_version ()" link="AsRelease.html#as-release-set-version" since="0.1.0"/>
+    <keyword type="function" name="as_release_set_timestamp ()" link="AsRelease.html#as-release-set-timestamp" since="0.1.0"/>
+    <keyword type="function" name="as_release_set_description ()" link="AsRelease.html#as-release-set-description" since="0.1.0"/>
+    <keyword type="function" name="as_release_add_location ()" link="AsRelease.html#as-release-add-location" since="0.3.5"/>
+    <keyword type="function" name="as_release_set_checksum ()" link="AsRelease.html#as-release-set-checksum" since="0.3.5"/>
+    <keyword type="function" name="as_provide_new ()" link="AsProvide.html#as-provide-new" since="0.1.6"/>
+    <keyword type="function" name="as_provide_kind_from_string ()" link="AsProvide.html#as-provide-kind-from-string" since="0.1.6"/>
+    <keyword type="function" name="as_provide_kind_to_string ()" link="AsProvide.html#as-provide-kind-to-string" since="0.1.6"/>
+    <keyword type="function" name="as_provide_get_value ()" link="AsProvide.html#as-provide-get-value" since="0.1.6"/>
+    <keyword type="function" name="as_provide_get_kind ()" link="AsProvide.html#as-provide-get-kind" since="0.1.6"/>
+    <keyword type="function" name="as_provide_set_value ()" link="AsProvide.html#as-provide-set-value" since="0.1.6"/>
+    <keyword type="function" name="as_provide_set_kind ()" link="AsProvide.html#as-provide-set-kind" since="0.1.6"/>
+    <keyword type="enum" name="enum AsProvideKind" link="AsProvide.html#AsProvideKind"/>
+    <keyword type="function" name="as_screenshot_new ()" link="AsScreenshot.html#as-screenshot-new" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_kind_from_string ()" link="AsScreenshot.html#as-screenshot-kind-from-string" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_kind_to_string ()" link="AsScreenshot.html#as-screenshot-kind-to-string" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_get_kind ()" link="AsScreenshot.html#as-screenshot-get-kind" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_get_priority ()" link="AsScreenshot.html#as-screenshot-get-priority" since="0.3.1"/>
+    <keyword type="function" name="as_screenshot_get_caption ()" link="AsScreenshot.html#as-screenshot-get-caption" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_get_images ()" link="AsScreenshot.html#as-screenshot-get-images" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_get_image ()" link="AsScreenshot.html#as-screenshot-get-image" since="0.2.2"/>
+    <keyword type="function" name="as_screenshot_get_source ()" link="AsScreenshot.html#as-screenshot-get-source" since="0.1.6"/>
+    <keyword type="function" name="as_screenshot_set_kind ()" link="AsScreenshot.html#as-screenshot-set-kind" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_set_priority ()" link="AsScreenshot.html#as-screenshot-set-priority" since="0.3.1"/>
+    <keyword type="function" name="as_screenshot_set_caption ()" link="AsScreenshot.html#as-screenshot-set-caption" since="0.1.0"/>
+    <keyword type="function" name="as_screenshot_add_image ()" link="AsScreenshot.html#as-screenshot-add-image" since="0.1.0"/>
+    <keyword type="enum" name="enum AsScreenshotKind" link="AsScreenshot.html#AsScreenshotKind"/>
+    <keyword type="function" name="as_store_new ()" link="AsStore.html#as-store-new" since="0.1.0"/>
+    <keyword type="function" name="as_store_error_quark ()" link="AsStore.html#as-store-error-quark" since="0.1.2"/>
+    <keyword type="function" name="as_store_get_size ()" link="AsStore.html#as-store-get-size" since="0.1.0"/>
+    <keyword type="function" name="as_store_from_file ()" link="AsStore.html#as-store-from-file" since="0.1.0"/>
+    <keyword type="function" name="as_store_from_xml ()" link="AsStore.html#as-store-from-xml" since="0.1.1"/>
+    <keyword type="function" name="as_store_load ()" link="AsStore.html#as-store-load" since="0.1.2"/>
+    <keyword type="function" name="as_store_load_path ()" link="AsStore.html#as-store-load-path" since="0.2.2"/>
+    <keyword type="function" name="as_store_remove_all ()" link="AsStore.html#as-store-remove-all" since="0.2.5"/>
+    <keyword type="function" name="as_store_get_apps ()" link="AsStore.html#as-store-get-apps" since="0.1.0"/>
+    <keyword type="function" name="as_store_get_apps_by_metadata ()" link="AsStore.html#as-store-get-apps-by-metadata" since="0.1.4"/>
+    <keyword type="function" name="as_store_get_app_by_id ()" link="AsStore.html#as-store-get-app-by-id" since="0.1.0"/>
+    <keyword type="function" name="as_store_get_app_by_pkgname ()" link="AsStore.html#as-store-get-app-by-pkgname" since="0.1.0"/>
+    <keyword type="function" name="as_store_add_app ()" link="AsStore.html#as-store-add-app" since="0.1.0"/>
+    <keyword type="function" name="as_store_remove_app ()" link="AsStore.html#as-store-remove-app" since="0.1.0"/>
+    <keyword type="function" name="as_store_remove_app_by_id ()" link="AsStore.html#as-store-remove-app-by-id" since="0.3.0"/>
+    <keyword type="function" name="as_store_to_xml ()" link="AsStore.html#as-store-to-xml" since="0.1.0"/>
+    <keyword type="function" name="as_store_to_file ()" link="AsStore.html#as-store-to-file" since="0.1.0"/>
+    <keyword type="function" name="as_store_convert_icons ()" link="AsStore.html#as-store-convert-icons" since="0.3.1"/>
+    <keyword type="function" name="as_store_get_origin ()" link="AsStore.html#as-store-get-origin" since="0.1.1"/>
+    <keyword type="function" name="as_store_set_origin ()" link="AsStore.html#as-store-set-origin" since="0.1.1"/>
+    <keyword type="function" name="as_store_get_builder_id ()" link="AsStore.html#as-store-get-builder-id" since="0.2.5"/>
+    <keyword type="function" name="as_store_set_builder_id ()" link="AsStore.html#as-store-set-builder-id" since="0.2.5"/>
+    <keyword type="function" name="as_store_get_destdir ()" link="AsStore.html#as-store-get-destdir" since="0.2.4"/>
+    <keyword type="function" name="as_store_set_destdir ()" link="AsStore.html#as-store-set-destdir" since="0.2.4"/>
+    <keyword type="function" name="as_store_get_api_version ()" link="AsStore.html#as-store-get-api-version" since="0.1.1"/>
+    <keyword type="function" name="as_store_set_api_version ()" link="AsStore.html#as-store-set-api-version" since="0.1.1"/>
+    <keyword type="function" name="as_store_get_add_flags ()" link="AsStore.html#as-store-get-add-flags" since="0.2.2"/>
+    <keyword type="function" name="as_store_set_add_flags ()" link="AsStore.html#as-store-set-add-flags" since="0.2.2"/>
+    <keyword type="function" name="as_store_validate ()" link="AsStore.html#as-store-validate" since="0.2.4"/>
+    <keyword type="function" name="as_store_add_metadata_index ()" link="AsStore.html#as-store-add-metadata-index" since="0.3.0"/>
+    <keyword type="function" name="as_store_add_filter ()" link="AsStore.html#as-store-add-filter" since="0.3.5"/>
+    <keyword type="function" name="as_store_remove_filter ()" link="AsStore.html#as-store-remove-filter" since="0.3.5"/>
+    <keyword type="enum" name="enum AsStoreLoadFlags" link="AsStore.html#AsStoreLoadFlags"/>
+    <keyword type="enum" name="enum AsStoreAddFlags" link="AsStore.html#AsStoreAddFlags"/>
+    <keyword type="enum" name="enum AsStoreError" link="AsStore.html#AsStoreError"/>
+    <keyword type="macro" name="AS_STORE_ERROR" link="AsStore.html#AS-STORE-ERROR:CAPS"/>
+    <keyword type="signal" name="The “changed” signal" link="AsStore.html#AsStore-changed"/>
+    <keyword type="function" name="as_problem_new ()" link="AsProblem.html#as-problem-new" since="0.1.4"/>
+    <keyword type="function" name="as_problem_kind_to_string ()" link="AsProblem.html#as-problem-kind-to-string" since="0.1.4"/>
+    <keyword type="function" name="as_problem_get_kind ()" link="AsProblem.html#as-problem-get-kind" since="0.1.4"/>
+    <keyword type="function" name="as_problem_get_line_number ()" link="AsProblem.html#as-problem-get-line-number" since="0.1.4"/>
+    <keyword type="function" name="as_problem_get_message ()" link="AsProblem.html#as-problem-get-message" since="0.1.4"/>
+    <keyword type="function" name="as_problem_set_kind ()" link="AsProblem.html#as-problem-set-kind" since="0.1.4"/>
+    <keyword type="function" name="as_problem_set_line_number ()" link="AsProblem.html#as-problem-set-line-number" since="0.1.4"/>
+    <keyword type="function" name="as_problem_set_message ()" link="AsProblem.html#as-problem-set-message" since="0.1.4"/>
+    <keyword type="enum" name="enum AsProblemKind" link="AsProblem.html#AsProblemKind"/>
+    <keyword type="function" name="as_id_kind_to_string ()" link="appstream-glib-as-enums.html#as-id-kind-to-string" since="0.1.0"/>
+    <keyword type="function" name="as_id_kind_from_string ()" link="appstream-glib-as-enums.html#as-id-kind-from-string" since="0.1.0"/>
+    <keyword type="function" name="as_url_kind_to_string ()" link="appstream-glib-as-enums.html#as-url-kind-to-string" since="0.1.0"/>
+    <keyword type="function" name="as_url_kind_from_string ()" link="appstream-glib-as-enums.html#as-url-kind-from-string" since="0.1.0"/>
+    <keyword type="function" name="as_kudo_kind_to_string ()" link="appstream-glib-as-enums.html#as-kudo-kind-to-string" since="0.2.2"/>
+    <keyword type="function" name="as_kudo_kind_from_string ()" link="appstream-glib-as-enums.html#as-kudo-kind-from-string" since="0.2.2"/>
+    <keyword type="enum" name="enum AsIdKind" link="appstream-glib-as-enums.html#AsIdKind"/>
+    <keyword type="enum" name="enum AsUrlKind" link="appstream-glib-as-enums.html#AsUrlKind"/>
+    <keyword type="enum" name="enum AsKudoKind" link="appstream-glib-as-enums.html#AsKudoKind"/>
+    <keyword type="function" name="as_node_new ()" link="appstream-glib-as-node.html#as-node-new" since="0.1.0"/>
+    <keyword type="function" name="as_node_error_quark ()" link="appstream-glib-as-node.html#as-node-error-quark" since="0.1.0"/>
+    <keyword type="function" name="as_node_unref ()" link="appstream-glib-as-node.html#as-node-unref" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_name ()" link="appstream-glib-as-node.html#as-node-get-name" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_data ()" link="appstream-glib-as-node.html#as-node-get-data" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_comment ()" link="appstream-glib-as-node.html#as-node-get-comment" since="0.1.6"/>
+    <keyword type="function" name="as_node_get_tag ()" link="appstream-glib-as-node.html#as-node-get-tag" since="0.1.2"/>
+    <keyword type="function" name="as_node_get_attribute ()" link="appstream-glib-as-node.html#as-node-get-attribute" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_attribute_as_int ()" link="appstream-glib-as-node.html#as-node-get-attribute-as-int" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_localized ()" link="appstream-glib-as-node.html#as-node-get-localized" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_localized_best ()" link="appstream-glib-as-node.html#as-node-get-localized-best" since="0.1.0"/>
+    <keyword type="function" name="as_node_get_localized_unwrap ()" link="appstream-glib-as-node.html#as-node-get-localized-unwrap" since="0.1.0"/>
+    <keyword type="function" name="as_node_set_name ()" link="appstream-glib-as-node.html#as-node-set-name" since="0.1.4"/>
+    <keyword type="function" name="as_node_set_data ()" link="appstream-glib-as-node.html#as-node-set-data" since="0.1.1"/>
+    <keyword type="function" name="as_node_set_comment ()" link="appstream-glib-as-node.html#as-node-set-comment" since="0.1.6"/>
+    <keyword type="function" name="as_node_add_attribute ()" link="appstream-glib-as-node.html#as-node-add-attribute" since="0.1.1"/>
+    <keyword type="function" name="as_node_add_attribute_as_int ()" link="appstream-glib-as-node.html#as-node-add-attribute-as-int" since="0.3.1"/>
+    <keyword type="function" name="as_node_remove_attribute ()" link="appstream-glib-as-node.html#as-node-remove-attribute" since="0.2.0"/>
+    <keyword type="function" name="as_node_to_xml ()" link="appstream-glib-as-node.html#as-node-to-xml" since="0.1.0"/>
+    <keyword type="function" name="as_node_from_xml ()" link="appstream-glib-as-node.html#as-node-from-xml" since="0.1.0"/>
+    <keyword type="function" name="as_node_from_file ()" link="appstream-glib-as-node.html#as-node-from-file" since="0.1.0"/>
+    <keyword type="function" name="as_node_to_file ()" link="appstream-glib-as-node.html#as-node-to-file" since="0.2.0"/>
+    <keyword type="function" name="as_node_find ()" link="appstream-glib-as-node.html#as-node-find" since="0.1.0"/>
+    <keyword type="function" name="as_node_find_with_attribute ()" link="appstream-glib-as-node.html#as-node-find-with-attribute" since="0.1.0"/>
+    <keyword type="function" name="as_node_insert ()" link="appstream-glib-as-node.html#as-node-insert" since="0.1.0"/>
+    <keyword type="function" name="as_node_insert_localized ()" link="appstream-glib-as-node.html#as-node-insert-localized" since="0.1.0"/>
+    <keyword type="function" name="as_node_insert_hash ()" link="appstream-glib-as-node.html#as-node-insert-hash" since="0.1.0"/>
+    <keyword type="enum" name="enum AsNodeToXmlFlags" link="appstream-glib-as-node.html#AsNodeToXmlFlags"/>
+    <keyword type="enum" name="enum AsNodeFromXmlFlags" link="appstream-glib-as-node.html#AsNodeFromXmlFlags"/>
+    <keyword type="enum" name="enum AsNodeInsertFlags" link="appstream-glib-as-node.html#AsNodeInsertFlags"/>
+    <keyword type="enum" name="enum AsNodeError" link="appstream-glib-as-node.html#AsNodeError"/>
+    <keyword type="macro" name="AS_NODE_ERROR" link="appstream-glib-as-node.html#AS-NODE-ERROR:CAPS"/>
+    <keyword type="function" name="as_tag_from_string ()" link="appstream-glib-as-tag.html#as-tag-from-string" since="0.1.0"/>
+    <keyword type="function" name="as_tag_from_string_full ()" link="appstream-glib-as-tag.html#as-tag-from-string-full" since="0.1.2"/>
+    <keyword type="function" name="as_tag_to_string ()" link="appstream-glib-as-tag.html#as-tag-to-string" since="0.1.0"/>
+    <keyword type="enum" name="enum AsTag" link="appstream-glib-as-tag.html#AsTag"/>
+    <keyword type="enum" name="enum AsTagFlags" link="appstream-glib-as-tag.html#AsTagFlags"/>
+    <keyword type="function" name="as_markup_convert_simple ()" link="appstream-glib-as-utils.html#as-markup-convert-simple" since="0.1.0"/>
+    <keyword type="function" name="as_markup_convert ()" link="appstream-glib-as-utils.html#as-markup-convert" since="0.3.5"/>
+    <keyword type="function" name="as_markup_strsplit_words ()" link="appstream-glib-as-utils.html#as-markup-strsplit-words" since="0.3.5"/>
+    <keyword type="function" name="as_utils_error_quark ()" link="appstream-glib-as-utils.html#as-utils-error-quark" since="0.3.7"/>
+    <keyword type="function" name="as_utils_is_stock_icon_name ()" link="appstream-glib-as-utils.html#as-utils-is-stock-icon-name" since="0.1.3"/>
+    <keyword type="function" name="as_utils_is_spdx_license_id ()" link="appstream-glib-as-utils.html#as-utils-is-spdx-license-id" since="0.1.5"/>
+    <keyword type="function" name="as_utils_is_spdx_license ()" link="appstream-glib-as-utils.html#as-utils-is-spdx-license" since="0.2.5"/>
+    <keyword type="function" name="as_utils_is_environment_id ()" link="appstream-glib-as-utils.html#as-utils-is-environment-id" since="0.2.4"/>
+    <keyword type="function" name="as_utils_is_category_id ()" link="appstream-glib-as-utils.html#as-utils-is-category-id" since="0.2.4"/>
+    <keyword type="function" name="as_utils_is_blacklisted_id ()" link="appstream-glib-as-utils.html#as-utils-is-blacklisted-id" since="0.2.2"/>
+    <keyword type="function" name="as_utils_spdx_license_tokenize ()" link="appstream-glib-as-utils.html#as-utils-spdx-license-tokenize" since="0.1.5"/>
+    <keyword type="function" name="as_utils_spdx_license_detokenize ()" link="appstream-glib-as-utils.html#as-utils-spdx-license-detokenize" since="0.2.5"/>
+    <keyword type="function" name="as_utils_check_url_exists ()" link="appstream-glib-as-utils.html#as-utils-check-url-exists" since="0.1.5"/>
+    <keyword type="function" name="as_utils_find_icon_filename ()" link="appstream-glib-as-utils.html#as-utils-find-icon-filename" since="0.2.5"/>
+    <keyword type="function" name="as_utils_find_icon_filename_full ()" link="appstream-glib-as-utils.html#as-utils-find-icon-filename-full" since="0.3.1"/>
+    <keyword type="function" name="as_utils_get_string_overlap ()" link="appstream-glib-as-utils.html#as-utils-get-string-overlap" since="0.3.1"/>
+    <keyword type="function" name="as_utils_install_filename ()" link="appstream-glib-as-utils.html#as-utils-install-filename" since="0.3.4"/>
+    <keyword type="function" name="as_utils_search_token_valid ()" link="appstream-glib-as-utils.html#as-utils-search-token-valid" since="0.3.4"/>
+    <keyword type="function" name="as_utils_search_tokenize ()" link="appstream-glib-as-utils.html#as-utils-search-tokenize" since="0.3.4"/>
+    <keyword type="function" name="as_utils_vercmp ()" link="appstream-glib-as-utils.html#as-utils-vercmp" since="0.3.5"/>
+    <keyword type="enum" name="enum AsUtilsError" link="appstream-glib-as-utils.html#AsUtilsError"/>
+    <keyword type="macro" name="AS_UTILS_ERROR" link="appstream-glib-as-utils.html#AS-UTILS-ERROR:CAPS"/>
+    <keyword type="enum" name="enum AsUtilsFindIconFlag" link="appstream-glib-as-utils.html#AsUtilsFindIconFlag"/>
+    <keyword type="enum" name="enum AsUtilsLocation" link="appstream-glib-as-utils.html#AsUtilsLocation"/>
+    <keyword type="enum" name="enum AsMarkupConvertFormat" link="appstream-glib-as-utils.html#AsMarkupConvertFormat"/>
+    <keyword type="macro" name="AS_CHECK_VERSION()" link="appstream-glib-as-version.html#AS-CHECK-VERSION:CAPS"/>
+    <keyword type="macro" name="AS_MAJOR_VERSION" link="appstream-glib-as-version.html#AS-MAJOR-VERSION:CAPS"/>
+    <keyword type="macro" name="AS_MINOR_VERSION" link="appstream-glib-as-version.html#AS-MINOR-VERSION:CAPS"/>
+    <keyword type="macro" name="AS_MICRO_VERSION" link="appstream-glib-as-version.html#AS-MICRO-VERSION:CAPS"/>
+  </functions>
+</book>

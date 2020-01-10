@@ -1,0 +1,261 @@
+<!-- ##### SECTION Title ##### -->
+as-utils
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### ENUM AsUtilsError ##### -->
+<para>
+
+</para>
+
+@AS_UTILS_ERROR_FAILED: 
+@AS_UTILS_ERROR_INVALID_TYPE: 
+
+<!-- ##### MACRO AS_UTILS_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### ENUM AsUtilsFindIconFlag ##### -->
+<para>
+
+</para>
+
+@AS_UTILS_FIND_ICON_NONE: 
+@AS_UTILS_FIND_ICON_HI_DPI: 
+
+<!-- ##### ENUM AsUtilsLocation ##### -->
+<para>
+
+</para>
+
+@AS_UTILS_LOCATION_SHARED: 
+@AS_UTILS_LOCATION_CACHE: 
+@AS_UTILS_LOCATION_USER: 
+
+<!-- ##### ENUM AsMarkupConvertFormat ##### -->
+<para>
+
+</para>
+
+@AS_MARKUP_CONVERT_FORMAT_SIMPLE: 
+@AS_MARKUP_CONVERT_FORMAT_MARKDOWN: 
+
+<!-- ##### FUNCTION as_markup_convert_simple ##### -->
+<para>
+
+</para>
+
+@markup: 
+@markup_len: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_markup_convert ##### -->
+<para>
+
+</para>
+
+@markup: 
+@markup_len: 
+@format: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_markup_strsplit_words ##### -->
+<para>
+
+</para>
+
+@text: 
+@line_len: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_error_quark ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_is_stock_icon_name ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_is_spdx_license_id ##### -->
+<para>
+
+</para>
+
+@license_id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_is_spdx_license ##### -->
+<para>
+
+</para>
+
+@license: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_is_environment_id ##### -->
+<para>
+
+</para>
+
+@environment_id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_is_category_id ##### -->
+<para>
+
+</para>
+
+@category_id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_is_blacklisted_id ##### -->
+<para>
+
+</para>
+
+@desktop_id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_spdx_license_tokenize ##### -->
+<para>
+
+</para>
+
+@license: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_spdx_license_detokenize ##### -->
+<para>
+
+</para>
+
+@license_tokens: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_check_url_exists ##### -->
+<para>
+
+</para>
+
+@url: 
+@timeout: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_find_icon_filename ##### -->
+<para>
+
+</para>
+
+@destdir: 
+@search: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_find_icon_filename_full ##### -->
+<para>
+
+</para>
+
+@destdir: 
+@search: 
+@flags: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_get_string_overlap ##### -->
+<para>
+
+</para>
+
+@s1: 
+@s2: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_install_filename ##### -->
+<para>
+
+</para>
+
+@location: 
+@filename: 
+@origin: 
+@destdir: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_search_token_valid ##### -->
+<para>
+
+</para>
+
+@token: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_search_tokenize ##### -->
+<para>
+
+</para>
+
+@search: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_utils_vercmp ##### -->
+<para>
+
+</para>
+
+@version_a: 
+@version_b: 
+@Returns: 
+
+

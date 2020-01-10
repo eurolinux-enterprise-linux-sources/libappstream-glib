@@ -1,0 +1,1620 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AppStream-glib Reference Manual: AsStore</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="AsScreenshot.html" title="AsScreenshot">
+<link rel="next" href="AsProblem.html" title="AsProblem">
+<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#AsStore.description" class="shortcut">Description</a></span><span id="nav_hierarchy">  <span class="dim">|</span> 
+                  <a href="#AsStore.object-hierarchy" class="shortcut">Object Hierarchy</a></span><span id="nav_signals">  <span class="dim">|</span> 
+                  <a href="#AsStore.signals" class="shortcut">Signals</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="AsScreenshot.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="AsProblem.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="AsStore"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="AsStore.top_of_page"></a>AsStore</span></h2>
+<p>AsStore — a hashed array store of applications</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="AsStore.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="AsStore.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a class="link" href="AsStore.html" title="AsStore"><span class="returnvalue">AsStore</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-new" title="as_store_new ()">as_store_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GQuark</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-error-quark" title="as_store_error_quark ()">as_store_error_quark</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">guint</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-size" title="as_store_get_size ()">as_store_get_size</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-from-file" title="as_store_from_file ()">as_store_from_file</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-from-xml" title="as_store_from_xml ()">as_store_from_xml</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-load" title="as_store_load ()">as_store_load</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-load-path" title="as_store_load_path ()">as_store_load_path</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-remove-all" title="as_store_remove_all ()">as_store_remove_all</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GPtrArray</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-apps" title="as_store_get_apps ()">as_store_get_apps</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GPtrArray</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-apps-by-metadata" title="as_store_get_apps_by_metadata ()">as_store_get_apps_by_metadata</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsApp.html" title="AsApp"><span class="returnvalue">AsApp</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-app-by-id" title="as_store_get_app_by_id ()">as_store_get_app_by_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsApp.html" title="AsApp"><span class="returnvalue">AsApp</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-app-by-pkgname" title="as_store_get_app_by_pkgname ()">as_store_get_app_by_pkgname</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-add-app" title="as_store_add_app ()">as_store_add_app</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-remove-app" title="as_store_remove_app ()">as_store_remove_app</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-remove-app-by-id" title="as_store_remove_app_by_id ()">as_store_remove_app_by_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GString</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-to-xml" title="as_store_to_xml ()">as_store_to_xml</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-to-file" title="as_store_to_file ()">as_store_to_file</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-convert-icons" title="as_store_convert_icons ()">as_store_convert_icons</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-origin" title="as_store_get_origin ()">as_store_get_origin</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-set-origin" title="as_store_set_origin ()">as_store_set_origin</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-builder-id" title="as_store_get_builder_id ()">as_store_get_builder_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-set-builder-id" title="as_store_set_builder_id ()">as_store_set_builder_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-destdir" title="as_store_get_destdir ()">as_store_get_destdir</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-set-destdir" title="as_store_set_destdir ()">as_store_set_destdir</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gdouble</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-api-version" title="as_store_get_api_version ()">as_store_get_api_version</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-set-api-version" title="as_store_set_api_version ()">as_store_set_api_version</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsStore.html#AsStoreAddFlags" title="enum AsStoreAddFlags"><span class="returnvalue">AsStoreAddFlags</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-get-add-flags" title="as_store_get_add_flags ()">as_store_get_add_flags</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-set-add-flags" title="as_store_set_add_flags ()">as_store_set_add_flags</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GPtrArray</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-validate" title="as_store_validate ()">as_store_validate</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-add-metadata-index" title="as_store_add_metadata_index ()">as_store_add_metadata_index</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-add-filter" title="as_store_add_filter ()">as_store_add_filter</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsStore.html#as-store-remove-filter" title="as_store_remove_filter ()">as_store_remove_filter</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsStore.signals"></a><h2>Signals</h2>
+<div class="informaltable"><table border="0">
+<colgroup>
+<col width="150px" class="signals_return">
+<col width="300px" class="signals_name">
+<col width="200px" class="signals_flags">
+</colgroup>
+<tbody><tr>
+<td class="signal_type"><span class="returnvalue">void</span></td>
+<td class="signal_name"><a class="link" href="AsStore.html#AsStore-changed" title="The “changed” signal">changed</a></td>
+<td class="signal_flags">Run Last</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsStore.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsStore.html#AsStoreLoadFlags" title="enum AsStoreLoadFlags">AsStoreLoadFlags</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsStore.html#AsStoreAddFlags" title="enum AsStoreAddFlags">AsStoreAddFlags</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsStore.html#AsStoreError" title="enum AsStoreError">AsStoreError</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsStore.html#AS-STORE-ERROR:CAPS" title="AS_STORE_ERROR">AS_STORE_ERROR</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsStore.object-hierarchy"></a><h2>Object Hierarchy</h2>
+<pre class="screen">    GObject
+    <span class="lineart">╰──</span> AsStore
+</pre>
+</div>
+<div class="refsect1">
+<a name="AsStore.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="AsStore.description"></a><h2>Description</h2>
+<p>This store contains both an array of <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a>'s but also a pair of hashes
+to quickly retrieve an application from the ID or package name.</p>
+<p>Applications can also be removed, and the whole store can be loaded and
+saved to a compressed XML file.</p>
+<p>See also: <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a></p>
+</div>
+<div class="refsect1">
+<a name="AsStore.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-store-new"></a><h3>as_store_new ()</h3>
+<pre class="programlisting"><a class="link" href="AsStore.html" title="AsStore"><span class="returnvalue">AsStore</span></a> *
+as_store_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Creates a new <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a>.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.2.5"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a>. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-error-quark"></a><h3>as_store_error_quark ()</h3>
+<pre class="programlisting"><span class="returnvalue">GQuark</span>
+as_store_error_quark (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<div class="refsect3">
+<a name="id-1.2.9.10.3.4"></a><h4>Returns</h4>
+<p> An error quark.</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-size"></a><h3>as_store_get_size ()</h3>
+<pre class="programlisting"><span class="returnvalue">guint</span>
+as_store_get_size (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets the size of the store after deduplication and prioritization has
+taken place.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.4.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.4.6"></a><h4>Returns</h4>
+<p> the number of usable applications in the store</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-from-file"></a><h3>as_store_from_file ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_store_from_file (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                    <em class="parameter"><code><span class="type">GFile</span> *file</code></em>,
+                    <em class="parameter"><code>const <span class="type">gchar</span> *icon_root</code></em>,
+                    <em class="parameter"><code><span class="type">GCancellable</span> *cancellable</code></em>,
+                    <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Parses an AppStream XML or DEP-11 YAML file and adds any valid applications
+to the store.</p>
+<p>If the root node does not have a 'origin' attribute, then the method
+<a class="link" href="AsStore.html#as-store-set-origin" title="as_store_set_origin ()"><code class="function">as_store_set_origin()</code></a> should be called *before* this function if cached
+icons are required.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.5.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>file</p></td>
+<td class="parameter_description"><p>a <span class="type">GFile</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>icon_root</p></td>
+<td class="parameter_description"><p>the icon path, or <code class="literal">NULL</code> for the default.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cancellable</p></td>
+<td class="parameter_description"><p>a <span class="type">GCancellable</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.5.7"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-from-xml"></a><h3>as_store_from_xml ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_store_from_xml (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                   <em class="parameter"><code>const <span class="type">gchar</span> *data</code></em>,
+                   <em class="parameter"><code><span class="type">gssize</span> data_len</code></em>,
+                   <em class="parameter"><code>const <span class="type">gchar</span> *icon_root</code></em>,
+                   <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Parses AppStream XML file and adds any valid applications to the store.</p>
+<p>If the root node does not have a 'origin' attribute, then the method
+<a class="link" href="AsStore.html#as-store-set-origin" title="as_store_set_origin ()"><code class="function">as_store_set_origin()</code></a> should be called *before* this function if cached
+icons are required.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.6.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>XML data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data_len</p></td>
+<td class="parameter_description"><p>Length of <em class="parameter"><code>data</code></em>
+, or -1 if NULL terminated</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>icon_root</p></td>
+<td class="parameter_description"><p>the icon path, or <code class="literal">NULL</code> for the default.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.6.7"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-load"></a><h3>as_store_load ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_store_load (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+               <em class="parameter"><code><a class="link" href="AsStore.html#AsStoreLoadFlags" title="enum AsStoreLoadFlags"><span class="type">AsStoreLoadFlags</span></a> flags</code></em>,
+               <em class="parameter"><code><span class="type">GCancellable</span> *cancellable</code></em>,
+               <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Loads the store from the default locations.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.7.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p><a class="link" href="AsStore.html#AsStoreLoadFlags" title="enum AsStoreLoadFlags"><span class="type">AsStoreLoadFlags</span></a>, e.g. <a class="link" href="AsStore.html#AS-STORE-LOAD-FLAG-APP-INFO-SYSTEM:CAPS"><code class="literal">AS_STORE_LOAD_FLAG_APP_INFO_SYSTEM</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cancellable</p></td>
+<td class="parameter_description"><p>a <span class="type">GCancellable</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.7.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-load-path"></a><h3>as_store_load_path ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_store_load_path (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                    <em class="parameter"><code>const <span class="type">gchar</span> *path</code></em>,
+                    <em class="parameter"><code><span class="type">GCancellable</span> *cancellable</code></em>,
+                    <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Loads the store from a specific path.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.8.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>path</p></td>
+<td class="parameter_description"><p>A path to load</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cancellable</p></td>
+<td class="parameter_description"><p>a <span class="type">GCancellable</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.8.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-remove-all"></a><h3>as_store_remove_all ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_remove_all (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Removes all applications from the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.9.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<p class="since">Since 0.2.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-apps"></a><h3>as_store_get_apps ()</h3>
+<pre class="programlisting"><span class="returnvalue">GPtrArray</span> *
+as_store_get_apps (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets an array of all the valid applications in the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.10.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.10.6"></a><h4>Returns</h4>
+<p> an array. </p>
+<p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> AsApp][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-apps-by-metadata"></a><h3>as_store_get_apps_by_metadata ()</h3>
+<pre class="programlisting"><span class="returnvalue">GPtrArray</span> *
+as_store_get_apps_by_metadata (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                               <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>,
+                               <em class="parameter"><code>const <span class="type">gchar</span> *value</code></em>);</pre>
+<p>Gets an array of all the applications that match a specific metadata element.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.11.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>metadata key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>value</p></td>
+<td class="parameter_description"><p>metadata value</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.11.6"></a><h4>Returns</h4>
+<p> an array. </p>
+<p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> AsApp][<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-app-by-id"></a><h3>as_store_get_app_by_id ()</h3>
+<pre class="programlisting"><a class="link" href="AsApp.html" title="AsApp"><span class="returnvalue">AsApp</span></a> *
+as_store_get_app_by_id (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                        <em class="parameter"><code>const <span class="type">gchar</span> *id</code></em>);</pre>
+<p>Finds an application in the store by ID.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.12.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>id</p></td>
+<td class="parameter_description"><p>the application full ID.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.12.6"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a> or <code class="literal">NULL</code>. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-app-by-pkgname"></a><h3>as_store_get_app_by_pkgname ()</h3>
+<pre class="programlisting"><a class="link" href="AsApp.html" title="AsApp"><span class="returnvalue">AsApp</span></a> *
+as_store_get_app_by_pkgname (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *pkgname</code></em>);</pre>
+<p>Finds an application in the store by package name.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.13.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>pkgname</p></td>
+<td class="parameter_description"><p>the package name.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.13.6"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a> or <code class="literal">NULL</code>. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-add-app"></a><h3>as_store_add_app ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_add_app (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                  <em class="parameter"><code><a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a> *app</code></em>);</pre>
+<p>Adds an application to the store. If a lower priority application has already
+been added then this new application will replace it.</p>
+<p>Additionally only applications where the kind is known will be added.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.14.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>app</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-remove-app"></a><h3>as_store_remove_app ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_remove_app (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                     <em class="parameter"><code><a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a> *app</code></em>);</pre>
+<p>Removes an application from the store if it exists.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.15.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>app</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsApp.html" title="AsApp"><span class="type">AsApp</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-remove-app-by-id"></a><h3>as_store_remove_app_by_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_remove_app_by_id (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                           <em class="parameter"><code>const <span class="type">gchar</span> *id</code></em>);</pre>
+<p>Removes an application from the store if it exists.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.16.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>id</p></td>
+<td class="parameter_description"><p>an application id</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.3.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-to-xml"></a><h3>as_store_to_xml ()</h3>
+<pre class="programlisting"><span class="returnvalue">GString</span> *
+as_store_to_xml (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                 <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeToXmlFlags" title="enum AsNodeToXmlFlags"><span class="type">AsNodeToXmlFlags</span></a> flags</code></em>);</pre>
+<p>Outputs an XML representation of all the applications in the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.17.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>the AsNodeToXmlFlags, e.g. <a class="link" href="appstream-glib-as-node.html#AS-NODE-INSERT-FLAG-NONE:CAPS"><code class="literal">AS_NODE_INSERT_FLAG_NONE</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.17.6"></a><h4>Returns</h4>
+<p> A <span class="type">GString</span></p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-to-file"></a><h3>as_store_to_file ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_store_to_file (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                  <em class="parameter"><code><span class="type">GFile</span> *file</code></em>,
+                  <em class="parameter"><code><a class="link" href="appstream-glib-as-node.html#AsNodeToXmlFlags" title="enum AsNodeToXmlFlags"><span class="type">AsNodeToXmlFlags</span></a> flags</code></em>,
+                  <em class="parameter"><code><span class="type">GCancellable</span> *cancellable</code></em>,
+                  <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Outputs an optionally compressed XML file of all the applications in the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.18.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>file</p></td>
+<td class="parameter_description"><p>file</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>the AsNodeToXmlFlags, e.g. <a class="link" href="appstream-glib-as-node.html#AS-NODE-INSERT-FLAG-NONE:CAPS"><code class="literal">AS_NODE_INSERT_FLAG_NONE</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cancellable</p></td>
+<td class="parameter_description"><p>A <span class="type">GCancellable</span>, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.18.6"></a><h4>Returns</h4>
+<p> A <span class="type">GString</span></p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-convert-icons"></a><h3>as_store_convert_icons ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_store_convert_icons (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                        <em class="parameter"><code><a class="link" href="AsIcon.html#AsIconKind" title="enum AsIconKind"><span class="type">AsIconKind</span></a> kind</code></em>,
+                        <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Converts all the icons in the store to a specific kind.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.19.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>the AsIconKind, e.g. <a class="link" href="AsIcon.html#AS-ICON-KIND-EMBEDDED:CAPS"><code class="literal">AS_ICON_KIND_EMBEDDED</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.19.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.3.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-origin"></a><h3>as_store_get_origin ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_store_get_origin (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets the metadata origin, which is used to locate icons.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.20.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.20.6"></a><h4>Returns</h4>
+<p> the origin string, or <code class="literal">NULL</code> if unset</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-set-origin"></a><h3>as_store_set_origin ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_set_origin (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                     <em class="parameter"><code>const <span class="type">gchar</span> *origin</code></em>);</pre>
+<p>Sets the metadata origin, which is used to locate icons.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.21.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>origin</p></td>
+<td class="parameter_description"><p>the origin, e.g. "fedora-21"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-builder-id"></a><h3>as_store_get_builder_id ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_store_get_builder_id (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets the metadata builder identifier, which is used to work out if old
+metadata is compatible with this builder.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.22.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.22.6"></a><h4>Returns</h4>
+<p> the builder_id string, or <code class="literal">NULL</code> if unset</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-set-builder-id"></a><h3>as_store_set_builder_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_set_builder_id (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                         <em class="parameter"><code>const <span class="type">gchar</span> *builder_id</code></em>);</pre>
+<p>Sets the metadata builder identifier, which is used to work out if old
+metadata can be used.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.23.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>builder_id</p></td>
+<td class="parameter_description"><p>the builder_id, e.g. "appstream-glib:1"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.2.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-destdir"></a><h3>as_store_get_destdir ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_store_get_destdir (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets the destdir, which is used to prefix usr.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.24.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.24.6"></a><h4>Returns</h4>
+<p> the destdir path, or <code class="literal">NULL</code> if unset</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-set-destdir"></a><h3>as_store_set_destdir ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_set_destdir (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                      <em class="parameter"><code>const <span class="type">gchar</span> *destdir</code></em>);</pre>
+<p>Sets the destdir, which is used to prefix usr.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.25.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>destdir</p></td>
+<td class="parameter_description"><p>the destdir, e.g. "/tmp"</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.2.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-api-version"></a><h3>as_store_get_api_version ()</h3>
+<pre class="programlisting"><span class="returnvalue">gdouble</span>
+as_store_get_api_version (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets the AppStream API version.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.26.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.26.6"></a><h4>Returns</h4>
+<p> the <a class="link" href="appstream-glib-as-node.html#AsNodeInsertFlags" title="enum AsNodeInsertFlags"><span class="type">AsNodeInsertFlags</span></a>, or 0 if unset</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-set-api-version"></a><h3>as_store_set_api_version ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_set_api_version (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                          <em class="parameter"><code><span class="type">gdouble</span> api_version</code></em>);</pre>
+<p>Sets the AppStream API version.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.27.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>api_version</p></td>
+<td class="parameter_description"><p>the API version</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-get-add-flags"></a><h3>as_store_get_add_flags ()</h3>
+<pre class="programlisting"><a class="link" href="AsStore.html#AsStoreAddFlags" title="enum AsStoreAddFlags"><span class="returnvalue">AsStoreAddFlags</span></a>
+as_store_get_add_flags (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>);</pre>
+<p>Gets the flags used for adding applications to the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.28.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.28.6"></a><h4>Returns</h4>
+<p> the <a class="link" href="AsStore.html#AsStoreAddFlags" title="enum AsStoreAddFlags"><span class="type">AsStoreAddFlags</span></a>, or 0 if unset</p>
+<p></p>
+</div>
+<p class="since">Since 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-set-add-flags"></a><h3>as_store_set_add_flags ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_set_add_flags (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                        <em class="parameter"><code><a class="link" href="AsStore.html#AsStoreAddFlags" title="enum AsStoreAddFlags"><span class="type">AsStoreAddFlags</span></a> add_flags</code></em>);</pre>
+<p>Sets the flags used when adding applications to the store.</p>
+<p>NOTE: Using <a class="link" href="AsStore.html#AS-STORE-ADD-FLAG-PREFER-LOCAL:CAPS"><code class="literal">AS_STORE_ADD_FLAG_PREFER_LOCAL</code></a> may be a privacy risk depending on
+your level of paranoia, and should not be used by default.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.29.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>add_flags</p></td>
+<td class="parameter_description"><p>the <a class="link" href="AsStore.html#AsStoreAddFlags" title="enum AsStoreAddFlags"><span class="type">AsStoreAddFlags</span></a>, e.g. <a class="link" href="AsStore.html#AS-STORE-ADD-FLAG-NONE:CAPS"><code class="literal">AS_STORE_ADD_FLAG_NONE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-validate"></a><h3>as_store_validate ()</h3>
+<pre class="programlisting"><span class="returnvalue">GPtrArray</span> *
+as_store_validate (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                   <em class="parameter"><code><a class="link" href="AsApp.html#AsAppValidateFlags" title="enum AsAppValidateFlags"><span class="type">AsAppValidateFlags</span></a> flags</code></em>,
+                   <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Validates infomation in the store for data applicable to the defined
+metadata version.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.30.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>the <a class="link" href="AsApp.html#AsAppValidateFlags" title="enum AsAppValidateFlags"><span class="type">AsAppValidateFlags</span></a> to use, e.g. <a class="link" href="AsApp.html#AS-APP-VALIDATE-FLAG-NONE:CAPS"><code class="literal">AS_APP_VALIDATE_FLAG_NONE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.9.10.30.6"></a><h4>Returns</h4>
+<p> A list of problems, or <code class="literal">NULL</code>. </p>
+<p><span class="annotation">[<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>][<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> AsProblem]</span></p>
+</div>
+<p class="since">Since 0.2.4</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-add-metadata-index"></a><h3>as_store_add_metadata_index ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_add_metadata_index (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                             <em class="parameter"><code>const <span class="type">gchar</span> *key</code></em>);</pre>
+<p>Adds a metadata index key.</p>
+<p>NOTE: if applications are removed *all* the indexes will be invalid and
+will have to be re-added.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.31.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the metadata key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.3.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-add-filter"></a><h3>as_store_add_filter ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_add_filter (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                     <em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a> kind</code></em>);</pre>
+<p>Adds a filter to the store so that only components of this type are
+loaded into the store. This may be useful if the client is only interested
+in certain types of component, or not interested in loading components
+it cannot process.</p>
+<p>If no filter is set then all types of components are loaded.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.32.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>a <a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a>, e.g. <a class="link" href="appstream-glib-as-enums.html#AS-ID-KIND-FIRMWARE:CAPS"><code class="literal">AS_ID_KIND_FIRMWARE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.3.5</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-store-remove-filter"></a><h3>as_store_remove_filter ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_store_remove_filter (<em class="parameter"><code><a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *store</code></em>,
+                        <em class="parameter"><code><a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a> kind</code></em>);</pre>
+<p>Removed a filter from the store so that components of this type are no longer
+loaded into the store. This may be useful if the client is only interested
+in certain types of component.</p>
+<p>If all filters are removed then all types of components are loaded.</p>
+<div class="refsect3">
+<a name="id-1.2.9.10.33.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>store</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>a <a class="link" href="appstream-glib-as-enums.html#AsIdKind" title="enum AsIdKind"><span class="type">AsIdKind</span></a>, e.g. <a class="link" href="appstream-glib-as-enums.html#AS-ID-KIND-FIRMWARE:CAPS"><code class="literal">AS_ID_KIND_FIRMWARE</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.3.5</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="AsStore.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsStoreLoadFlags"></a><h3>enum AsStoreLoadFlags</h3>
+<p>The flags to use when loading the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.11.2.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-NONE:CAPS"></a>AS_STORE_LOAD_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No extra flags to use</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-APP-INFO-SYSTEM:CAPS"></a>AS_STORE_LOAD_FLAG_APP_INFO_SYSTEM</p></td>
+<td class="enum_member_description">
+<p>The system app-info AppStream data</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-APP-INFO-USER:CAPS"></a>AS_STORE_LOAD_FLAG_APP_INFO_USER</p></td>
+<td class="enum_member_description">
+<p>The per-user app-info AppStream data</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-APP-INSTALL:CAPS"></a>AS_STORE_LOAD_FLAG_APP_INSTALL</p></td>
+<td class="enum_member_description">
+<p>The ubuntu-specific app-install data</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-APPDATA:CAPS"></a>AS_STORE_LOAD_FLAG_APPDATA</p></td>
+<td class="enum_member_description">
+<p>The installed AppData files</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-DESKTOP:CAPS"></a>AS_STORE_LOAD_FLAG_DESKTOP</p></td>
+<td class="enum_member_description">
+<p>The installed desktop files</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-LOAD-FLAG-ALLOW-VETO:CAPS"></a>AS_STORE_LOAD_FLAG_ALLOW_VETO</p></td>
+<td class="enum_member_description">
+<p>Add vetoed applications</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsStoreAddFlags"></a><h3>enum AsStoreAddFlags</h3>
+<p>The flags to use when adding applications to the store.</p>
+<div class="refsect3">
+<a name="id-1.2.9.11.3.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-ADD-FLAG-NONE:CAPS"></a>AS_STORE_ADD_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No extra flags to use</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-STORE-ADD-FLAG-PREFER-LOCAL:CAPS"></a>AS_STORE_ADD_FLAG_PREFER_LOCAL</p></td>
+<td class="enum_member_description">
+<p>Local files will be used by default</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsStoreError"></a><h3>enum AsStoreError</h3>
+<p>The error type.</p>
+<div class="refsect3">
+<a name="id-1.2.9.11.4.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody><tr>
+<td class="enum_member_name"><p><a name="AS-STORE-ERROR-FAILED:CAPS"></a>AS_STORE_ERROR_FAILED</p></td>
+<td class="enum_member_description">
+<p>Generic failure</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-STORE-ERROR:CAPS"></a><h3>AS_STORE_ERROR</h3>
+<pre class="programlisting">#define AS_STORE_ERROR				as_store_error_quark ()
+</pre>
+<p>
+</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="AsStore.signal-details"></a><h2>Signal Details</h2>
+<div class="refsect2">
+<a name="AsStore-changed"></a><h3>The <code class="literal">“changed”</code> signal</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+user_function (<a class="link" href="AsStore.html" title="AsStore"><span class="type">AsStore</span></a> *device,
+               <span class="type">gpointer</span> user_data)</pre>
+<p>Flags: Run Last</p>
+<p class="since">Since 0.1.2</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>
+          Generated by GTK-Doc V1.21</div>
+</body>
+</html>

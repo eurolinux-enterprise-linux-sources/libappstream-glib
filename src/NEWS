@@ -1,0 +1,584 @@
+Version 0.3.6
+~~~~~~~~~~~~~
+Released: 2015-03-30
+
+New Features:
+ - Add a 'replace-screenshots' command to appstream-util (Richard Hughes)
+ - Add --batch-output to be able to disable the panel (Richard Hughes)
+ - Make the AppStream builder support optional (Richard Hughes)
+ - Now gcab is a hard requirement (Marc-Andre Lureau, Alberto Ruiz)
+ - Put all the screenshots in a file (Richard Hughes)
+ - Use the latest released version for unspecified (Richard Hughes)
+ - Use the upstream screenshot when we are using --no-net (Richard Hughes)
+
+Bugfixes:
+ - Add the source-only tags when outputting AppData files (Richard Hughes)
+ - Allow uninstalling AppStream files from /var/cache (Richard Hughes)
+ - Also subsume application licenses (Richard Hughes)
+ - Always upscale screenshots if they are too small (Kalev Lember)
+ - Assume the INF DriverVer is UTC (Richard Hughes)
+ - Do not fail due to style warnings when using relaxed validation (Richard Hughes)
+ - Do not trust the result of FcConfigAppFontAddFile() (Richard Hughes)
+ - Remove the gtk3 dep from libappstream-glib (Richard Hughes)
+ - Teach the builder how to write other archive formats (Richard Hughes)
+ - Update the checksums for the gcab-generated firmware (Richard Hughes)
+ - Use the correct image URL for HiDPI screenshots (Richard Hughes)
+
+Version 0.3.5
+~~~~~~~~~~~~~
+Released: 2015-03-11
+
+New Features:
+ - Add new API required for firmware support (Richard Hughes)
+ - Add new API required for OSTree and xdg-app support (Richard Hughes)
+ - Add 'news-to-appdata' and 'appdata-to-news' cmds to appstream-util (Richard Hughes)
+ - Support all of the yet-unreleased AppStream 0.9 spec (Richard Hughes)
+
+Bugfixes:
+ - Add releases from the upstream AppData files (Richard Hughes)
+ - Allow short descriptions when validating <description> in releases (Richard Hughes)
+ - Correctly load descriptions from <releases> in AppData files (Richard Hughes)
+ - Fix a builder crash where a package depends on itself (Richard Hughes)
+ - Fix a crash when more than one thread tries to ensure the same package (Richard Hughes)
+ - Fix DSO Linking error when built with --as-needed (Tim Lunn)
+ - Make the failed AppStream metadata optional (Richard Hughes)
+ - Make the icon tarball optional (Richard Hughes)
+ - Relax validation checks to allow empty release sections (Richard Hughes)
+ - Return the correct exit code from appstream-builder (Richard Hughes)
+
+Version 0.3.4
+~~~~~~~~~~~~~
+Released: 2015-01-17
+
+New Features:
+ - Add an --origin option to appstream-builder (Richard Hughes)
+ - Add as_app_get_search_tokens() (Richard Hughes)
+ - Add show-search-tokens subcommand to appstream-util (Richard Hughes)
+ - Add the matrix-html subcommand to appstream-util (Richard Hughes)
+ - Add the VCS information to the AppStream metadata (Richard Hughes)
+
+Bugfixes:
+ - Add more applications to the blacklist (Richard Hughes, Igor Gnatenko)
+ - Allow specifying --packages-dir multiple times (Richard Hughes)
+ - Alow setting the cachedir different from the outputdir (Richard Hughes)
+ - Always return errors from the correct domain when parsing broken AppData files (Richard Hughes)
+ - Assume <image>foo</image> is a source image kind for AppData files (Richard Hughes)
+ - Assume that stock icons are available in HiDPI sizes (Richard Hughes)
+ - Blacklist the 40 most common search tokens (Richard Hughes)
+ - Check if the search entries are valid before searching (Richard Hughes)
+ - Check screenshots are a reasonable size (Richard Hughes)
+ - Do not absorb metainfo files for package deps (Richard Hughes)
+ - Do not blacklist applications with broken AppData files (Richard Hughes)
+ - Do not veto applications with NoDisplay=false (Richard Hughes)
+ - Fall back to the dumb tokenizer for keywords with special chars (Richard Hughes)
+ - Handle other-endian MO files (Andreas Schwab)
+ - Move as_utils_install_filename() into libappstream-glib (Richard Hughes)
+ - Output the full filename for local icons (Richard Hughes)
+ - Preserve the URL for remote icon types and filename for local icons (Richard Hughes)
+ - Require AppData for Xvfb-using applications (Richard Hughes)
+ - Set an error if an XML file contains font markup (Richard Hughes)
+ - Show the offending text when validation fails (Richard Hughes)
+
+Version 0.3.3
+~~~~~~~~~~~~~
+Released: 2014-11-24
+
+New Features:
+ - Allow filtering addons in the status html pages (Richard Hughes)
+
+Bugfixes:
+ - Detect missing parents in the old metadata (Richard Hughes)
+ - Do not fail to load all the desktop files if one is bad (Richard Hughes)
+ - Improve appdata-xml.m4 deprecation notice (David King)
+ - Use <update_contact> from the AppStream specification (Richard Hughes)
+ - When using install-origin install into /var/cache (Richard Hughes)
+
+Version 0.3.2
+~~~~~~~~~~~~~
+Released: 2014-11-04
+
+New Features:
+ - Add --veto-ignore to appstream-builder (Richard Hughes)
+ - Add BLUR and SHARPEN values for AsImageSaveFlags (Richard Hughes)
+ - Add a simple 'search' command to appstream-util (Richard Hughes)
+ - Add as_app_set_origin() (Richard Hughes)
+
+Bugfixes:
+ - Add some more valid metadata licenses (Richard Hughes)
+ - Do not composite an app with its duplicate (Richard Hughes)
+ - Do not create a hardlink when the target does not exist (Richard Hughes)
+ - Do not generate metadata with an icon prefix (Richard Hughes)
+ - Fix FTBFS on GNU/Hurd (Matthias Klumpp)
+ - Fix extraction of hardlinks (Richard Hughes)
+ - Obsolete the appdata-tools package (Richard Hughes)
+ - Save the screenshots as soon as possible (Richard Hughes)
+ - Show the kudo stats on the status page (Richard Hughes)
+ - Support HiDPI YAML icons (Richard Hughes)
+ - Support getting the origin from .yml files (Richard Hughes)
+
+Version 0.3.1
+~~~~~~~~~~~~~
+Released: 2014-10-21
+
+Notes:
+ - This branch is still unstable and should not be used in stable distributions.
+ - This release allows appstream-builer to parse Alpm packages for Arch Linux.
+ - HiDPI support is now working well for icons and screenshots.
+
+New Features:
+ - Add a kudo for a HiDPI icon (Richard Hughes)
+ - Add an --enable-hidpi argument to appstream-builder (Richard Hughes)
+ - Add AS_APP_VALIDATE_FLAG_ALL_APPS (Richard Hughes)
+ - Add asb_app_set_hidpi_enabled() (Richard Hughes)
+ - Add asb_context_get_min_icon_size() (Richard Hughes)
+ - Add asb_context_set_embedded_icons() (Richard Hughes)
+ - Add AsIcon as a new abstract icon object (Richard Hughes)
+ - Add as_icon_convert_to_kind() (Richard Hughes)
+ - Add AS_ICON_KIND_EMBEDDED and AS_ICON_KIND_LOCAL (Richard Hughes)
+ - Add as_node_add_attribute_as_int() (Richard Hughes)
+ - Add as_screenshot_set_priority() (Richard Hughes)
+ - Add as_store_convert_icons() (Richard Hughes)
+ - Add as_utils_find_icon_filename_full() for HiDPI support (Richard Hughes)
+ - Add as_utils_get_string_overlap() (Richard Hughes)
+ - Alpm backend for appstream-builder (Fabien Bourigault)
+ - Support filtering by metadata in status-csv (Richard Hughes)
+
+Bugfixes:
+ - Add more applications to the blacklist (Richard Hughes)
+ - Allow application with NoDisplay=true and an AppData file (Richard Hughes)
+ - Allow AppStream files to be upgraded using appstream-util (Richard Hughes)
+ - Correctly write symlinks when extracting packages (Richard Hughes)
+ - Do not allow applications to extend themselves (Richard Hughes)
+ - Do not crash when doing as_tag_from_string(NULL) (Richard Hughes)
+ - Do not leak applications when building if more than one plugin returns results (Richard Hughes)
+ - Do not subsume vetoed fonts into the parent component (Richard Hughes)
+ - Do not write provides with an unknown kind (Richard Hughes)
+ - Flush the package log again after the metadata write (Richard Hughes)
+ - Ignore translation for non-translatable tags (Richard Hughes)
+ - Include the width and height in the <icon> tag (Richard Hughes)
+ - Install AppStream files with correct permissions (Richard Hughes)
+ - Log when applications are automatically composited (Richard Hughes)
+ - Manually search for HiDPI icons if the application only has one listed icon (Richard Hughes)
+ - Monitor the XML and icons path for changes (Richard Hughes)
+ - Never allow more than one default screenshot (Richard Hughes)
+ - Never return a smaller HiDPI icon than a LoDPI icon (Richard Hughes)
+ - Only detect missing data after the application have been merged (Richard Hughes)
+ - Only guess a project as GNOME if it uses the GNOME bugzilla (Richard Hughes)
+ - Only process fonts with valid metainfo files (Richard Hughes)
+ - Relax validation requirements for font metainfo files (Richard Hughes)
+ - Respect AS_NODE_FROM_XML_FLAG_LITERAL_TEXT when dealing with comments (Richard Hughes)
+ - Sort the screenshots with a priority value (Richard Hughes)
+ - Support multiple XML comments per tag (Richard Hughes)
+ - Support upgrading more than one AppData file at a time (Richard Hughes)
+ - When validating AppStream files also validate the application objects (Richard Hughes)
+ - Write the application XML after all the vetos have been added (Richard Hughes)
+
+Version 0.3.0
+~~~~~~~~~~~~~
+Released: 2014-09-01
+
+Notes:
+ - This release breaks API and bumps the soname. See docs/PORTING.txt for more
+   details about what was changed.
+
+New Features:
+ - Add a new kudo for high contrast icons (Richard Hughes)
+ - Add as_app_add_veto() (Richard Hughes)
+ - Add AS_APP_PARSE_FLAG_ALLOW_VETO (Richard Hughes)
+ - Add asb_utils_ensure_exists() (Richard Hughes)
+ - Add a self test framework for libappstream-builder (Richard Hughes)
+ - Add as_store_add_metadata_index() (Richard Hughes)
+ - Add AS_STORE_LOAD_FLAG_ALLOW_VETO (Richard Hughes)
+ - Add as_store_remove_all() (Richard Hughes)
+ - Add as_store_remove_app_by_id() (Richard Hughes)
+ - Add as_store_set_builder_id() (Richard Hughes)
+ - Add as_utils_find_icon_filename() (Richard Hughes)
+ - Add as_utils_is_spdx_license() (Richard Hughes)
+ - Add as_utils_spdx_license_detokenize() (Richard Hughes)
+ - Add check-root to appstream-util (Richard Hughes)
+ - Add some validation rules for metainfo files (Richard Hughes)
+ - Allow desktop->addon demotion with an AppData file (Richard Hughes)
+ - Allow filtering other kinds of components in status-csv (Richard Hughes)
+ - Allow translated keywords (Richard Hughes)
+ - Rename as_app_get_id_full() to as_app_get_id() (Richard Hughes)
+ - Rename as_app_get_id() to as_app_get_id_filename() (Richard Hughes)
+
+Bugfixes:
+ - Add a veto if a .desktop file has NoDisplay=true (Richard Hughes)
+ - Add dummy failed applications (Richard Hughes)
+ - Add more things to the blacklist that are not applications (Richard Hughes)
+ - A keyword search match is better than the project name (Richard Hughes)
+ - Allow different source roots to define addons (Richard Hughes)
+ - Check the locale more carefully (Richard Hughes)
+ - Conform to the actual SPDX 2.0 license expression syntax (Richard Hughes)
+ - Do not require sentence case when validating with relaxed settings (Richard Hughes)
+ - Do not try to download screenshots when run with --nonet (Richard Hughes)
+ - Do not write <pkgname> into the ignore metadata (Richard Hughes)
+ - Don't add localized keywords that already exist in C (Richard Hughes)
+ - Ignore AppData screenshots with xml:lang attributes (Richard Hughes)
+ - Link client/appstream-util against gdk-pixbuf (William Hua)
+ - Make validate,install,dump and convert to accept a *.yml (Igor Gnatenko)
+ - Metadata licenses like 'CC0 and CC-BY-3.0' are content licenses (Richard Hughes)
+ - Never add duplicate <extends> tags (Richard Hughes)
+ - Never add empty keywords (Richard Hughes)
+ - Only get the package data when required (Richard Hughes)
+ - Rework as_utils_spdx_license_tokenize() to be more efficient (Richard Hughes)
+ - Store vetos in the XML itself (Richard Hughes)
+ - Support keywords separated by comma (Richard Hughes)
+ - Turn of sig checking for rpm packages (Richard Hughes)
+ - Update the SPDX license list to v1.20 (Richard Hughes)
+ - Use libyaml to read DEP-11 metadata (Richard Hughes)
+
+Version 0.2.4
+~~~~~~~~~~~~~
+Released: 2014-08-05
+
+New Features:
+ - Add AS_PROVIDE_KIND_DBUS_SYSTEM (Richard Hughes)
+ - Add an 'install-origin' command to appstream-util (Richard Hughes)
+ - Add an installed tests to validate appdata (Matthias Clasen)
+ - Add as_store_set_destdir() so we can use a different root (Richard Hughes)
+ - Add as_store_validate() (Richard Hughes)
+ - Add asb_app_set_veto_description() (Richard Hughes)
+ - Add support for <source_pkgname> which will be in AppStream 0.8 (Richard Hughes)
+ - Add the <dbus> provide for applications automatically (Richard Hughes)
+
+Bugfixes:
+ - Add a plugin to detect new-style 'gtk/menus.ui' AppMenu support (Richard Hughes)
+ - Avoid using rsync's -a parameter (Kalev Lember)
+ - Detect any addons with missing parents (Richard Hughes)
+ - Do not load applications with NoDisplay=true when loading local (Richard Hughes)
+ - Do not pad the compressed AppStream metadata with NUL bytes (Richard Hughes)
+ - Do not treat app-install metadata as installed (Richard Hughes)
+ - Markup errors should not be fatal when assembling a store (Richard Hughes)
+ - Only add registered projects and categories to the metadata (Richard Hughes)
+ - Only link to apps.fedoraproject.org when processing Fedora metadata (Richard Hughes)
+ - Show the time remaining when building metadata (Richard Hughes)
+ - Show what application addons extend in status.html (Richard Hughes)
+ - Validate for a sentence case start in <p>, <li> and <name> tags (Richard Hughes)
+
+Version 0.2.3
+~~~~~~~~~~~~~
+Released: 2014-07-17
+
+New Features:
+ - Add some simple filtering in the status.html page (Richard Hughes)
+ - Record if distro metadata and screenshots are being used (Richard Hughes)
+ - Show the builder progress in a ncurses-style panel (Richard Hughes)
+ - Support pre-decompressed RPMs (Richard Hughes)
+
+Bugfixes:
+ - Add oxygen-icon-theme when an application depends on kde-runtime (Richard Hughes)
+ - Be more careful with untrusted XML data (Richard Hughes)
+ - Do not allow duplicates to be added when using as_app_add_kudo_kind() (Richard Hughes)
+ - Do not fail to build packages with invalid KDE service files (Richard Hughes)
+ - Do not warn if the AppData file duplicates the .desktop value (Richard Hughes)
+ - Show any package duplicates when generating metadata (Richard Hughes)
+ - Show apps with missing icons in the failed metadata (Richard Hughes)
+
+Version 0.2.2
+~~~~~~~~~~~~~
+Released: 2014-07-11
+
+New Features:
+ - Add as_app_get_source_file() to return the file that created the AsApp (Richard Hughes)
+ - Add as_app_set_state() (Richard Hughes)
+ - Add as_app_set_trust_flags() (Richard Hughes)
+ - Add as_app_source_kind_to_string() (Richard Hughes)
+ - Add AS_APP_SUBSUME_FLAG_PARTIAL (Richard Hughes)
+ - Add a script to download the Fedora package cache (Richard Hughes)
+ - Add as_image_get_alpha_flags() (Richard Hughes)
+ - Add as_screenshot_get_image() (Richard Hughes)
+ - Add AS_STORE_ADD_FLAG_PREFER_LOCAL to allow the client to prefer local files (Richard Hughes)
+ - Add as_store_load_path() (Richard Hughes)
+ - Add as_store_set_add_flags() (Richard Hughes)
+ - Add a 'status-csv' command to appstream-util (Richard Hughes)
+ - Add as_utils_is_blacklisted_id() (Richard Hughes)
+ - Add --screenshot-dir to appstream-builder (Richard Hughes)
+ - Add some useful image size constants (Richard Hughes)
+ - Add support for <kudo> introduced in AppStream 0.8 (Richard Hughes)
+ - Add two new builder plugins to add kudos on KDE applications (Richard Hughes)
+ - Allow AsStore to load directories of AppData and desktop files (Richard Hughes)
+ - Remove asb_context_set_extra_checks() (Richard Hughes)
+ - Remove as_util_get_possible_kudos() as it's now unused (Richard Hughes)
+ - Sharpen resized screenshots after resizing with a cubic interpolation (Richard Hughes)
+
+Bugfixes:
+ - Allow calling as_image_set_pixbuf() with a NULL pixbuf (Richard Hughes)
+ - Allow install/uninstall xml.gz (Igor Gnatenko)
+ - Allow old applications in the metadata if they have AppData (Richard Hughes)
+ - Allow per-distro AppData files to be used when upstream supplies a broken one (Richard Hughes)
+ - Allow users to specify the location and name of the status files (Richard Hughes)
+ - Always check for duplicate screenshots when using as_app_subsume() (Richard Hughes)
+ - Always download data files for each application on Fedora (Richard Hughes)
+ - Always write a 'source' screenshot image (Richard Hughes)
+ - Assume local files are untrusted when parsing (Richard Hughes)
+ - Copy the icon kind when removing duplicates (Richard Hughes)
+ - Deallocate the pixbuf data when the AsbApp has been saved (Richard Hughes)
+ - Do not allow NoDisplay=true applications to ever be in the metadata (Richard Hughes)
+ - Do not allow RequiresAppdata to become true with AppData (Richard Hughes)
+ - Do not hardcode a blacklist of package extra deps (Richard Hughes)
+ - Fix linking with libarchive (Igor Gnatenko)
+ - Load extra screenshots for any apps created in appstream-extra (Richard Hughes)
+ - Never load SVG files at the native size (Richard Hughes)
+ - Never scale up small screenshots (Richard Hughes)
+ - Never upscale icons, either pad or downscale with sharpening (Richard Hughes)
+ - Never use release descriptions from package files (Richard Hughes)
+ - Promote DESKTOP sources to APPDATA if we subsume an appdata.xml file (Richard Hughes)
+ - Sort the <component> values alphabetically (Richard Hughes)
+ - Use as_image_get_alpha_flags() when validating and building metadata (Richard Hughes)
+ - Use realpath() when setting AsbContext paths (Richard Hughes)
+ - Validate screenshot captions (Richard Hughes)
+ - Write metadata of the failed applications (Richard Hughes)
+
+Version 0.2.1
+~~~~~~~~~~~~~
+Released: 2014-06-24
+
+New Features:
+ - Add AS_NODE_INSERT_FLAG_MARK_TRANSLATABLE (Richard Hughes)
+ - Add AS_NODE_TO_XML_FLAG_SORT_CHILDREN (Richard Hughes)
+ - Add an 'appstream-util upgrade' command to convert version < 0.6 metadata (Richard Hughes)
+ - Add as_node_find_with_attribute() (Richard Hughes)
+
+Bugfixes:
+ - Add packages recursively when using appstream-builder --packages-dir (Richard Hughes)
+ - Allow empty URL sections (Richard Hughes)
+ - Always use the latest version of AppStream for logs (Richard Hughes)
+ - Do not abort the build if a non-package file is found while building (Richard Hughes)
+ - Do not include <metadata> for pre-0.4 metadata (Richard Hughes)
+ - Do not ship Addons in metadata version less than 0.7 (Richard Hughes)
+ - Do not write X-Kudo-RecentRelease for new versions of the metadata (Richard Hughes)
+ - Fix the xmldir in the APPSTREAM_XML_RULES m4 helper (Richard Hughes)
+ - Include a newline before XML comments to help them stand out (Richard Hughes)
+
+Version 0.2.0
+~~~~~~~~~~~~~
+Released: 2014-06-19
+
+Notes:
+ - This is the first release that merges the createrepo_as project with this one.
+   A new experimental command 'appstream-builder' has been added and can be used
+   by distributors to build metadata. Normal users don't need this or the shared
+   library libappstream-bulder, and this can be split off into a subpackage by
+   downstream if required.
+ - We're slowly merging parts of appdata-tools into this project too, but we'll
+   provide more details when the merge is complete.
+
+New Features:
+ - Add an m4 file to easily validate AppData and MetaInfo files (Richard Hughes)
+ - Add a --nonet option to appstream-util (Richard Hughes)
+ - Add 'appstream appdata-from-desktop' to autogenerate a boilerplate file (Richard Hughes)
+ - Add as_app_get_mimetypes() (Richard Hughes)
+ - Add as_app_get_pkgname_default() (Richard Hughes)
+ - Add as_app_guess_source_kind() (Richard Hughes)
+ - Add as_app_to_file() (Richard Hughes)
+ - Add as_node_remove_attribute() (Richard Hughes)
+ - Add as_node_to_file() (Richard Hughes)
+ - Add bash-completion files for appstream-builder and appstream-util (Igor Gnatenko)
+ - Add <developer_name> from the draft AppStream 0.7 specification (Richard Hughes)
+ - Add manpages for appstream-util and appstream-builder (Richard Hughes)
+ - Add Russian translation (Igor Gnatenko)
+ - Allow installing AppData and MetaInfo files using appstream-util (Richard Hughes)
+ - Allow validating more types of files (Richard Hughes)
+ - Make the project translatable using transifex (Igor Gnatenko)
+
+Bugfixes:
+ - Accept slightly truncated SPDX IDs (Richard Hughes)
+ - Add a AsAppParseFlags flag to be able to append non-duplicate data (Richard Hughes)
+ - Add appstream-build from the createrepo_as project (Richard Hughes)
+ - Allow any SPDX license when validating in relaxed mode (Richard Hughes)
+ - Allow 'appstream-util convert' to work with two AppData files (Richard Hughes)
+ - Allow as_node_get_attribute_as_int() to parse negative numbers (Richard Hughes)
+ - Allow comments on the root XML node (Richard Hughes)
+ - Allow dumping .desktop, .appdata.xml and .metainfo.xml files in appstream-util (Richard Hughes)
+ - Do not add addons that are packaged in the parent package (Richard Hughes)
+ - Do not require a content license to be included into the metadata (Richard Hughes)
+ - Don't add the fake ApplicationAddon category for addons (Richard Hughes)
+ - Inherit search tokens from the addon to the main application (Richard Hughes)
+ - Return the URL in the validation error when screenshots fail to be loaded (Richard Hughes)
+ - Validate the <developer_name> tag values (Richard Hughes)
+
+Version 0.1.7
+~~~~~~~~~~~~~
+Released: 2014-06-12
+
+New Features:
+ - Add <extends> from the draft AppStream 0.7 specification (Richard Hughes)
+ - Add support for the 'dbus' AsProvideKind (Richard Hughes)
+ - Add support for validating metainfo.xml files (Richard Hughes)
+
+Bugfixes:
+ - Allow 'appstream-util validate' to validate multiple files (Richard Hughes)
+ - Automatically demangle the update contact (Richard Hughes)
+ - Correctly use convert-translatable when the source kind is already set (Richard Hughes)
+ - Do not log a critical warning in as_store_to_xml() (Richard Hughes)
+ - Do not write a screenshot type of 'normal' as it's the default value (Richard Hughes)
+ - Don't include the filename in the error output (Richard Hughes)
+ - Fail to validate AppData files with URLs in the descriptions (Richard Hughes)
+ - Fix a crash when we try to validate <p></p> (Richard Hughes)
+ - Support the non-standard X-Ubuntu-Software-Center-Name (Richard Hughes)
+
+Version 0.1.6
+~~~~~~~~~~~~~
+Released: 2014-05-28
+
+New Features:
+ - Add as_app_get_names() (Richard Hughes)
+ - Add as_image_get_basename() (Richard Hughes)
+ - Add as_image_get_md5() (Richard Hughes)
+ - Add as_image_load_filename() (Richard Hughes)
+ - Add as_image_save_filename() (Richard Hughes)
+ - Add as_image_save_pixbuf() (Richard Hughes)
+ - Add as_image_set_pixbuf() (Richard Hughes)
+ - Add as_node_get_comment() (Richard Hughes)
+ - Add AsProvide (Richard Hughes, Kalev Lember)
+ - Add as_screenshot_get_source() convenience helper (Richard Hughes)
+ - Add AS_TAG_FLAG_USE_TRANSLATED (Richard Hughes)
+ - Add validation for <releases> (Richard Hughes)
+
+Bugfixes:
+ - Also support validating .appdata.xml.in files (Richard Hughes)
+ - Correctly parse the localized descriptions from AppData files (Richard Hughes)
+ - Export as_app_set_source_kind() (Richard Hughes)
+ - Fix validation of old-style AppData files without screenshot sizes (Richard Hughes)
+ - Only autodetect the AsAppSourceKind when unknown (Richard Hughes)
+ - Only require <project_licence> when being strict (Richard Hughes)
+ - Only show the thumbnail when creating the HTML status page (Richard Hughes)
+ - Retain comments in .desktop and .appdata.xml files when required (Richard Hughes)
+ - Subsume more properties in AsApp (Richard Hughes)
+
+Version 0.1.5
+~~~~~~~~~~~~~
+Released: 2014-05-12
+
+New Features:
+ - Add as_app_has_category() (Richard Hughes)
+ - Add as_utils_check_url_exists() (Richard Hughes)
+ - Add as_utils_spdx_license_tokenize() (Richard Hughes)
+ - Add the new 'help' url type (Richard Hughes)
+ - Check the licenses against the SPDX list when validating (Richard Hughes)
+
+Bugfixes:
+ - Be less strict with the case of the XML header (Richard Hughes)
+ - Do not save the 'xx' locale (Richard Hughes)
+ - Do not validate AppData files without <project_license> (Richard Hughes)
+ - Don't crash when doing 'status-html' on an empty XML file (Richard Hughes)
+ - LXDE uses X-LXDE-Settings for settings panels (Richard Hughes)
+ - Only count desktop applications when doing the overview stats (Richard Hughes)
+ - Support AppData version 0.6 files too (Richard Hughes)
+ - Use SPDX license IDs in <metadata_license> (Richard Hughes)
+
+Version 0.1.4
+~~~~~~~~~~~~~
+Released: 2014-04-25
+
+Notes:
+ - This release adds a utility 'appstream-util' that can do simple operations
+   on AppStream metadata including generating status pages or converting the
+   metadata from one version to another.
+
+New Features:
+ - Add AsProblem to report non-critical problems with metadata
+ - Add as_app_get_metadata_license()
+ - Add as_app_get_source_kind()
+ - Add as_app_get_update_contact()
+ - Add as_app_subsume_full()
+ - Add as_app_validate() to validate AppStream and AppData files
+ - Add as_node_reflow_text() to reflow XML text properly
+ - Add as_node_set_name() internal method
+ - Add as_store_get_apps_by_metadata()
+ - Add as_util_get_possible_kudos()
+ - Add a flag to as_node_to_xml() so it can process all children
+ - Add a 'html-status' command to appstream-util
+ - Add a 'non-package-yaml' command to appstream-util
+ - Add a 'validate' command to appstream-util
+ - Parse AppData files when using as_app_parse_file()
+ - Read AppStream metadata from the per-machine location
+
+Bugfixes:
+ - Allow writing AppStream entries with an unknown type
+ - Do not add a 'type' attribute if the component type is unknown
+ - Do not crash if an AppStream entry has no ID
+ - Do not save metadata keys with an 'x-test' locale
+ - Do not try to parse non-application tags as applicatons
+ - Do not write xml:lang key versions when the same as the 'C' version
+ - Return -1 from as_app_get_language() if the language is not found
+ - Sort the application languages by name so they are predictable
+ - Support <screenshot> sections without <image>'s
+ - Support the AppStream 0.6.1 priority attribute
+ - Support translated <ul> and <ol> tags when normalizing
+ - When adding a duplicate AppStream application merge the entries
+
+Version 0.1.3
+~~~~~~~~~~~~~
+Released: 2014-04-10
+
+New Features:
+ - Add as_app_search_matches_all()
+ - Add as_utils_is_stock_icon_name()
+
+Bugfixes:
+ - Actually add mimetype data to the AsApp object
+ - Do not allow applications without icons
+ - Ignore settings panels when parsing desktop files
+ - Load AppStream files assuming literal text strings
+ - Only set app-install icons to cached if not already stock
+ - Set the icon kind to stock if it matches any stock icon
+ - Use the legacy names when using as_node_get_tag()
+
+Version 0.1.2
+~~~~~~~~~~~~~
+Released: 2014-03-26
+
+Notes:
+ - This release adds basic Ubuntu app-install support, speeds up the time taken
+   to parse large metadata files and reduces the amount of memory used to load
+   the AppStream metadata.
+
+New Features:
+ - Add as_app_parse_file() which parses a .desktop file into an AsApp
+ - Add as_node_get_tag() and only store the name when the tag is unknown
+ - Add as_node_take_attribute() to reduce allocations during parse
+ - Add as_store_load() to load system and user locations
+ - Add as_tag_from_string_full() to control whether fallback names are used
+ - Load the Ubuntu app-install data which uses screenshots.debian.net
+ - Use gperf to generate a perfect hash for the tag names
+
+Bugfixes:
+ - Do not use GHashTable to store node attributes
+ - Reduce the number of small attr key allocations
+ - Use the full ID for the AsStore hash
+
+Version 0.1.1
+~~~~~~~~~~~~~
+Released: 2014-03-21
+
+New Features:
+ - Add an 'api-version' property to AsStore
+ - Add as_store_from_xml() to load text XML not from a file
+ - Add the new AsUrlKind's and <architectures> from API 0.6
+ - Speed up as_tag_to_string() by using a table and a single lookup
+ - Support old-style markup-less <description> tags
+ - Support the 'origin' attribute on the root node
+
+Bugfixes:
+ - Do not crash when using getting an unset description
+ - Do not depend on functions introduced in Glib 2.39.1
+ - Fix parsing incompletely translated AppData files
+ - The 'appcategories' tag is now deprecated for 'categories'
+
+Version 0.1.0
+~~~~~~~~~~~~~
+Released: 2014-03-18
+
+Notes:
+ - This library provides GObjects and helper methods to make it easy to read and
+   write AppStream metadata.
+
+New Features:
+ - Add and search for applications in an application store
+ - Easily retrieve the best application data for the current locale
+ - Efficiently interface with more heavy-weight parsers like expat
+ - Get screenshot image data and release announcements
+ - Read and write compressed AppStream XML files

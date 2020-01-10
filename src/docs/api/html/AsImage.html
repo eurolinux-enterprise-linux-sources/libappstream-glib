@@ -1,0 +1,1124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AppStream-glib Reference Manual: AsImage</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="AppStream-glib Reference Manual">
+<link rel="up" href="libappstream-glib.html" title="libappstream-glib GObject library">
+<link rel="prev" href="AsIcon.html" title="AsIcon">
+<link rel="next" href="AsRelease.html" title="AsRelease">
+<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#AsImage.description" class="shortcut">Description</a></span><span id="nav_hierarchy">  <span class="dim">|</span> 
+                  <a href="#AsImage.object-hierarchy" class="shortcut">Object Hierarchy</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="libappstream-glib.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="AsIcon.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="AsRelease.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="AsImage"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="AsImage.top_of_page"></a>AsImage</span></h2>
+<p>AsImage — Object representing a single image used in a screenshot.</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="AsImage.stability-level"></a><h2>Stability Level</h2>
+<acronym title="The intention of a Stable interface is to enable arbitrary third parties to
+develop applications to these interfaces, release them, and have confidence that
+they will run on all minor releases of the product (after the one in which the
+interface was introduced, and within the same major release). Even at a major
+release, incompatible changes are expected to be rare, and to have strong
+justifications.
+"><span class="acronym">Stable</span></acronym>, unless otherwise indicated
+</div>
+<div class="refsect1">
+<a name="AsImage.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a class="link" href="AsImage.html" title="AsImage"><span class="returnvalue">AsImage</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-new" title="as_image_new ()">as_image_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="returnvalue">AsImageKind</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-kind-from-string" title="as_image_kind_from_string ()">as_image_kind_from_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-kind-to-string" title="as_image_kind_to_string ()">as_image_kind_to_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-url" title="as_image_get_url ()">as_image_get_url</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-md5" title="as_image_get_md5 ()">as_image_get_md5</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">gchar</span> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-basename" title="as_image_get_basename ()">as_image_get_basename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">guint</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-width" title="as_image_get_width ()">as_image_get_width</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">guint</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-height" title="as_image_get_height ()">as_image_get_height</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="returnvalue">AsImageKind</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-kind" title="as_image_get_kind ()">as_image_get_kind</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-pixbuf" title="as_image_get_pixbuf ()">as_image_get_pixbuf</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-url" title="as_image_set_url ()">as_image_set_url</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-basename" title="as_image_set_basename ()">as_image_set_basename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-width" title="as_image_set_width ()">as_image_set_width</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-height" title="as_image_set_height ()">as_image_set_height</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-kind" title="as_image_set_kind ()">as_image_set_kind</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-set-pixbuf" title="as_image_set_pixbuf ()">as_image_set_pixbuf</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags"><span class="returnvalue">AsImageAlphaFlags</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-get-alpha-flags" title="as_image_get_alpha_flags ()">as_image_get_alpha_flags</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-load-filename" title="as_image_load_filename ()">as_image_load_filename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-save-pixbuf" title="as_image_save_pixbuf ()">as_image_save_pixbuf</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="AsImage.html#as-image-save-filename" title="as_image_save_filename ()">as_image_save_filename</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsImage.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind">AsImageKind</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags">AsImageSaveFlags</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags">AsImageAlphaFlags</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-LARGE-HEIGHT:CAPS" title="AS_IMAGE_LARGE_HEIGHT">AS_IMAGE_LARGE_HEIGHT</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-LARGE-WIDTH:CAPS" title="AS_IMAGE_LARGE_WIDTH">AS_IMAGE_LARGE_WIDTH</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-NORMAL-HEIGHT:CAPS" title="AS_IMAGE_NORMAL_HEIGHT">AS_IMAGE_NORMAL_HEIGHT</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-NORMAL-WIDTH:CAPS" title="AS_IMAGE_NORMAL_WIDTH">AS_IMAGE_NORMAL_WIDTH</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-THUMBNAIL-HEIGHT:CAPS" title="AS_IMAGE_THUMBNAIL_HEIGHT">AS_IMAGE_THUMBNAIL_HEIGHT</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="AsImage.html#AS-IMAGE-THUMBNAIL-WIDTH:CAPS" title="AS_IMAGE_THUMBNAIL_WIDTH">AS_IMAGE_THUMBNAIL_WIDTH</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="AsImage.object-hierarchy"></a><h2>Object Hierarchy</h2>
+<pre class="screen">    GObject
+    <span class="lineart">╰──</span> AsImage
+</pre>
+</div>
+<div class="refsect1">
+<a name="AsImage.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;appstream-glib.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="AsImage.description"></a><h2>Description</h2>
+<p>Screenshot may have multiple versions of an image in different resolutions
+or aspect ratios. This object allows access to the location and size of a
+single image.</p>
+<p>See also: <a class="link" href="AsScreenshot.html" title="AsScreenshot"><span class="type">AsScreenshot</span></a></p>
+</div>
+<div class="refsect1">
+<a name="AsImage.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="as-image-new"></a><h3>as_image_new ()</h3>
+<pre class="programlisting"><a class="link" href="AsImage.html" title="AsImage"><span class="returnvalue">AsImage</span></a> *
+as_image_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Creates a new <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.2.5"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a>. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-kind-from-string"></a><h3>as_image_kind_from_string ()</h3>
+<pre class="programlisting"><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="returnvalue">AsImageKind</span></a>
+as_image_kind_from_string (<em class="parameter"><code>const <span class="type">gchar</span> *kind</code></em>);</pre>
+<p>Converts the text representation to an enumerated value.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.3.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>the string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.3.6"></a><h4>Returns</h4>
+<p> a <a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a>, or <a class="link" href="AsImage.html#AS-IMAGE-KIND-UNKNOWN:CAPS"><code class="literal">AS_IMAGE_KIND_UNKNOWN</code></a> for unknown. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-kind-to-string"></a><h3>as_image_kind_to_string ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_image_kind_to_string (<em class="parameter"><code><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a> kind</code></em>);</pre>
+<p>Converts the enumerated value to an text representation.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.4.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>the <a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.4.6"></a><h4>Returns</h4>
+<p> string version of <em class="parameter"><code>kind</code></em>
+</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-url"></a><h3>as_image_get_url ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_image_get_url (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the full qualified URL for the image, usually pointing at some mirror.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.5.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.5.6"></a><h4>Returns</h4>
+<p> URL</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-md5"></a><h3>as_image_get_md5 ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_image_get_md5 (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the string representation of the pixbuf hash value.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.6.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.6.6"></a><h4>Returns</h4>
+<p> string representing the MD5 sum, or <code class="literal">NULL</code> if unset</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-basename"></a><h3>as_image_get_basename ()</h3>
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
+as_image_get_basename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the suggested basename the image, including file extension.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.7.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.7.6"></a><h4>Returns</h4>
+<p> filename</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-width"></a><h3>as_image_get_width ()</h3>
+<pre class="programlisting"><span class="returnvalue">guint</span>
+as_image_get_width (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the image width.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.8.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.8.6"></a><h4>Returns</h4>
+<p> width in pixels</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-height"></a><h3>as_image_get_height ()</h3>
+<pre class="programlisting"><span class="returnvalue">guint</span>
+as_image_get_height (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the image height.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.9.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.9.6"></a><h4>Returns</h4>
+<p> height in pixels</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-kind"></a><h3>as_image_get_kind ()</h3>
+<pre class="programlisting"><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="returnvalue">AsImageKind</span></a>
+as_image_get_kind (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the image kind.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.10.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.10.6"></a><h4>Returns</h4>
+<p> the <a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a></p>
+<p></p>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-pixbuf"></a><h3>as_image_get_pixbuf ()</h3>
+<pre class="programlisting"><a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+as_image_get_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the image pixbuf if set.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.11.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.11.6"></a><h4>Returns</h4>
+<p> the <a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>, or <code class="literal">NULL</code>. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-url"></a><h3>as_image_set_url ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_url (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                  <em class="parameter"><code>const <span class="type">gchar</span> *url</code></em>,
+                  <em class="parameter"><code><span class="type">gssize</span> url_len</code></em>);</pre>
+<p>Sets the fully-qualified mirror URL to use for the image.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.12.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>url</p></td>
+<td class="parameter_description"><p>the URL.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>url_len</p></td>
+<td class="parameter_description"><p>the size of <em class="parameter"><code>url</code></em>
+, or -1 if <code class="literal">NULL</code>-terminated.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-basename"></a><h3>as_image_set_basename ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_basename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                       <em class="parameter"><code>const <span class="type">gchar</span> *basename</code></em>);</pre>
+<p>Sets the image basename filename.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.13.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>basename</p></td>
+<td class="parameter_description"><p>the new filename basename.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-width"></a><h3>as_image_set_width ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_width (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                    <em class="parameter"><code><span class="type">guint</span> width</code></em>);</pre>
+<p>Sets the image width.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.14.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>width</p></td>
+<td class="parameter_description"><p>the width in pixels.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-height"></a><h3>as_image_set_height ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_height (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                     <em class="parameter"><code><span class="type">guint</span> height</code></em>);</pre>
+<p>Sets the image height.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.15.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>height</p></td>
+<td class="parameter_description"><p>the height in pixels.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-kind"></a><h3>as_image_set_kind ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_kind (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                   <em class="parameter"><code><a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a> kind</code></em>);</pre>
+<p>Sets the image kind.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.16.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>kind</p></td>
+<td class="parameter_description"><p>the <a class="link" href="AsImage.html#AsImageKind" title="enum AsImageKind"><span class="type">AsImageKind</span></a>, e.g. <a class="link" href="AsImage.html#AS-IMAGE-KIND-THUMBNAIL:CAPS"><code class="literal">AS_IMAGE_KIND_THUMBNAIL</code></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-set-pixbuf"></a><h3>as_image_set_pixbuf ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+as_image_set_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                     <em class="parameter"><code><a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
+<p>Sets the image pixbuf.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.17.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>pixbuf</p></td>
+<td class="parameter_description"><p>the <a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>, or <code class="literal">NULL</code></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-get-alpha-flags"></a><h3>as_image_get_alpha_flags ()</h3>
+<pre class="programlisting"><a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags"><span class="returnvalue">AsImageAlphaFlags</span></a>
+as_image_get_alpha_flags (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>);</pre>
+<p>Gets the alpha flags for the image. The following image would have all flags
+set, where 'x' is alpha and '@' is non-alpha.</p>
+<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xx@@@@@@@@@@@@@@@@@@@@@@@<em class="parameter"><code>xx</code></em>
+
+xx@@@@@@<em class="parameter"><code>xxxxxx</code></em>
+@@@@@@@@@@<em class="parameter"><code>xx</code></em>
+
+xx@@@@@@<em class="parameter"><code>xxxxxx</code></em>
+@@@@@@@@@@<em class="parameter"><code>xx</code></em>
+
+xx@@@@@@@@@@@@@@@@@@@@@@@<em class="parameter"><code>xx</code></em>
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.18.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.18.7"></a><h4>Returns</h4>
+<p> <a class="link" href="AsImage.html#AsImageAlphaFlags" title="enum AsImageAlphaFlags"><span class="type">AsImageAlphaFlags</span></a>, e.g. <a class="link" href="AsImage.html#AS-IMAGE-ALPHA-FLAG-LEFT:CAPS"><code class="literal">AS_IMAGE_ALPHA_FLAG_LEFT</code></a></p>
+<p></p>
+</div>
+<p class="since">Since 0.2.2</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-load-filename"></a><h3>as_image_load_filename ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_image_load_filename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                        <em class="parameter"><code>const <span class="type">gchar</span> *filename</code></em>,
+                        <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Reads a pixbuf from a file.</p>
+<p>NOTE: This function also sets the suggested filename which can be retrieved
+using <a class="link" href="AsImage.html#as-image-get-basename" title="as_image_get_basename ()"><code class="function">as_image_get_basename()</code></a>. This can be overridden if required.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.19.6"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>filename</p></td>
+<td class="parameter_description"><p>filename to read from</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.19.7"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-save-pixbuf"></a><h3>as_image_save_pixbuf ()</h3>
+<pre class="programlisting"><a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="returnvalue">GdkPixbuf</span></a> *
+as_image_save_pixbuf (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                      <em class="parameter"><code><span class="type">guint</span> width</code></em>,
+                      <em class="parameter"><code><span class="type">guint</span> height</code></em>,
+                      <em class="parameter"><code><a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags"><span class="type">AsImageSaveFlags</span></a> flags</code></em>);</pre>
+<p>Resamples a pixbuf to a specific size.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.20.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>width</p></td>
+<td class="parameter_description"><p>target width, or 0 for default</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>height</p></td>
+<td class="parameter_description"><p>target height, or 0 for default</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>some <a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags"><span class="type">AsImageSaveFlags</span></a> values, e.g. <a class="link" href="AsImage.html#AS-IMAGE-SAVE-FLAG-PAD-16-9:CAPS"><code class="literal">AS_IMAGE_SAVE_FLAG_PAD_16_9</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.20.6"></a><h4>Returns</h4>
+<p> A <a href="http://library.gnome.org/devel/gdk-pixbuf/unstable/gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> of the specified size. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="as-image-save-filename"></a><h3>as_image_save_filename ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+as_image_save_filename (<em class="parameter"><code><a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> *image</code></em>,
+                        <em class="parameter"><code>const <span class="type">gchar</span> *filename</code></em>,
+                        <em class="parameter"><code><span class="type">guint</span> width</code></em>,
+                        <em class="parameter"><code><span class="type">guint</span> height</code></em>,
+                        <em class="parameter"><code><a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags"><span class="type">AsImageSaveFlags</span></a> flags</code></em>,
+                        <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
+<p>Saves a pixbuf to a file.</p>
+<div class="refsect3">
+<a name="id-1.2.5.9.21.5"></a><h4>Parameters</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>image</p></td>
+<td class="parameter_description"><p>a <a class="link" href="AsImage.html" title="AsImage"><span class="type">AsImage</span></a> instance.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>filename</p></td>
+<td class="parameter_description"><p>filename to write to</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>width</p></td>
+<td class="parameter_description"><p>target width, or 0 for default</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>height</p></td>
+<td class="parameter_description"><p>target height, or 0 for default</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>some <a class="link" href="AsImage.html#AsImageSaveFlags" title="enum AsImageSaveFlags"><span class="type">AsImageSaveFlags</span></a> values, e.g. <a class="link" href="AsImage.html#AS-IMAGE-SAVE-FLAG-PAD-16-9:CAPS"><code class="literal">AS_IMAGE_SAVE_FLAG_PAD_16_9</code></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>A <span class="type">GError</span> or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="id-1.2.5.9.21.6"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> for success</p>
+<p></p>
+</div>
+<p class="since">Since 0.1.6</p>
+</div>
+</div>
+<div class="refsect1">
+<a name="AsImage.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="AsImageKind"></a><h3>enum AsImageKind</h3>
+<p>The image type.</p>
+<div class="refsect3">
+<a name="id-1.2.5.10.2.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-KIND-UNKNOWN:CAPS"></a>AS_IMAGE_KIND_UNKNOWN</p></td>
+<td class="enum_member_description">
+<p>Type invalid or not known</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-KIND-SOURCE:CAPS"></a>AS_IMAGE_KIND_SOURCE</p></td>
+<td class="enum_member_description">
+<p>The source image at full resolution</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-KIND-THUMBNAIL:CAPS"></a>AS_IMAGE_KIND_THUMBNAIL</p></td>
+<td class="enum_member_description">
+<p>A thumbnail at reduced resolution</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsImageSaveFlags"></a><h3>enum AsImageSaveFlags</h3>
+<p>The flags used for saving images.</p>
+<div class="refsect3">
+<a name="id-1.2.5.10.3.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-SAVE-FLAG-NONE:CAPS"></a>AS_IMAGE_SAVE_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No special flags set</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-SAVE-FLAG-PAD-16-9:CAPS"></a>AS_IMAGE_SAVE_FLAG_PAD_16_9</p></td>
+<td class="enum_member_description">
+<p>Pad with alpha to 16:9 aspect</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-SAVE-FLAG-SHARPEN:CAPS"></a>AS_IMAGE_SAVE_FLAG_SHARPEN</p></td>
+<td class="enum_member_description"> </td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-SAVE-FLAG-BLUR:CAPS"></a>AS_IMAGE_SAVE_FLAG_BLUR</p></td>
+<td class="enum_member_description"> </td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AsImageAlphaFlags"></a><h3>enum AsImageAlphaFlags</h3>
+<p>The flags used for reporting the alpha cutouts in the image.</p>
+<div class="refsect3">
+<a name="id-1.2.5.10.4.4"></a><h4>Members</h4>
+<div class="informaltable"><table width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-NONE:CAPS"></a>AS_IMAGE_ALPHA_FLAG_NONE</p></td>
+<td class="enum_member_description">
+<p>No padding detected</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-TOP:CAPS"></a>AS_IMAGE_ALPHA_FLAG_TOP</p></td>
+<td class="enum_member_description">
+<p>Padding detected at the image top</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-BOTTOM:CAPS"></a>AS_IMAGE_ALPHA_FLAG_BOTTOM</p></td>
+<td class="enum_member_description">
+<p>Padding detected at the image bottom</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-LEFT:CAPS"></a>AS_IMAGE_ALPHA_FLAG_LEFT</p></td>
+<td class="enum_member_description">
+<p>Padding detected at the image left side</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-RIGHT:CAPS"></a>AS_IMAGE_ALPHA_FLAG_RIGHT</p></td>
+<td class="enum_member_description">
+<p>Padding detected at the image right side</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="AS-IMAGE-ALPHA-FLAG-INTERNAL:CAPS"></a>AS_IMAGE_ALPHA_FLAG_INTERNAL</p></td>
+<td class="enum_member_description">
+<p>Internal alpha cut out areas detected</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-LARGE-HEIGHT:CAPS"></a><h3>AS_IMAGE_LARGE_HEIGHT</h3>
+<pre class="programlisting">#define AS_IMAGE_LARGE_HEIGHT		423 /* Since: 0.2.2 */
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-LARGE-WIDTH:CAPS"></a><h3>AS_IMAGE_LARGE_WIDTH</h3>
+<pre class="programlisting">#define AS_IMAGE_LARGE_WIDTH		752 /* Since: 0.2.2 */
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-NORMAL-HEIGHT:CAPS"></a><h3>AS_IMAGE_NORMAL_HEIGHT</h3>
+<pre class="programlisting">#define AS_IMAGE_NORMAL_HEIGHT		351 /* Since: 0.2.2 */
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-NORMAL-WIDTH:CAPS"></a><h3>AS_IMAGE_NORMAL_WIDTH</h3>
+<pre class="programlisting">#define AS_IMAGE_NORMAL_WIDTH		624 /* Since: 0.2.2 */
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-THUMBNAIL-HEIGHT:CAPS"></a><h3>AS_IMAGE_THUMBNAIL_HEIGHT</h3>
+<pre class="programlisting">#define AS_IMAGE_THUMBNAIL_HEIGHT 63 /* Since: 0.2.2 */
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="AS-IMAGE-THUMBNAIL-WIDTH:CAPS"></a><h3>AS_IMAGE_THUMBNAIL_WIDTH</h3>
+<pre class="programlisting">#define AS_IMAGE_THUMBNAIL_WIDTH 	112 /* Since: 0.2.2 */
+</pre>
+<p>
+</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>
+          Generated by GTK-Doc V1.21</div>
+</body>
+</html>

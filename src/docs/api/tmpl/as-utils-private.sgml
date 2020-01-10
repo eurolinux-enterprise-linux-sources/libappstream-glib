@@ -1,0 +1,62 @@
+<!-- ##### SECTION Title ##### -->
+as-utils-private
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION as_strndup ##### -->
+<para>
+
+</para>
+
+@text: 
+@text_len: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_hash_lookup_by_locale ##### -->
+<para>
+
+</para>
+
+@hash: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_pixbuf_sharpen ##### -->
+<para>
+
+</para>
+
+@src: 
+@radius: 
+@amount: 
+
+
+<!-- ##### FUNCTION as_pixbuf_blur ##### -->
+<para>
+
+</para>
+
+@src: 
+@radius: 
+@iterations: 
+
+

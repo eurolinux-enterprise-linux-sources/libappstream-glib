@@ -1,0 +1,1138 @@
+<!-- ##### SECTION Title ##### -->
+AsApp
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### ENUM AsAppParseFlags ##### -->
+<para>
+
+</para>
+
+@AS_APP_PARSE_FLAG_NONE: 
+@AS_APP_PARSE_FLAG_USE_HEURISTICS: 
+@AS_APP_PARSE_FLAG_KEEP_COMMENTS: 
+@AS_APP_PARSE_FLAG_CONVERT_TRANSLATABLE: 
+@AS_APP_PARSE_FLAG_APPEND_DATA: 
+@AS_APP_PARSE_FLAG_ALLOW_VETO: 
+
+<!-- ##### ENUM AsAppSubsumeFlags ##### -->
+<para>
+
+</para>
+
+@AS_APP_SUBSUME_FLAG_NONE: 
+@AS_APP_SUBSUME_FLAG_NO_OVERWRITE: 
+@AS_APP_SUBSUME_FLAG_BOTH_WAYS: 
+@AS_APP_SUBSUME_FLAG_PARTIAL: 
+
+<!-- ##### ENUM AsAppError ##### -->
+<para>
+
+</para>
+
+@AS_APP_ERROR_FAILED: 
+@AS_APP_ERROR_INVALID_TYPE: 
+
+<!-- ##### ENUM AsAppValidateFlags ##### -->
+<para>
+
+</para>
+
+@AS_APP_VALIDATE_FLAG_NONE: 
+@AS_APP_VALIDATE_FLAG_RELAX: 
+@AS_APP_VALIDATE_FLAG_STRICT: 
+@AS_APP_VALIDATE_FLAG_NO_NETWORK: 
+@AS_APP_VALIDATE_FLAG_ALL_APPS: 
+
+<!-- ##### ENUM AsAppTrustFlags ##### -->
+<para>
+
+</para>
+
+@AS_APP_TRUST_FLAG_COMPLETE: 
+@AS_APP_TRUST_FLAG_CHECK_DUPLICATES: 
+@AS_APP_TRUST_FLAG_CHECK_VALID_UTF8: 
+
+<!-- ##### ENUM AsAppSourceKind ##### -->
+<para>
+
+</para>
+
+@AS_APP_SOURCE_KIND_UNKNOWN: 
+@AS_APP_SOURCE_KIND_APPSTREAM: 
+@AS_APP_SOURCE_KIND_DESKTOP: 
+@AS_APP_SOURCE_KIND_APPDATA: 
+@AS_APP_SOURCE_KIND_METAINFO: 
+@AS_APP_SOURCE_KIND_INF: 
+
+<!-- ##### ENUM AsAppState ##### -->
+<para>
+
+</para>
+
+@AS_APP_STATE_UNKNOWN: 
+@AS_APP_STATE_INSTALLED: 
+@AS_APP_STATE_AVAILABLE: 
+@AS_APP_STATE_AVAILABLE_LOCAL: 
+@AS_APP_STATE_UPDATABLE: 
+@AS_APP_STATE_UNAVAILABLE: 
+@AS_APP_STATE_QUEUED_FOR_INSTALL: 
+@AS_APP_STATE_INSTALLING: 
+@AS_APP_STATE_REMOVING: 
+
+<!-- ##### MACRO AS_APP_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION as_app_new ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_error_quark ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_guess_source_kind ##### -->
+<para>
+
+</para>
+
+@filename: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_source_kind_from_string ##### -->
+<para>
+
+</para>
+
+@source_kind: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_source_kind_to_string ##### -->
+<para>
+
+</para>
+
+@source_kind: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_state_to_string ##### -->
+<para>
+
+</para>
+
+@state: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_id_kind ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_source_kind ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_state ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_trust_flags ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_languages ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_addons ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_categories ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_compulsory_for_desktops ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_extends ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_keywords ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_kudos ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_permissions ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_mimetypes ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_pkgnames ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_architectures ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_releases ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_provides ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_screenshots ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_icons ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_bundles ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_names ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_comments ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_developer_names ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_metadata ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_descriptions ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_urls ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_vetos ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_icon_path ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_id_filename ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_id ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_pkgname_default ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_source_pkgname ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_origin ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_project_group ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_project_license ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_metadata_license ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_update_contact ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_source_file ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_name ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_comment ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_developer_name ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_description ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_priority ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_language ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_metadata_item ##### -->
+<para>
+
+</para>
+
+@app: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_url_item ##### -->
+<para>
+
+</para>
+
+@app: 
+@url_kind: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_has_category ##### -->
+<para>
+
+</para>
+
+@app: 
+@category: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_has_kudo ##### -->
+<para>
+
+</para>
+
+@app: 
+@kudo: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_has_kudo_kind ##### -->
+<para>
+
+</para>
+
+@app: 
+@kudo: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_has_permission ##### -->
+<para>
+
+</para>
+
+@app: 
+@permission: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_set_id ##### -->
+<para>
+
+</para>
+
+@app: 
+@id: 
+@id_len: 
+
+
+<!-- ##### FUNCTION as_app_set_id_kind ##### -->
+<para>
+
+</para>
+
+@app: 
+@id_kind: 
+
+
+<!-- ##### FUNCTION as_app_set_source_kind ##### -->
+<para>
+
+</para>
+
+@app: 
+@source_kind: 
+
+
+<!-- ##### FUNCTION as_app_set_state ##### -->
+<para>
+
+</para>
+
+@app: 
+@state: 
+
+
+<!-- ##### FUNCTION as_app_set_trust_flags ##### -->
+<para>
+
+</para>
+
+@app: 
+@trust_flags: 
+
+
+<!-- ##### FUNCTION as_app_set_origin ##### -->
+<para>
+
+</para>
+
+@app: 
+@origin: 
+
+
+<!-- ##### FUNCTION as_app_set_project_group ##### -->
+<para>
+
+</para>
+
+@app: 
+@project_group: 
+@project_group_len: 
+
+
+<!-- ##### FUNCTION as_app_set_project_license ##### -->
+<para>
+
+</para>
+
+@app: 
+@project_license: 
+@project_license_len: 
+
+
+<!-- ##### FUNCTION as_app_set_metadata_license ##### -->
+<para>
+
+</para>
+
+@app: 
+@metadata_license: 
+@metadata_license_len: 
+
+
+<!-- ##### FUNCTION as_app_set_source_pkgname ##### -->
+<para>
+
+</para>
+
+@app: 
+@source_pkgname: 
+@source_pkgname_len: 
+
+
+<!-- ##### FUNCTION as_app_set_update_contact ##### -->
+<para>
+
+</para>
+
+@app: 
+@update_contact: 
+@update_contact_len: 
+
+
+<!-- ##### FUNCTION as_app_set_icon_path ##### -->
+<para>
+
+</para>
+
+@app: 
+@icon_path: 
+@icon_path_len: 
+
+
+<!-- ##### FUNCTION as_app_set_name ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@name: 
+@name_len: 
+
+
+<!-- ##### FUNCTION as_app_set_comment ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@comment: 
+@comment_len: 
+
+
+<!-- ##### FUNCTION as_app_set_developer_name ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@developer_name: 
+@developer_name_len: 
+
+
+<!-- ##### FUNCTION as_app_set_description ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@description: 
+@description_len: 
+
+
+<!-- ##### FUNCTION as_app_set_source_file ##### -->
+<para>
+
+</para>
+
+@app: 
+@source_file: 
+
+
+<!-- ##### FUNCTION as_app_set_priority ##### -->
+<para>
+
+</para>
+
+@app: 
+@priority: 
+
+
+<!-- ##### FUNCTION as_app_add_category ##### -->
+<para>
+
+</para>
+
+@app: 
+@category: 
+@category_len: 
+
+
+<!-- ##### FUNCTION as_app_add_keyword ##### -->
+<para>
+
+</para>
+
+@app: 
+@locale: 
+@keyword: 
+@keyword_len: 
+
+
+<!-- ##### FUNCTION as_app_add_kudo ##### -->
+<para>
+
+</para>
+
+@app: 
+@kudo: 
+@kudo_len: 
+
+
+<!-- ##### FUNCTION as_app_add_kudo_kind ##### -->
+<para>
+
+</para>
+
+@app: 
+@kudo_kind: 
+
+
+<!-- ##### FUNCTION as_app_add_permission ##### -->
+<para>
+
+</para>
+
+@app: 
+@permission: 
+@permission_len: 
+
+
+<!-- ##### FUNCTION as_app_add_mimetype ##### -->
+<para>
+
+</para>
+
+@app: 
+@mimetype: 
+@mimetype_len: 
+
+
+<!-- ##### FUNCTION as_app_add_pkgname ##### -->
+<para>
+
+</para>
+
+@app: 
+@pkgname: 
+@pkgname_len: 
+
+
+<!-- ##### FUNCTION as_app_add_arch ##### -->
+<para>
+
+</para>
+
+@app: 
+@arch: 
+@arch_len: 
+
+
+<!-- ##### FUNCTION as_app_add_release ##### -->
+<para>
+
+</para>
+
+@app: 
+@release: 
+
+
+<!-- ##### FUNCTION as_app_add_provide ##### -->
+<para>
+
+</para>
+
+@app: 
+@provide: 
+
+
+<!-- ##### FUNCTION as_app_add_screenshot ##### -->
+<para>
+
+</para>
+
+@app: 
+@screenshot: 
+
+
+<!-- ##### FUNCTION as_app_add_icon ##### -->
+<para>
+
+</para>
+
+@app: 
+@icon: 
+
+
+<!-- ##### FUNCTION as_app_add_bundle ##### -->
+<para>
+
+</para>
+
+@app: 
+@bundle: 
+
+
+<!-- ##### FUNCTION as_app_add_language ##### -->
+<para>
+
+</para>
+
+@app: 
+@percentage: 
+@locale: 
+@locale_len: 
+
+
+<!-- ##### FUNCTION as_app_add_compulsory_for_desktop ##### -->
+<para>
+
+</para>
+
+@app: 
+@compulsory_for_desktop: 
+@compulsory_for_desktop_len: 
+
+
+<!-- ##### FUNCTION as_app_add_url ##### -->
+<para>
+
+</para>
+
+@app: 
+@url_kind: 
+@url: 
+@url_len: 
+
+
+<!-- ##### FUNCTION as_app_add_metadata ##### -->
+<para>
+
+</para>
+
+@app: 
+@key: 
+@value: 
+@value_len: 
+
+
+<!-- ##### FUNCTION as_app_remove_metadata ##### -->
+<para>
+
+</para>
+
+@app: 
+@key: 
+
+
+<!-- ##### FUNCTION as_app_add_addon ##### -->
+<para>
+
+</para>
+
+@app: 
+@addon: 
+
+
+<!-- ##### FUNCTION as_app_add_extends ##### -->
+<para>
+
+</para>
+
+@app: 
+@extends: 
+@extends_len: 
+
+
+<!-- ##### FUNCTION as_app_validate ##### -->
+<para>
+
+</para>
+
+@app: 
+@flags: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_subsume ##### -->
+<para>
+
+</para>
+
+@app: 
+@donor: 
+
+
+<!-- ##### FUNCTION as_app_subsume_full ##### -->
+<para>
+
+</para>
+
+@app: 
+@donor: 
+@flags: 
+
+
+<!-- ##### FUNCTION as_app_add_veto ##### -->
+<para>
+
+</para>
+
+@app: 
+@fmt: 
+@...: 
+
+
+<!-- ##### FUNCTION as_app_search_matches_all ##### -->
+<para>
+
+</para>
+
+@app: 
+@search: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_search_matches ##### -->
+<para>
+
+</para>
+
+@app: 
+@search: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_parse_file ##### -->
+<para>
+
+</para>
+
+@app: 
+@filename: 
+@flags: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_to_file ##### -->
+<para>
+
+</para>
+
+@app: 
+@file: 
+@cancellable: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_icon_default ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_icon_for_size ##### -->
+<para>
+
+</para>
+
+@app: 
+@width: 
+@height: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_bundle_default ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_release ##### -->
+<para>
+
+</para>
+
+@app: 
+@version: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_get_release_default ##### -->
+<para>
+
+</para>
+
+@app: 
+@Returns: 
+
+
+<!-- ##### FUNCTION as_app_convert_icons ##### -->
+<para>
+
+</para>
+
+@app: 
+@kind: 
+@error: 
+@Returns: 
+
+
